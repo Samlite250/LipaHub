@@ -27,19 +27,16 @@ The root configuration includes the backend output and shared JSON in the functi
 
 ## 3. Environment variables
 
-Set these in Vercel before building the production deployment:
+The repository already knows the project URL through `shared/deployment.json`. The frontend and API share the same validated public key. Only two private environment entries are required in Vercel, unless an authorized connection configures them for you:
 
 | Variable | Value |
 | --- | --- |
-| `VITE_SUPABASE_URL` | `https://pzxmfdqfsoltoqgflxcm.supabase.co` |
-| `SUPABASE_URL` | The same URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase publishable/anon key |
-| `SUPABASE_ANON_KEY` | The same publishable/anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase secret/service-role key, server-only |
-| `VITE_ENABLE_DEMO` | `false` |
-| `VITE_API_URL` | Leave unset/empty for this combined deployment |
-| `PAYMENT_PROOF_INTAKE_ENABLED` | `false` until real private-storage and account checks are complete |
-| `UPSTREAM_TIMEOUT_MS` | `10000` |
+| `SUPABASE_ANON_KEY` | The Supabase publishable/anon key; also accepts `SUPABASE_PUBLISHABLE_KEY` |
+| `SUPABASE_SERVICE_ROLE_KEY` | The Supabase secret/service-role key; server-only |
+
+No duplicate `VITE_*` keys, API URL, build commands or output settings need to be entered. Production demo access and payment proof intake default to disabled. Existing explicit `VITE_SUPABASE_*` values remain supported. A secret placed in a public-key setting causes the build to fail rather than exposing it.
+
+Private server secrets cannot be stored in GitHub. An authenticated Vercel connection is needed if the assistant is to configure those entries on your behalf. Merely importing the source cannot obtain missing account credentials.
 
 The function derives its HTTPS website origin from Vercel system variables when `WEB_ORIGIN` is unset. An explicit `WEB_ORIGIN` can override it. Preview deployments use their own URL. The Vercel entry defaults the trusted proxy hop count to 1; local servers remain at 0. Review proxy settings again if another CDN/proxy is later introduced.
 
@@ -47,7 +44,7 @@ Keep private keys in the server environment only. Rebuild/redeploy after changin
 
 ## 4. Supabase setup
 
-Apply migrations 001 through 008, once and in order, using [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, confirmation email delivery and the first trusted administrator.
+For a new empty database, run `Backend/setup/new-project.sql` once, or authorize Supabase so the assistant can apply it. That file contains migrations 001 through 008 in order. Existing databases must apply only their missing migrations; see [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, confirmation email delivery and the first trusted administrator.
 
 After Vercel returns the production `https://...vercel.app` URL, set that as the Supabase Auth Site URL and allow these redirects:
 

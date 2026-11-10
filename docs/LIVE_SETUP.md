@@ -4,6 +4,8 @@ The app uses a React frontend, a separate Express API and a Supabase project. No
 
 ## 1. Create and configure the project
 
+For a new empty project, the same ordered setup is available in `Backend/setup/new-project.sql`. Existing projects must apply only missing migrations.
+
 Create a Supabase project in your account. Keep the database password and server secret private. In its SQL editor, apply these files **once, in order**:
 
 1. `Backend/migrations/001_robot_payment_proofs.sql`

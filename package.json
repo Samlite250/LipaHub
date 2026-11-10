@@ -16,7 +16,8 @@
     "test": "npm run build --workspace Backend && playwright test",
     "test:db": "node --test Backend/tests/*.test.mjs",
     "check": "npm run lint && npm run build && npm run test:db && npm test",
-    "backend:check": "node Backend/scripts/check-backend.mjs"
+    "backend:check": "node Backend/scripts/check-backend.mjs",
+    "setup:sql": "node Backend/scripts/build-setup.mjs"
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": {
