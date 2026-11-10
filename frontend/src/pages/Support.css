@@ -1,0 +1,23 @@
+.support-workspace { display: grid; gap: 20px; }
+.support-heading { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.support-heading h2,.support-heading h3 { margin: 5px 0 10px; }
+.support-heading p { color: var(--muted); margin: 0; }
+.support-grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.3fr); gap: 20px; align-items: start; }
+.support-grid>div { min-width: 0; }
+.support-form,.support-list,.support-thread,.support-empty { padding: 24px; }
+.support-form { display: grid; gap: 16px; margin-bottom: 20px; }
+.support-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 16px; min-width: 0; }
+.support-form label { display: grid; gap: 8px; font-weight: 600; }
+.support-form input,.support-form textarea { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; resize: vertical; }
+.support-form p { margin: 0; font-size: 12px; }
+.support-list>button { display: grid; grid-template-columns: 1fr auto; width: 100%; text-align: left; padding: 16px 0; gap: 8px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; }
+.support-list>button[aria-pressed=true] { color: var(--teal); }
+.support-list strong,.support-thread small { overflow-wrap: anywhere; }
+.support-list small { grid-column: 1 / -1; color: var(--muted); overflow-wrap: anywhere; }
+.support-messages { display: grid; gap: 14px; margin: 24px 0; }
+.support-message { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.support-message.admin { border-left: 3px solid #14b8a6; }
+.support-message time { display: block; font-size: 11px; color: var(--muted); margin-top: 5px; }
+.support-message p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin-bottom: 0; }
+.support-empty { text-align: center; color: var(--muted); }
+@media(max-width: 800px) { .support-grid { grid-template-columns: minmax(0, 1fr); } .support-heading { flex-wrap: wrap; } .support-thread,.support-form,.support-list { padding: 18px; } }

@@ -1,0 +1,8 @@
+Google Material Design Icons
+Copyright Google LLC
+https://github.com/google/material-design-icons
+Licensed under Apache License 2.0. See material-icons-LICENSE.txt.
+
+The SVG artwork used for the service balance icons is retained from the
+supplied reference. Paths and geometric shapes are unchanged; the root
+fill is set to white and presentation-only attributes are removed.

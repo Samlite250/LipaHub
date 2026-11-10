@@ -1,0 +1,13 @@
+Font Awesome Free icons
+Copyright Fonticons, Inc.
+https://fontawesome.com/
+https://fontawesome.com/license/free
+
+The WhatsApp, Twitter, square Facebook and envelope SVG icon artwork used in
+LipaHub's invite-sharing controls is licensed under Creative Commons
+Attribution 4.0 International (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+The SVG paths and view boxes are unchanged from the Font Awesome icons in
+the supplied reference. They are rendered in a local React component with
+matching colors. No affiliation with the represented brands is implied.

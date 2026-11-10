@@ -1,0 +1,15 @@
+node_modules
+.npm-cache
+.git
+.github
+Materials-References
+artifacts
+playwright-report
+test-results
+tests
+Backend/tests
+docs
+**/.env
+**/.env.*
+**/*.local
+**/*.tsbuildinfo

@@ -1,0 +1,38 @@
+export const dictionary = {
+  en: {
+    home: 'Home', dashboard: 'Dashboard', signin: 'Sign In', signup: 'Sign Up',
+    welcome: 'Welcome back to LipaHub!', create: 'Get Started', createSub: 'Welcome, start your journey with us!',
+    username: 'Username', email: 'Email', password: 'Password', confirm: 'Confirm password', phone: 'Telephone', country: 'Country',
+    forgot: 'Forgot password?', remember: 'Remember me', noAccount: "Don’t have an account?", hasAccount: 'Already have an account?',
+    agree: 'By creating an account, I agree to the', terms: 'Terms of Use', privacy: 'Privacy Policy', and: 'and',
+    main: 'Main', accounts: 'Accounts', products: 'Products', explore: 'Explore', settings: 'Settings', profile: 'Profile', support: 'Support', logout: 'Log out',
+    hello: 'Hello', member: 'Member', wallet: 'My wallet', total: 'Total earnings', expense: 'Expense', once: 'one-time',
+    balance: 'Balance', withdrawn: 'Withdrawn', affiliate: 'Affiliate earnings', bonus: 'Agent bonus', allTime: 'All time',
+    referrals: 'Referrals', mix: 'Earnings mix', last7: 'Last 7 days', today: 'Today', week: 'This week', actions: 'Quick actions',
+    deposit: 'Deposit', withdraw: 'Withdraw', voucher: 'Voucher', ranks: 'Ranks', surveys: 'Surveys', courses: 'Courses',
+    chat: 'Chat & Earn', trading: 'Crypto Robotic Trading', demo: 'Demo workspace', demoNote: 'Sample balances only. No real money or rewards.',
+    demoEnter: 'Explore the demo', back: 'Back to sign in', reset: 'Reset password', resetSub: 'Enter your email to request a reset link.',
+    send: 'Send reset link', appearance: 'Appearance', light: 'Light', dark: 'Dark', language: 'Language',
+    intro: 'Your learning, community and activity, all in one place.', simulated: 'Simulation only', planned: 'Planned',
+    invite: 'Invite link', copy: 'Copy link', goal: 'Agent bonus goal', service: 'Service balance', timetable: 'Activity timetable',
+  },
+  rw: {
+    home: 'Ahabanza', dashboard: 'Incamake', signin: 'Injira', signup: 'Fungura Konti',
+    welcome: 'Murakaza neza kuri LipaHub!', create: 'Tangira Nonaha', createSub: 'Murakaza neza, Tangira nawe wiyandikishe!',
+    username: 'Shyiramo izina', email: 'Imeri', password: 'Pasuwadi uzajya ukoresha', confirm: 'Subiramo pasuwadi', phone: 'Telephone', country: 'Igihugu',
+    forgot: 'Wibagiwe pasuwadi?', remember: 'Nyibuka', noAccount: 'Nta konti ufite?', hasAccount: 'Usanzwe ufite konti?',
+    agree: 'Mu gufungura konti, wemera', terms: 'Amabwiriza n’Amasezerano', privacy: 'Politiki y’ibanga', and: 'na',
+    main: 'Ibanze', accounts: 'Konti', products: 'Ibicuruzwa', explore: 'Shakisha', settings: 'Igenamiterere', profile: 'Umwirondoro', support: 'Ubufasha', logout: 'Sohoka',
+    hello: 'Muraho', member: 'Umunyamuryango', wallet: 'Ikofi yanjye', total: 'Amafaranga yose', expense: 'Ibyakoreshejwe', once: 'rimwe',
+    balance: 'Asigaye', withdrawn: 'Ayabikujwe', affiliate: 'Ayo kwamamaza', bonus: 'Agahimbazamusyi', allTime: 'Igihe cyose',
+    referrals: 'Abatumirwa', mix: 'Inkomoko y’amafaranga', last7: 'Iminsi 7 ishize', today: 'Uyu munsi', week: 'Iki cyumweru', actions: 'Ibikorwa byihuse',
+    deposit: 'Bika', withdraw: 'Bikuza', voucher: 'Vawushe', ranks: 'Urutonde', surveys: 'Ubushakashatsi', courses: 'Amasomo',
+    chat: 'Ganira & Wunguke', trading: 'Ubucuruzi bwa Crypto', demo: 'Ahantu ho kugerageza', demoNote: 'Aya ni amafaranga y’urugero gusa. Nta mafaranga nyayo.',
+    demoEnter: 'Gerageza urubuga', back: 'Subira kwinjira', reset: 'Hindura pasuwadi', resetSub: 'Shyiramo imeri yawe kugira ngo uhindure pasuwadi.',
+    send: 'Ohereza', appearance: 'Imigaragarire', light: 'Urumuri', dark: 'Umwijima', language: 'Ururimi',
+    intro: 'Amasomo, ibiganiro n’ibikorwa byawe hamwe.', simulated: 'Igerageza gusa', planned: 'Birateganywa',
+    invite: 'Ihuza ryo gutumira', copy: 'Koporora', goal: 'Intego y’agahimbazamusyi', service: 'Amafaranga ya serivisi', timetable: 'Ingengabihe',
+  },
+} as const
+export type Language = keyof typeof dictionary
+export type TranslationKey = keyof typeof dictionary.en
