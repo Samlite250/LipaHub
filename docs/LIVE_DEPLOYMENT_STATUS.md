@@ -1,6 +1,20 @@
 # Live deployment status — 11 November 2026
 
-Production: https://lipahub-nine.vercel.app
+Production: https://lipahub1.vercel.app
+
+## Renamed production URL and username invitations — 11 November 2026
+
+The owner renamed the Vercel site to `https://lipahub1.vercel.app` and requested a GitHub push and production deployment. The new URL returned 200 for `/api/health` and `/api/ready` before this update. Supabase migration `009_invitation_usernames.sql` was missing and has now been applied. Supabase Auth Site URL and exact `/dashboard` and `/reset-password` callbacks now use the new URL. Other Auth settings were preserved. Source publication and the new deployment are in progress; the earlier resume check below describes the state before the rename was known.
+
+## Resume check — 11 November 2026
+
+The uncommitted work switches shared invitation links to saved usernames, retains legacy UUID links, and adds migration `009_invitation_usernames.sql` with a service-only, case-insensitive lookup. Unsupported or missing names fall back to an account-ID link. Deployment and application of migration 009 have not been verified during this resume check; apply only missing migrations, never the full new-project setup to the existing database.
+
+Local verification passed lint, both workspace builds, the frontend TypeScript check, and all 14 database/deployment tests. The full browser/API run reported 135 passing cases and one intentional skip using `npx playwright test --workers=2 --timeout=60000 --reporter=list`. The runner then stalled during shutdown and was interrupted, so this was not a clean command exit. The default 30-second run had admin timeouts; the verification run used a 60-second per-test timeout without changing repository defaults. Fresh desktop/mobile invitation screenshots were captured under `artifacts/screenshots/`.
+
+Fresh unauthenticated requests to the recorded production URL's `/api/ready` and `/api/invitations/Cynthia` returned Vercel `404 DEPLOYMENT_NOT_FOUND`. Vercel CLI nevertheless listed deployment `dpl_ABTbFPvMwf4tmFB5CAukjv3T5T3r` (`https://lipahub-c7qikzshn-samlite250s-projects.vercel.app`) as Ready, targeting production, with the recorded URL among its aliases. The direct deployment URL and project alias redirected to Vercel sign-in, rather than returning application readiness JSON. Public availability is therefore unresolved; the earlier successful checks below are historical.
+
+Vercel's diagnostic `curl` command unexpectedly created one automation bypass secret. It was revoked, and a subsequent project read verified its removal. No deployment, migration, environment-variable or account changes were made during this check.
 
 Vercel project: `samlite250s-projects/lipahub`. Frontend and API deploy together from the repository root. The original live deployment was made directly from this checkout. GitHub synchronization and a fresh production deployment were requested on 11 November 2026.
 
@@ -43,7 +57,7 @@ Sign-in now routes accounts with trusted `app_metadata.role = admin` to `/admin`
 
 The existing invited owner account needed a one-time confirmation after email confirmation was disabled for new registrations. With explicit owner approval, `lipahubsupport@gmail.com` was confirmed through Supabase Auth administration on 11 November 2026, preserving its password and trusted admin role. Public password sign-in then succeeded and `/api/admin/system/status` returned 200. Current HTML and its referenced CSS/JavaScript returned 200; older asset filenames from previous deployments returned 404, so previously open tabs should be refreshed. The telephone input no longer supplies the unsupported `inputProps.type` override.
 
-`lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Administrator console: https://lipahub-nine.vercel.app/admin.
+`lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Current administrator console: https://lipahub1.vercel.app/admin.
 
 The support address was saved using the audited settings operation. Auth Site URL and exact dashboard/reset-password redirects use the production URL. At the owner's request, the live minimum password length was reduced to 8 and email confirmation was disabled on 11 November 2026. New registrations receive a session immediately and can access the dashboard.
 

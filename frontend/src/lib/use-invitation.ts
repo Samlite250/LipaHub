@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useApp } from '../state'
 import { invitationReference } from './invitations'
 
-type Inviter = { id: string; name: string }
+type Inviter = { id: string; name: string; username?: string }
 type InvitationState = { reference: string; inviter?: Inviter; error?: 'missing' | 'unavailable' }
 export function useInvitation(enabled: boolean) {
   const location = useLocation()
@@ -20,14 +20,15 @@ export function useInvitation(enabled: boolean) {
       .then(async response => {
         if (!response.ok) { if (active) setState({ reference, error: response.status === 404 ? 'missing' : 'unavailable' }); return }
         const data = await response.json()
-        if (data.inviter?.id !== reference || typeof data.inviter?.name !== 'string') throw new Error('Invalid invitation response')
+        const legacyId = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(reference)
+        if (typeof data.inviter?.id !== 'string' || typeof data.inviter?.name !== 'string' || (legacyId ? data.inviter.id.toLowerCase() !== reference.toLowerCase() : data.inviter.username?.toLowerCase() !== reference.toLowerCase())) throw new Error('Invalid invitation response')
         if (active) setState({ reference, inviter: data.inviter })
       })
       .catch(() => { if (active) setState({ reference, error: 'unavailable' }) })
     return () => { active = false; controller.abort() }
   }, [reference, attempt])
   const current = state?.reference === reference ? state : null
-  const preview = demo?.id === reference ? { id: demo.id, name: demo.name } : undefined
+  const preview = demo && (demo.id === reference || demo.name.toLowerCase() === reference?.toLowerCase()) ? { id: demo.id, name: demo.name, username: demo.name } : undefined
   return { reference, inviter: current?.inviter || preview, error: preview ? undefined : current?.error, retry: () => { setState(null); setAttempt(value => value + 1) } }
 }
 

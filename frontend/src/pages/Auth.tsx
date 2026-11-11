@@ -61,7 +61,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         const phone = telephone.current?.getInstance()?.getNumber() || ''
         if (!/^\+[1-9]\d{6,14}$/.test(phone)) throw new Error('Enter a complete telephone number for the selected calling code.')
         const { data, error } = await supabase.auth.signUp({ email, password: String(fields.get('password')),
-          options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { display_name: String(fields.get('username')).trim(), phone, country, ...(invitation.reference ? { invitation_reference: invitation.reference } : {}), ...(invitation.inviter ? { invited_by: invitation.inviter.id } : {}) } } })
+          options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { username: String(fields.get('username')).trim(), display_name: String(fields.get('username')).trim(), phone, country, ...(invitation.reference ? { invitation_reference: invitation.reference } : {}), ...(invitation.inviter ? { invited_by: invitation.inviter.id, invited_by_username: invitation.inviter.username || invitation.inviter.name } : {}) } } })
         if (error) throw error
         if (data.session) { clearInvitation(); navigate(accountDestination(data.session.user, requestedDestination), { replace: true }) }
         else setMessage('Sign in to access your dashboard. If you already have an account, use your existing password.')

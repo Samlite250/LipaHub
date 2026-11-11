@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 
-const reference = '11111111-1111-4111-8111-111111111111'
+const reference = 'Cynthia'
+const inviterId = '11111111-1111-4111-8111-111111111111'
 test('invited registration shows the inviter above the fields and preserves the invitation across pages', async ({ page }, info) => {
-  await page.route('**/api/invitations/*', route => route.fulfill({json: {inviter: {id: reference, name: 'Cynthia'}}}))
-  await page.goto(`/?ref=${reference}`)
+  await page.route('**/api/invitations/*', route => route.fulfill({json: {inviter: {id: inviterId, name: 'Cynthia', username: 'Cynthia'}}}))
+  await page.goto(`/?ref=cYnThIa`)
   await page.goto('/login')
   await page.getByRole('link', {name: 'Sign Up', exact: true}).click()
   const banner = page.locator('.registration-invitation')
@@ -21,10 +22,18 @@ test('invited registration shows the inviter above the fields and preserves the 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
 })
 
+test('previously shared ID links still show the saved username', async ({ page }) => {
+  await page.route(`**/api/invitations/${inviterId}`, route => route.fulfill({json: {inviter: {id: inviterId, name: 'Cynthia', username: 'Cynthia'}}}))
+  await page.goto(`/register?ref=${inviterId}`)
+  await expect(page.locator('.registration-invitation')).toHaveText('Invited by: Cynthia')
+  await page.reload()
+  await expect(page.locator('.registration-invitation')).toHaveText('Invited by: Cynthia')
+})
+
 test('invitation errors allow registration and retry without trusting a name supplied in the URL', async ({ page }) => {
   let unavailable = true
   await page.route('**/api/invitations/*', route => {
-    return unavailable ? route.fulfill({status: 503, json: {error: 'Unavailable'}}) : route.fulfill({json: {inviter: {id: reference, name: '<img src=x onerror=alert(1)>'}}})
+    return unavailable ? route.fulfill({status: 503, json: {error: 'Unavailable'}}) : route.fulfill({json: {inviter: {id: inviterId, name: '<img src=x onerror=alert(1)>', username: 'Cynthia'}}})
   })
   await page.goto(`/register?ref=${reference}&name=Forged`)
   const banner = page.locator('.registration-invitation')
@@ -38,7 +47,7 @@ test('invitation errors allow registration and retry without trusting a name sup
   await page.reload()
   await expect(banner).toContainText('You can still create an account.')
   await expect(page.locator('button.auth-submit')).toBeEnabled()
-  await page.goto('/register?ref=invalid')
+  await page.goto('/register?ref=%3Cinvalid%3E')
   await expect(banner).toHaveCount(0)
   expect(await page.evaluate(() => sessionStorage.getItem('lipahub-invitation'))).toBeNull()
 })

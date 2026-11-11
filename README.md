@@ -1,12 +1,12 @@
 # LipaHub
 
-Live review site: **https://lipahub-nine.vercel.app**. See [the verified deployment status and remaining client-launch blockers](docs/LIVE_DEPLOYMENT_STATUS.md) for the current cloud state; older local milestones below describe the earlier setup.
+Review site URL: **https://lipahub1.vercel.app**. The owner renamed the Vercel URL on 11 November 2026. See [deployment checks and remaining client-launch blockers](docs/LIVE_DEPLOYMENT_STATUS.md) for the current cloud state; older local milestones below describe the earlier setup.
 
 The earlier local audit and backend milestone is documented in [SYSTEM_AUDIT.md](docs/SYSTEM_AUDIT.md). See [BACKEND.md](docs/BACKEND.md) for the API and readiness checks, and [LIVE_DEPLOYMENT_STATUS.md](docs/LIVE_DEPLOYMENT_STATUS.md) for completed live integration checks and remaining launch work. `npm run check` runs the complete local quality checks.
 
 ## Moving to real accounts
 
-Invited registration now shows the inviter's display name above the fields in English or Kinyarwanda, following the supplied form reference. Invite context survives navigation and is included in signup profile metadata; referral rewards remain disabled. See [invitation behavior and limits](docs/INVITATIONS.md).
+Invited registration shows the inviter's saved username above the fields in English or Kinyarwanda, following the supplied form reference. Shared links use usernames, such as `/register?ref=Cynthia`, and previously shared account-ID links remain supported. Existing databases require migration `009_invitation_usernames.sql` before deploying this update. Invite context survives navigation and is included in signup profile metadata; referral rewards remain disabled. See [invitation behavior and limits](docs/INVITATIONS.md).
 
 For a new Supabase project, follow [the live setup guide](docs/LIVE_SETUP.md) and run `npm run setup:check` after configuring the two workspace environment files. Production builds disable browser demo access by default. Real sign-in, administration, published content, private payment proofs and balances require the configured Supabase project.
 
@@ -151,7 +151,7 @@ Screenshots are written to a fresh dated directory under `artifacts/screenshots/
 
 For the requested combined Vercel deployment, use the repository root (`.`), the root `vercel.json`, and [VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). Both frontend and API run on the same Vercel domain. The older frontend-only configuration is an alternative, not the setting for this deployment.
 
-The review site is deployed at **https://lipahub-nine.vercel.app** with frontend and API hosted together from the repository root. `npm run build` creates frontend output in `frontend/dist/` and API output in `Backend/dist/`. The `frontend/vercel.json` configuration is only for the alternative frontend-only deployment with a separately hosted API. No custom domain is recorded. No secrets belong in `VITE_*` variables.
+The review site is deployed at **https://lipahub1.vercel.app** with frontend and API hosted together from the repository root. `npm run build` creates frontend output in `frontend/dist/` and API output in `Backend/dist/`. The `frontend/vercel.json` configuration is only for the alternative frontend-only deployment with a separately hosted API. No custom domain is recorded. No secrets belong in `VITE_*` variables.
 
 Final privacy/terms, production password recovery email, final operational verification of the supplied database policies and live financial verification/activation integrations remain future work. No earnings, business partners, users or market performance are claimed by this preview.
 

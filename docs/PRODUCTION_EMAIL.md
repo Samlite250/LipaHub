@@ -29,9 +29,9 @@ Open the [LipaHub project](https://supabase.com/dashboard/project/pzxmfdqfsoltoq
 
 Use a sender under the verified domain. Do not use the Gmail support address as the Resend sender. Keep email confirmation disabled and the minimum password length at 8, as requested by the owner. Keep these existing authentication URLs:
 
-- Site URL: `https://lipahub-nine.vercel.app`
-- Allowed redirect: `https://lipahub-nine.vercel.app/dashboard`
-- Allowed redirect: `https://lipahub-nine.vercel.app/reset-password`
+- Site URL: `https://lipahub1.vercel.app`
+- Allowed redirect: `https://lipahub1.vercel.app/dashboard`
+- Allowed redirect: `https://lipahub1.vercel.app/reset-password`
 
 Disable click tracking for authentication emails so recovery and invitation links are not rewritten. Review Supabase's email rate limit and the provider's quota together before onboarding clients. SMTP credentials belong in Supabase, not frontend variables or this repository. No application redeployment is required just to change Supabase SMTP.
 

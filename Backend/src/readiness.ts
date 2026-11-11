@@ -30,7 +30,11 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
           return { name: 'private_proof_bucket', ready: !error && !!data && data.public === false && Number(data.file_size_limit) === 5242880 && data.allowed_mime_types?.length === 2 && ['image/png', 'image/jpeg'].every(type => data.allowed_mime_types?.includes(type)) }
         } catch { return { name: 'private_proof_bucket', ready: false } }
       })()
-      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck]))
+      const invitationCheck = (async () => {
+        try { return { name: 'invitation_username_lookup', ready: !(await db.rpc('resolve_invitation_username', { p_username: '__readiness__' })).error } }
+        catch { return { name: 'invitation_username_lookup', ready: false } }
+      })()
+      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck]))
     }
     return { ready: checks.every(check => check.ready), checks, checkedAt: new Date().toISOString() }
   }

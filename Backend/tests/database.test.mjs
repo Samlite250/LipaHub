@@ -19,7 +19,7 @@ before(async () => {
     create role anon; create role authenticated; create role service_role bypassrls;
     create schema auth; create schema storage;
     grant usage on schema public,auth,storage to anon,authenticated,service_role;
-    create table auth.users(id uuid primary key, raw_app_meta_data jsonb default '{}', banned_until timestamptz);
+    create table auth.users(id uuid primary key, raw_app_meta_data jsonb default '{}', banned_until timestamptz, raw_user_meta_data jsonb default '{}');
     create function auth.jwt() returns jsonb language sql stable as $$
       select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb
     $$;
@@ -64,6 +64,24 @@ async function rejected(sql, values, code) {
   await db.exec('rollback to savepoint rejected_operation; release savepoint rejected_operation')
   assert.equal(failure?.code, code, failure?.message || 'Operation unexpectedly succeeded')
 }
+
+test('username invitations resolve case-insensitively and reject duplicate or suspended accounts', async () => {
+  await db.query(`update auth.users set raw_user_meta_data = '{"username":"Cynthia","display_name":"New display name"}' where id=$1`, [member])
+  let found = await db.query(`select * from public.resolve_invitation_username('cYnThIa')`)
+  assert.deepEqual(found.rows, [{id: member, username: 'Cynthia'}])
+  await db.query(`update auth.users set raw_user_meta_data = '{"username":"cynthia"}' where id=$1`, [other])
+  assert.equal((await db.query(`select * from public.resolve_invitation_username('Cynthia')`)).rows.length, 0)
+  await db.query(`update auth.users set raw_user_meta_data = '{}' where id=$1`, [other])
+  await db.query(`update auth.users set banned_until = '2099-01-01' where id=$1`, [member])
+  assert.equal((await db.query(`select * from public.resolve_invitation_username('Cynthia')`)).rows.length, 0)
+})
+
+test('browser roles cannot call the service-only username lookup', async () => {
+  await role('anon')
+  await rejected(`select * from public.resolve_invitation_username('Cynthia')`, [], '42501')
+  await role('authenticated')
+  await rejected(`select * from public.resolve_invitation_username('Cynthia')`, [], '42501')
+})
 
 test('all migrations apply and every application table enables RLS', async () => {
   const { rows } = await db.query(`select relname,relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace

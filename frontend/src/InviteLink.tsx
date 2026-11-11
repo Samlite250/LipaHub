@@ -3,6 +3,7 @@ import { ChevronDown, EllipsisVertical } from 'lucide-react'
 import { Panel } from './components'
 import { ShareIcon } from './ShareIcon'
 import { useApp } from './state'
+import { shareInvitationReference } from './lib/invitations'
 import './InviteLink.css'
 
 export function InviteLink() {
@@ -11,7 +12,8 @@ export function InviteLink() {
   const [expanded, setExpanded] = useState<'primary' | 'alternative' | null>('primary')
   const [notice, setNotice] = useState('')
   const inputs = useRef<Record<string, HTMLInputElement | null>>({})
-  const reference = demo?.id || session?.user.id
+  const account = demo ? { name: demo.name, id: demo.id } : session ? { name: session.user.user_metadata.username || session.user.user_metadata.display_name, id: session.user.id } : null
+  const reference = account ? shareInvitationReference(account.name, account.id) : null
   const primary = new URL('/register', window.location.origin)
   const alternative = new URL('/', window.location.origin)
   if (reference) { primary.searchParams.set('ref', reference); alternative.searchParams.set('ref', reference) }

@@ -110,7 +110,7 @@ test('invite links copy, offer a manual fallback and share LipaHub URLs', async 
   const primaryUrl = await primary.inputValue()
   expect(new URL(primaryUrl).origin).toBe('http://127.0.0.1:5173')
   expect(new URL(primaryUrl).pathname).toBe('/register')
-  expect(new URL(primaryUrl).searchParams.get('ref')).toBe(await page.evaluate(() => JSON.parse(sessionStorage.getItem('lipahub-demo')!).id))
+  expect(new URL(primaryUrl).searchParams.get('ref')).toBe(await page.evaluate(() => JSON.parse(sessionStorage.getItem('lipahub-demo')!).name))
   await card.getByRole('button', { name: 'Copy link', exact: true }).click()
   await expect(card.getByRole('status')).toHaveText('Link copied.')
   expect(await page.evaluate(() => localStorage.getItem('lipahub-test-clipboard'))).toBe(primaryUrl)

@@ -44,7 +44,7 @@ Keep private keys in the server environment only. Rebuild/redeploy after changin
 
 ## 4. Supabase setup
 
-For a new empty database, run `Backend/setup/new-project.sql` once, or authorize Supabase so the assistant can apply it. That file contains migrations 001 through 008 in order. Existing databases must apply only their missing migrations; see [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, an 8-character minimum password, disabled email confirmation, recovery email delivery and the first trusted administrator.
+For a new empty database, run `Backend/setup/new-project.sql` once, or authorize Supabase so the assistant can apply it. That file contains migrations 001 through 009 in order. Existing databases must apply only their missing migrations; see [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, an 8-character minimum password, disabled email confirmation, recovery email delivery and the first trusted administrator.
 
 After Vercel returns the production `https://...vercel.app` URL, set that as the Supabase Auth Site URL and allow these redirects:
 
