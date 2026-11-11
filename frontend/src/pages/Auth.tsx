@@ -9,10 +9,11 @@ import { normalizeCountry } from '../domain/countries'
 import IntlTelInput, { intlTelInput, type IntlTelInputRef } from '@intl-tel-input/react'
 import 'intl-tel-input/styles'
 import { CountrySelect } from '../CountrySelect'
+import { accountDestination } from '../lib/auth-navigation'
 
 type Mode = 'login' | 'register' | 'forgot'
 export function AuthPage({ mode }: { mode: Mode }) {
-  const { t, startDemo, language } = useApp()
+  const { t, startDemo, language, session } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
   const [visible, setVisible] = useState(false)
@@ -33,7 +34,11 @@ export function AuthPage({ mode }: { mode: Mode }) {
   }
   const isRegister = mode === 'register'
   const isForgot = mode === 'forgot'
-  const destination = typeof location.state?.from === 'string' && location.state.from.startsWith('/dashboard') ? location.state.from : '/dashboard'
+  const requestedDestination: unknown = location.state?.from
+  const destination = accountDestination(null, requestedDestination)
+  useEffect(() => {
+    if (mode === 'login' && session) navigate(accountDestination(session.user, requestedDestination), { replace: true })
+  }, [mode, session, requestedDestination, navigate])
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); setError(''); setMessage('')
     const fields = new FormData(e.currentTarget)
@@ -53,12 +58,12 @@ export function AuthPage({ mode }: { mode: Mode }) {
         const { data, error } = await supabase.auth.signUp({ email, password: String(fields.get('password')),
           options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { display_name: String(fields.get('username')).trim(), phone, country } } })
         if (error) throw error
-        if (data.session) navigate(destination)
+        if (data.session) navigate(accountDestination(data.session.user, requestedDestination), { replace: true })
         else setMessage('Sign in to access your dashboard. If you already have an account, use your existing password.')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password: String(fields.get('password')) })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password: String(fields.get('password')) })
         if (error) throw error
-        navigate(destination)
+        navigate(accountDestination(data.user, requestedDestination), { replace: true })
       }
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to connect. Please try again.') }
     finally { setBusy(false) }
@@ -118,7 +123,7 @@ export function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password: String(fields.get('password')) })
     setBusy(false)
     if (error) setError(error.message)
-    else navigate('/dashboard')
+    else navigate(accountDestination(session.user), { replace: true })
   }
   return <main className="auth-page"><div className="auth-wrap"><Logo /><section className="auth-card"><h1>Choose a new password</h1><p className="auth-subtitle">Use at least 8 characters.</p><form onSubmit={submit}><label>New password<input name="password" type="password" minLength={8} autoComplete="new-password" required /></label><label>Confirm password<input name="confirm" type="password" minLength={8} autoComplete="new-password" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button primary" disabled={busy || loading}>{busy ? 'Saving…' : 'Save password'}</button></form><Link className="text-link" to="/forgot-password">Request a new reset link</Link></section></div></main>
 }

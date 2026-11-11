@@ -35,6 +35,8 @@ Live mobile-browser verification registered a temporary member with an 8-charact
 
 ## Administrator
 
+Sign-in now routes accounts with trusted `app_metadata.role = admin` to `/admin`; members go to `/dashboard` or their requested member page. Visiting `/login` with an existing administrator session also opens `/admin`. Password reset uses the same role-based destination. User-editable metadata never determines this redirect. Lint, build and 10 focused desktop/mobile authentication and routing checks passed for this change.
+
 The existing invited owner account needed a one-time confirmation after email confirmation was disabled for new registrations. With explicit owner approval, `lipahubsupport@gmail.com` was confirmed through Supabase Auth administration on 11 November 2026, preserving its password and trusted admin role. Public password sign-in then succeeded and `/api/admin/system/status` returned 200. Current HTML and its referenced CSS/JavaScript returned 200; older asset filenames from previous deployments returned 404, so previously open tabs should be refreshed. The telephone input no longer supplies the unsupported `inputProps.type` override.
 
 `lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Administrator console: https://lipahub-nine.vercel.app/admin.
