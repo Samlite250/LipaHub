@@ -27,6 +27,12 @@ Supabase project: `pzxmfdqfsoltoqgflxcm`. All 12 public application tables have 
 - Temporary support messages, ticket and all three test accounts were removed. Audit records are retained.
 - The local build and all 12 database/deployment tests passed before deployment. Vercel successfully built the final onboarding text changes.
 
+## Immediate registration update
+
+Source commit `17e38be19e14e211e94fcbf1619f13c8411fb9de` is on GitHub and deployed as `dpl_B41XmhLMsjyNLN8kPysp4uLd2zsx`, aliased to the production URL. Live Supabase Auth and registration, reset and admin forms use an 8-character minimum. Email confirmation is disabled.
+
+Live mobile-browser verification registered a temporary member with an 8-character password, reached the dashboard immediately, accessed the authenticated API and signed in again without email confirmation. A 7-character password was rejected, and an authenticated password change accepted 8 characters. The temporary account was deleted. Lint, build and all 8 focused desktop/mobile authentication and admin checks passed. Public route checks and API readiness also passed.
+
 ## Administrator
 
 `lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Administrator console: https://lipahub-nine.vercel.app/admin.
