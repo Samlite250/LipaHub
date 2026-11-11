@@ -35,7 +35,7 @@ export function InviteLink() {
       <a className="invite-facebook" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(primary.href)}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook"><ShareIcon name="facebook" /></a>
       <a className="invite-email" href={`mailto:?subject=${encodeURIComponent('Join me on LipaHub')}&body=${encodeURIComponent(shareText)}`} aria-label="Share by email"><ShareIcon name="email" /></a>
     </div>
-    <p className="invite-link-note">Referral tracking and rewards are not enabled.</p>
+    <p className="invite-link-note">Your name appears on the invited signup form. Referral rewards are not enabled.</p>
     <p className="invite-link-status" role="status">{notice}</p>
   </div></Panel>
 }

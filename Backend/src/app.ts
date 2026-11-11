@@ -11,6 +11,7 @@ import { paymentRouter } from './payments/router.js'
 import { adminRouter, memberContentRouter } from './admin/router.js'
 import { memberBalanceRouter } from './admin/balances.js'
 import { supportRouter } from './support/router.js'
+import { invitationRouter } from './invitations.js'
 
 export function createApp(config: BackendConfig, clients: { auth?: SupabaseClient | null; service?: SupabaseClient | null } = {}) {
   const timedFetch: typeof fetch = (input, init = {}) => fetch(input, { ...init, signal: init.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(config.upstreamTimeoutMs)]) : AbortSignal.timeout(config.upstreamTimeoutMs) })
@@ -37,6 +38,7 @@ export function createApp(config: BackendConfig, clients: { auth?: SupabaseClien
   app.use('/api/member-content', memberContentRouter(auth, db))
   app.use('/api/member-balances', memberBalanceRouter(auth, db))
   app.use('/api/support', supportRouter(auth, db))
+  app.use('/api/invitations', invitationRouter(db))
   app.use((_req, res) => { res.status(404).json({ error: 'Not found', requestId: res.locals.requestId }) })
   app.use(apiError())
   return app

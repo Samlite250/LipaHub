@@ -6,6 +6,8 @@ The earlier local audit and backend milestone is documented in [SYSTEM_AUDIT.md]
 
 ## Moving to real accounts
 
+Invited registration now shows the inviter's display name above the fields in English or Kinyarwanda, following the supplied form reference. Invite context survives navigation and is included in signup profile metadata; referral rewards remain disabled. See [invitation behavior and limits](docs/INVITATIONS.md).
+
 For a new Supabase project, follow [the live setup guide](docs/LIVE_SETUP.md) and run `npm run setup:check` after configuring the two workspace environment files. Production builds disable browser demo access by default. Real sign-in, administration, published content, private payment proofs and balances require the configured Supabase project.
 
 Members can now submit private support requests at `/dashboard/support`; authorized staff reply, close and reopen them at `/admin/support`. Requests and replies persist in Supabase after applying migration `004_member_support.sql`. `/dashboard/transactions` displays the member's saved balance correction history. These features have no live-to-demo fallback. Cloud setup and live database checks are still required; this checkout is not yet a publicly launched financial platform. See the guide for remaining payment and trading limitations.

@@ -12,6 +12,7 @@ import { SupportPage } from './pages/Support'
 import { TransactionsPage } from './pages/Transactions'
 import { DepositPage, VoucherPage, WithdrawPage, TeamPage } from './pages/AccountTabs'
 import { ConversationPage } from './pages/Conversations'
+import { invitationReference } from './lib/invitations'
 
 function MemberRoute() {
   const { session, demo, loading } = useApp()
@@ -21,6 +22,7 @@ function MemberRoute() {
 }
 export function App() {
   const location = useLocation()
+  useEffect(() => { invitationReference(location.search) }, [location.search])
   useEffect(() => { window.scrollTo(0, 0); document.title = `${location.pathname === '/' ? 'Learn. Connect. Explore.' : location.pathname.split('/').filter(Boolean).pop()?.replaceAll('-', ' ')} | LipaHub` }, [location.pathname])
   return <Routes>
     <Route path="/" element={<Landing />} />

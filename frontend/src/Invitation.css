@@ -1,0 +1,5 @@
+.registration-invitation{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:37px;padding:9px 13px;margin:0 0 18px;border:1px solid #e3eeee;border-radius:8px;background:#f6f8f8;color:#148329;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.registration-invitation strong{font-weight:650}
+.registration-invitation.invitation-unavailable{color:#647378;align-items:flex-start}
+.registration-invitation button{flex-shrink:0;padding:0;color:#0d9488;font-size:11px;text-decoration:underline}
+@media(min-width:601px){.registration:has(.registration-invitation) .auth-wrap{width:450px}.registration:has(.registration-invitation) .auth-card{padding:47px 47px 42px}.registration:has(.registration-invitation) .auth-card h1{font-size:20px}.registration:has(.registration-invitation) .auth-subtitle{font-size:13px}.registration:has(.registration-invitation) .auth-card label{font-size:12px}.registration:has(.registration-invitation) .auth-card input{min-height:42px;font-size:12px}}

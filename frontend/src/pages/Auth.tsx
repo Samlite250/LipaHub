@@ -10,6 +10,9 @@ import IntlTelInput, { intlTelInput, type IntlTelInputRef } from '@intl-tel-inpu
 import 'intl-tel-input/styles'
 import { CountrySelect } from '../CountrySelect'
 import { accountDestination } from '../lib/auth-navigation'
+import { InvitationBanner } from '../Invitation'
+import { useInvitation } from '../lib/use-invitation'
+import { clearInvitation } from '../lib/invitations'
 
 type Mode = 'login' | 'register' | 'forgot'
 export function AuthPage({ mode }: { mode: Mode }) {
@@ -33,6 +36,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
     if (list && selected) list.scrollTop = selected.offsetTop - list.offsetTop - 64
   }
   const isRegister = mode === 'register'
+  const invitation = useInvitation(isRegister)
   const isForgot = mode === 'forgot'
   const requestedDestination: unknown = location.state?.from
   const destination = accountDestination(null, requestedDestination)
@@ -52,13 +56,14 @@ export function AuthPage({ mode }: { mode: Mode }) {
         if (error) throw error
         setMessage('If an account exists for this email, a password reset link will arrive shortly.')
       } else if (isRegister) {
+        if (invitation.reference && !invitation.inviter && !invitation.error) throw new Error(language === 'rw' ? 'Tegereza ko ubutumire bugenzurwa.' : 'Please wait while we check your invitation.')
         await telephone.current?.getInstance()?.promise
         const phone = telephone.current?.getInstance()?.getNumber() || ''
         if (!/^\+[1-9]\d{6,14}$/.test(phone)) throw new Error('Enter a complete telephone number for the selected calling code.')
         const { data, error } = await supabase.auth.signUp({ email, password: String(fields.get('password')),
-          options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { display_name: String(fields.get('username')).trim(), phone, country } } })
+          options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { display_name: String(fields.get('username')).trim(), phone, country, ...(invitation.reference ? { invitation_reference: invitation.reference } : {}), ...(invitation.inviter ? { invited_by: invitation.inviter.id } : {}) } } })
         if (error) throw error
-        if (data.session) navigate(accountDestination(data.session.user, requestedDestination), { replace: true })
+        if (data.session) { clearInvitation(); navigate(accountDestination(data.session.user, requestedDestination), { replace: true }) }
         else setMessage('Sign in to access your dashboard. If you already have an account, use your existing password.')
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password: String(fields.get('password')) })
@@ -75,6 +80,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         {isRegister && <Languages />}
         <h1>{isRegister ? t('create') : isForgot ? t('reset') : t('signin')}</h1>
         <p className="auth-subtitle">{isRegister ? t('createSub') : isForgot ? t('resetSub') : t('welcome')}</p>
+        {isRegister && <InvitationBanner invitation={invitation} />}
         <form onSubmit={submit} key={mode}>
           {isRegister && <>
             <label>{t('username')} <em>*</em><input name="username" placeholder={t('username')} autoComplete="nickname" minLength={2} maxLength={40} required /></label>
