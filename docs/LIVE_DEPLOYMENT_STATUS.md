@@ -2,6 +2,12 @@
 
 Production: https://lipahub1.vercel.app
 
+## Visible username correction — 11 November 2026
+
+Source commit `c78c75a` was pushed to GitHub and deployed as `dpl_BZAXZYcGcE8con4sH6xt9ES1CHJw`, Ready at the production URL. The invite card now displays the username explicitly and reads the current Auth profile instead of relying solely on cached session metadata. Newly generated links never substitute an account ID; missing usernames show a profile prompt. Previously shared ID links still resolve.
+
+The account in the supplied screenshot has the saved username `Ish`; its public username lookup returned 200. Lint and both builds passed. All 12 focused desktop/mobile test cases passed; the local runner again stalled during shutdown and was interrupted after reporting the results. Live verification completed with a clean exit: a temporary member's dashboard showed its username, then recovered the correct username and URL after its cached metadata was deliberately replaced with an account ID. The mobile card screenshot is under `artifacts/screenshots/invite-username-fix-1794421014622.png`. Public routes, API readiness, invitation languages and intercepted signup metadata checks also passed. The temporary member was deleted; no signup email was sent.
+
 ## Renamed production URL and username invitations — 11 November 2026
 
 Source commit `6b8a1ff24e921fdb9b6fe6106b0f50caa23c2793` was pushed to `Samlite250/LipaHub` on `main` and deployed as `dpl_BTj5ao1FnjwPcX31rmnoNbAWAkqm`. Vercel reached `READY` and aliased the deployment to the owner's renamed production URL, `https://lipahub1.vercel.app`. Subsequent documentation-only commits may follow this deployed source commit.
