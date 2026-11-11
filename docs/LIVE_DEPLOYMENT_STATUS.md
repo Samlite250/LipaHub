@@ -35,6 +35,8 @@ Live mobile-browser verification registered a temporary member with an 8-charact
 
 ## Administrator
 
+The existing invited owner account needed a one-time confirmation after email confirmation was disabled for new registrations. With explicit owner approval, `lipahubsupport@gmail.com` was confirmed through Supabase Auth administration on 11 November 2026, preserving its password and trusted admin role. Public password sign-in then succeeded and `/api/admin/system/status` returned 200. Current HTML and its referenced CSS/JavaScript returned 200; older asset filenames from previous deployments returned 404, so previously open tabs should be refreshed. The telephone input no longer supplies the unsupported `inputProps.type` override.
+
 `lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Administrator console: https://lipahub-nine.vercel.app/admin.
 
 The support address was saved using the audited settings operation. Auth Site URL and exact dashboard/reset-password redirects use the production URL. At the owner's request, the live minimum password length was reduced to 8 and email confirmation was disabled on 11 November 2026. New registrations receive a session immediately and can access the dashboard.

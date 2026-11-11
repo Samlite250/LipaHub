@@ -77,7 +77,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
               <IntlTelInput ref={telephone} initialCountry="rw" separateDialCode countrySelectorMode="DROPDOWN" countrySearch
                 uiTranslations={{ selectedCountryAriaLabel: 'Calling code: ${countryName} (${dialCode})', searchPlaceholder: 'Search countries'  }} countryNameOverrides={{ cd: 'DR Congo' }} matchDropdownWidth onOpenCountrySelector={centerCallingCode} loadUtils={() => import('intl-tel-input/utils')} placeholderNumberPolicy="OFF"
                 formatAsYouType={false}
-                inputProps={{ id: 'registration-phone', type: 'tel', name: 'phone', autoComplete: 'tel-national', placeholder: language === 'rw' ? 'Shyiramo nimero' : 'Phone number', required: true, maxLength: 24 }} />
+                inputProps={{ id: 'registration-phone', name: 'phone', autoComplete: 'tel-national', placeholder: language === 'rw' ? 'Shyiramo nimero' : 'Phone number', required: true, maxLength: 24 }} />
             </div>
           </>}
           <label>{t('email')}{isRegister && <em> *</em>}<input name="email" type="email" placeholder="you@example.com" autoComplete="email" required /></label>
