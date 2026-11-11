@@ -6,6 +6,14 @@ Vercel project: `samlite250s-projects/lipahub`. Frontend and API deploy together
 
 Planned custom domain: `lipahub1.com`, with `www.lipahub1.com` for the website. The owner will purchase it later; ownership, DNS and hosting are not configured. The existing Vercel URL remains the active site. See [production email setup](PRODUCTION_EMAIL.md) for the proposed sending subdomain.
 
+## GitHub and Vercel refresh
+
+On 11 November 2026, source commit `f42ae5b43a6a8ac71cdd69f03cfe5716840e209b` was pushed to `Samlite250/LipaHub` on `main` and deployed to the existing production project. Vercel deployment `dpl_6PkGMis4FQLbAaj8DAwBbvHnzroL` reached `READY` and was aliased to https://lipahub-nine.vercel.app. Subsequent documentation-only commits may follow this deployed source commit.
+
+Fresh public checks returned 200 for home, registration, login, admin and member-support route shells. `/api/health` confirmed authentication configuration and disabled payment services; `/api/ready` returned 200 with `ready: true`.
+
+Local lint, build and all 12 database/deployment checks passed. The browser suite completed with 120 passed, one intentionally skipped and one desktop payment-demo timeout. That timed-out test passed when rerun alone with its original timeout. No production email, custom-domain or payment-provider setup was performed in this refresh.
+
 Supabase project: `pzxmfdqfsoltoqgflxcm`. All 12 public application tables have RLS enabled. Schema revision 8 and the private `robot-payment-proofs` bucket passed the live API readiness check. Production credentials are stored privately in Vercel, with demo access and payment proof intake explicitly disabled.
 
 ## Verified
