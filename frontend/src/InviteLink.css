@@ -12,6 +12,8 @@
 .invite-link-fields>input { display: block; width: 100%; min-width: 0; border: 0; border-radius: 5px; padding: 10px 13px; background: var(--soft); color: var(--text); font: inherit; font-size: 12px; }
 .invite-link-fields>.button { padding: 9px 15px; min-height: 37px; font-size: 12px; font-weight: 700; margin: 4px 0 0; border-radius: 5px; }
 .invite-share-caption { margin: 20px 0 14px; font-size: 13px; }
+.invite-link-username { margin: 0 0 14px; font-size: 13px; overflow-wrap: anywhere; }
+.invite-link-username strong { color: var(--teal); }
 .invite-share-links { display: flex; flex-wrap: wrap; align-items: center; gap: 1px; }
 .invite-share-links>a { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 7px; }
 .invite-share-links>a:hover { background: var(--bg); }

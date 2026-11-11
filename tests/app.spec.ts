@@ -106,6 +106,7 @@ test('invite links copy, offer a manual fallback and share LipaHub URLs', async 
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (value: string) => { localStorage.setItem('lipahub-test-clipboard', value) } } }))
   await demo(page)
   const card = page.locator('.invite-link-card')
+  await expect(card.locator('.invite-link-username')).toHaveText('Username: Alex')
   const primary = card.getByRole('textbox', { name: 'Invite link URL', exact: true })
   const primaryUrl = await primary.inputValue()
   expect(new URL(primaryUrl).origin).toBe('http://127.0.0.1:5173')

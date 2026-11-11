@@ -1,9 +1,10 @@
 const storageKey = 'lipahub-invitation'
 const referencePattern = /^[\p{L}\p{N}][\p{L}\p{N} ._'-]{1,79}$/u
 
-export function shareInvitationReference(username: unknown, accountId: string): string {
+export function shareInvitationReference(username: unknown): string | null {
   const name = typeof username === 'string' ? username.trim() : ''
-  return referencePattern.test(name) ? name : accountId
+  const accountIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  return referencePattern.test(name) && !accountIdPattern.test(name) ? name : null
 }
 
 export function invitationReference(search: string): string | null {

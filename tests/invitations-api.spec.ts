@@ -6,13 +6,13 @@ import { invitationRouter } from '../Backend/src/invitations'
 import { apiError } from '../Backend/src/auth'
 import { shareInvitationReference } from '../frontend/src/lib/invitations'
 
-test('shared invitations preserve supported names and fall back for older account metadata', () => {
+test('shared invitations preserve usernames and never substitute account IDs', () => {
   const id = '11111111-1111-4111-8111-111111111111'
   for (const name of ['Cynthia', ' Jean Claude ', 'Élodie', "O'Brien", 'user_01']) {
-    expect(shareInvitationReference(name, id)).toBe(name.trim())
+    expect(shareInvitationReference(name)).toBe(name.trim())
   }
-  for (const name of [undefined, null, 12, {}, '', 'A', 'Member 🎉', '<invalid>', 'x'.repeat(81)]) {
-    expect(shareInvitationReference(name, id)).toBe(id)
+  for (const name of [undefined, null, 12, {}, '', 'A', 'Member 🎉', '<invalid>', 'x'.repeat(81), id]) {
+    expect(shareInvitationReference(name)).toBeNull()
   }
 })
 
