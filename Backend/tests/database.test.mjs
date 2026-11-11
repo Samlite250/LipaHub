@@ -2,6 +2,7 @@ import { before, after, beforeEach, afterEach, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile, readdir } from 'node:fs/promises'
 import { PGlite } from '@electric-sql/pglite'
+import { createHash } from 'node:crypto'
 
 // Actual PostgreSQL execution with minimal Supabase Auth/Storage schema fixtures.
 // This does not replace testing Auth, PostgREST or Storage against Supabase itself.
@@ -79,8 +80,23 @@ test('username invitations resolve case-insensitively and reject duplicate or su
 test('browser roles cannot call the service-only username lookup', async () => {
   await role('anon')
   await rejected(`select * from public.resolve_invitation_username('Cynthia')`, [], '42501')
+  await rejected(`select * from public.resolve_invitation_code('abcdefgh')`, [], '42501')
   await role('authenticated')
   await rejected(`select * from public.resolve_invitation_username('Cynthia')`, [], '42501')
+  await rejected(`select * from public.resolve_invitation_code('abcdefgh')`, [], '42501')
+})
+
+test('short username hashes match the browser algorithm and reject duplicate or suspended inviters', async () => {
+  const code = createHash('sha256').update('cynthia').digest('base64url').slice(0, 8)
+  await db.query(`update auth.users set raw_user_meta_data = '{"username":"Cynthia"}' where id=$1`, [member])
+  await role('service_role')
+  assert.deepEqual((await db.query(`select * from public.resolve_invitation_code($1)`, [code])).rows, [{id: member, username: 'Cynthia'}])
+  await role('postgres')
+  await db.query(`update auth.users set raw_user_meta_data = '{"username":"cYnThIa"}' where id=$1`, [other])
+  assert.equal((await db.query(`select * from public.resolve_invitation_code($1)`, [code])).rows.length, 0)
+  await db.query(`update auth.users set raw_user_meta_data = '{}' where id=$1`, [other])
+  await db.query(`update auth.users set banned_until = '2099-01-01' where id=$1`, [member])
+  assert.equal((await db.query(`select * from public.resolve_invitation_code($1)`, [code])).rows.length, 0)
 })
 
 test('all migrations apply and every application table enables RLS', async () => {

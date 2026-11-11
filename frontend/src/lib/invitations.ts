@@ -1,6 +1,11 @@
 const storageKey = 'lipahub-invitation'
 const referencePattern = /^[\p{L}\p{N}][\p{L}\p{N} ._'-]{1,79}$/u
 
+export async function invitationCode(username: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(username.trim().toLowerCase()))
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replaceAll('+', '-').replaceAll('/', '_').slice(0, 8)
+}
+
 export function shareInvitationReference(username: unknown): string | null {
   const name = typeof username === 'string' ? username.trim() : ''
   const accountIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i

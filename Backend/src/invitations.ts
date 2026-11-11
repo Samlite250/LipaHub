@@ -4,15 +4,16 @@ import { httpError, requireStorage } from './auth.js'
 
 export function invitationRouter(service: SupabaseClient | null) {
   const router = express.Router()
-  router.get('/:reference', requireStorage(service), async (req, res) => {
-    const reference = String(req.params.reference).trim()
-    if (!/^[\p{L}\p{N}][\p{L}\p{N} ._'-]{1,79}$/u.test(reference)) httpError('Invitation not found.', 404)
-    const legacyId = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(reference)
+  router.get(['/code/:code', '/:reference'], requireStorage(service), async (req, res) => {
+    const isCode = typeof req.params.code === 'string'
+    const reference = String(isCode ? req.params.code : req.params.reference).trim()
+    if (!(isCode ? /^[A-Za-z0-9_-]{8}$/ : /^[\p{L}\p{N}][\p{L}\p{N} ._'-]{1,79}$/u).test(reference)) httpError('Invitation not found.', 404)
+    const legacyId = !isCode && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(reference)
     let accountId = reference.toLowerCase()
     let username = ''
     if (!legacyId) {
       let lookup
-      try { lookup = await service!.rpc('resolve_invitation_username', { p_username: reference }) }
+      try { lookup = await service!.rpc(isCode ? 'resolve_invitation_code' : 'resolve_invitation_username', isCode ? { p_code: reference } : { p_username: reference }) }
       catch { httpError('Invitations are temporarily unavailable.', 503) }
       if (lookup.error) httpError('Invitations are temporarily unavailable.', 503)
       if (!Array.isArray(lookup.data) || lookup.data.length !== 1) httpError('Invitation not found. The username may be unavailable or shared by multiple accounts.', 404)

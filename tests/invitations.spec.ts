@@ -6,6 +6,8 @@ const inviterId = '11111111-1111-4111-8111-111111111111'
 test('invited registration shows the inviter above the fields and preserves the invitation across pages', async ({ page }, info) => {
   await page.route('**/api/invitations/*', route => route.fulfill({json: {inviter: {id: inviterId, name: 'Cynthia', username: 'Cynthia'}}}))
   await page.goto(`/?ref=cYnThIa`)
+  await expect(page).toHaveURL('/register?ref=cYnThIa')
+  await expect(page.locator('.registration-invitation')).toHaveText('Invited by: Cynthia')
   await page.goto('/login')
   await page.getByRole('link', {name: 'Sign Up', exact: true}).click()
   const banner = page.locator('.registration-invitation')
@@ -20,6 +22,29 @@ test('invited registration shows the inviter above the fields and preserves the 
   await page.screenshot({path: `artifacts/screenshots/${process.env.LIPAHUB_SCREENSHOT_RUN}/${info.project.name}-invited-registration.png`, fullPage: true})
   await page.setViewportSize({width: 320, height: 740})
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+})
+
+test('short alternative invitation opens the username registration and supports retry', async ({ page }) => {
+  let offline = true
+  await page.route('**/api/invitations/code/QTzyTk12', route => offline ? route.fulfill({status: 503, json: {error: 'Unavailable'}}) : route.fulfill({json: {inviter: {id: inviterId, name: 'Cynthia', username: 'Cynthia'}}}))
+  await page.route('**/api/invitations/Cynthia', route => route.fulfill({json: {inviter: {id: inviterId, name: 'Cynthia', username: 'Cynthia'}}}))
+  await page.goto('/i/QTzyTk12')
+  await expect(page.getByRole('alert')).toContainText('couldn’t open this invitation')
+  offline = false
+  await page.getByRole('button', {name: 'Try again'}).click()
+  await expect(page).toHaveURL('/register?ref=Cynthia')
+  await expect(page.locator('.registration-invitation')).toHaveText('Invited by: Cynthia')
+  await page.reload()
+  await expect(page.locator('.registration-invitation')).toHaveText('Invited by: Cynthia')
+})
+
+test('invalid short invitations offer ordinary registration without reusing a previous inviter', async ({ page }) => {
+  await page.goto('/register?ref=Cynthia')
+  await page.goto('/i/invalid!')
+  await expect(page.getByRole('heading', {name: 'Invitation unavailable'})).toBeVisible()
+  await page.getByRole('link', {name: 'Create an account'}).click()
+  await expect(page.locator('.registration-invitation')).toHaveCount(0)
+  expect(await page.evaluate(() => sessionStorage.getItem('lipahub-invitation'))).toBeNull()
 })
 
 test('previously shared ID links still show the saved username', async ({ page }) => {

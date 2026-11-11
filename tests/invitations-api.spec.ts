@@ -4,7 +4,8 @@ import type { AddressInfo } from 'node:net'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { invitationRouter } from '../Backend/src/invitations'
 import { apiError } from '../Backend/src/auth'
-import { shareInvitationReference } from '../frontend/src/lib/invitations'
+import { invitationCode, shareInvitationReference } from '../frontend/src/lib/invitations'
+import { createHash } from 'node:crypto'
 
 test('shared invitations preserve usernames and never substitute account IDs', () => {
   const id = '11111111-1111-4111-8111-111111111111'
@@ -16,6 +17,13 @@ test('shared invitations preserve usernames and never substitute account IDs', (
   }
 })
 
+test('alternative codes are stable opaque username hashes', async () => {
+  const code = await invitationCode(' Cynthia ')
+  expect(code).toMatch(/^[A-Za-z0-9_-]{8}$/)
+  expect(code).toBe(await invitationCode('cYnThIa'))
+  expect(code).toBe(createHash('sha256').update('cynthia').digest('base64url').slice(0, 8))
+})
+
 test('public invitation lookup exposes only a display name and rejects invalid or suspended inviters', async ({ request }) => {
   const id = '11111111-1111-4111-8111-111111111111'
   let calls = 0
@@ -23,9 +31,10 @@ test('public invitation lookup exposes only a display name and rejects invalid o
   let missing = false
   let offline = false
   let ambiguous = false
-  const service = {rpc: async (_name: string, input: {p_username: string}) => {
+  const service = {rpc: async (name: string, input: {p_username?: string; p_code?: string}) => {
     if (offline) throw new Error('Private upstream secret')
-    return {data: ambiguous || input.p_username.toLowerCase() !== 'cynthia' ? [] : [{id, username: 'Cynthia'}], error: null}
+    const matches = name === 'resolve_invitation_code' ? input.p_code === 'QTzyTk12' : input.p_username?.toLowerCase() === 'cynthia'
+    return {data: ambiguous || !matches ? [] : [{id, username: 'Cynthia'}], error: null}
   }, auth: {admin: {getUserById: async () => {
     calls++
     if (offline) throw new Error('Private upstream secret')
@@ -45,11 +54,18 @@ test('public invitation lookup exposes only a display name and rejects invalid o
     const named = await request.get(`${origin}/cYnThIa`)
     expect(named.status()).toBe(200)
     expect(await named.json()).toEqual({inviter: {id, name: 'Cynthia', username: 'Cynthia'}})
+    const coded = await request.get(`${origin}/code/QTzyTk12`)
+    expect(coded.status()).toBe(200)
+    expect(await coded.json()).toEqual({inviter: {id, name: 'Cynthia', username: 'Cynthia'}})
+    expect((await request.get(`${origin}/code/qtzytk12`)).status()).toBe(404)
+    expect((await request.get(`${origin}/code/bad`)).status()).toBe(404)
     ambiguous = true
     expect((await request.get(`${origin}/Cynthia`)).status()).toBe(404)
+    expect((await request.get(`${origin}/code/QTzyTk12`)).status()).toBe(404)
     ambiguous = false
     banned = true
     expect((await request.get(`${origin}/${id}`)).status()).toBe(404)
+    expect((await request.get(`${origin}/code/QTzyTk12`)).status()).toBe(404)
     banned = false; missing = true
     expect((await request.get(`${origin}/${id}`)).status()).toBe(404)
     offline = true

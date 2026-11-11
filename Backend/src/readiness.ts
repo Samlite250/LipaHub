@@ -34,7 +34,11 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
         try { return { name: 'invitation_username_lookup', ready: !(await db.rpc('resolve_invitation_username', { p_username: '__readiness__' })).error } }
         catch { return { name: 'invitation_username_lookup', ready: false } }
       })()
-      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck]))
+      const codeCheck = (async () => {
+        try { return { name: 'invitation_code_lookup', ready: !(await db.rpc('resolve_invitation_code', { p_code: '__readiness__' })).error } }
+        catch { return { name: 'invitation_code_lookup', ready: false } }
+      })()
+      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck, codeCheck]))
     }
     return { ready: checks.every(check => check.ready), checks, checkedAt: new Date().toISOString() }
   }

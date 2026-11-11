@@ -4,7 +4,7 @@ import { ChevronDown, EllipsisVertical } from 'lucide-react'
 import { Panel } from './components'
 import { ShareIcon } from './ShareIcon'
 import { useApp } from './state'
-import { shareInvitationReference } from './lib/invitations'
+import { invitationCode, shareInvitationReference } from './lib/invitations'
 import { supabase } from './lib/supabase'
 import './InviteLink.css'
 
@@ -30,11 +30,19 @@ export function InviteLink() {
     return () => { active = false }
   }, [userId, savedUsername, displayName])
   const reference = demo ? shareInvitationReference(demo.name) : current?.userId === userId ? current?.reference : shareInvitationReference(savedUsername) || shareInvitationReference(displayName)
+  const [short, setShort] = useState<{ reference: string; code: string } | null>(null)
+  useEffect(() => {
+    if (!reference) return
+    let active = true
+    void invitationCode(reference).then(code => { if (active) setShort({ reference, code }) }).catch(() => { /* The primary invitation remains available. */ })
+    return () => { active = false }
+  }, [reference])
   const primary = new URL('/register', window.location.origin)
-  const alternative = new URL('/', window.location.origin)
-  if (reference) { primary.searchParams.set('ref', reference); alternative.searchParams.set('ref', reference) }
+  const code = short?.reference === reference ? short?.code : null
+  const alternative = code ? new URL(`/i/${code}`, window.location.origin).href : ''
+  if (reference) primary.searchParams.set('ref', reference)
   const shareText = `Join me on LipaHub: ${primary.href}`
-  const sections = [{ key: 'primary' as const, title: 'Invite link', url: primary.href }, { key: 'alternative' as const, title: 'Alternative link', url: alternative.href }]
+  const sections = [{ key: 'primary' as const, title: 'Invite link', url: primary.href }, { key: 'alternative' as const, title: 'Alternative link', url: alternative }]
   async function copy(key: string, url: string) {
     setNotice('')
     try { await navigator.clipboard.writeText(url); setNotice('Link copied.') }
@@ -46,7 +54,7 @@ export function InviteLink() {
     {reference ? <>
     <div className="invite-link-sections">{sections.map(section => <div className="invite-link-section" key={section.key}>
       <button type="button" className="invite-link-toggle" aria-expanded={expanded === section.key} aria-controls={`${id}-${section.key}`} onClick={() => setExpanded(value => value === section.key ? null : section.key)}><span>{section.title}</span><ChevronDown size={14} /></button>
-      <div className="invite-link-collapse" data-open={expanded === section.key} id={`${id}-${section.key}`} inert={expanded !== section.key} aria-hidden={expanded !== section.key}><div className="invite-link-fields"><label className="sr-only" htmlFor={`${id}-${section.key}-url`}>{section.title} URL</label><input ref={element => { inputs.current[section.key] = element }} id={`${id}-${section.key}-url`} value={section.url} readOnly onFocus={event => event.target.select()} /><button type="button" className="button primary small" onClick={() => void copy(section.key, section.url)}>{t('copy')}</button></div></div>
+      <div className="invite-link-collapse" data-open={expanded === section.key} id={`${id}-${section.key}`} inert={expanded !== section.key} aria-hidden={expanded !== section.key}><div className="invite-link-fields"><label className="sr-only" htmlFor={`${id}-${section.key}-url`}>{section.title} URL</label><input ref={element => { inputs.current[section.key] = element }} id={`${id}-${section.key}-url`} value={section.url} placeholder="Preparing your link…" readOnly onFocus={event => event.target.select()} /><button type="button" className="button primary small" disabled={!section.url} onClick={() => void copy(section.key, section.url)}>{t('copy')}</button></div></div>
     </div>)}</div>
     <p className="invite-share-caption">Or click on the icons to share</p>
     <div className="invite-share-links" aria-label="Share your invite link">

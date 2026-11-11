@@ -13,6 +13,7 @@ import { TransactionsPage } from './pages/Transactions'
 import { DepositPage, VoucherPage, WithdrawPage, TeamPage } from './pages/AccountTabs'
 import { ConversationPage } from './pages/Conversations'
 import { invitationReference } from './lib/invitations'
+import { ShortInvitation } from './ShortInvitation'
 
 function MemberRoute() {
   const { session, demo, loading } = useApp()
@@ -25,7 +26,8 @@ export function App() {
   useEffect(() => { invitationReference(location.search) }, [location.search])
   useEffect(() => { window.scrollTo(0, 0); document.title = `${location.pathname === '/' ? 'Learn. Connect. Explore.' : location.pathname.split('/').filter(Boolean).pop()?.replaceAll('-', ' ')} | LipaHub` }, [location.pathname])
   return <Routes>
-    <Route path="/" element={<Landing />} />
+    <Route path="/" element={new URLSearchParams(location.search).has('ref') ? <Navigate to={{ pathname: '/register', search: location.search, hash: location.hash }} replace /> : <Landing />} />
+    <Route path="/i/:code" element={<ShortInvitation />} />
     <Route path="/login" element={<AuthPage key="login" mode="login" />} />
     <Route path="/register" element={<AuthPage key="register" mode="register" />} />
     <Route path="/forgot-password" element={<AuthPage key="forgot" mode="forgot" />} />
