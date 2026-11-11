@@ -4,7 +4,13 @@ Production: https://lipahub1.vercel.app
 
 ## Renamed production URL and username invitations — 11 November 2026
 
-The owner renamed the Vercel site to `https://lipahub1.vercel.app` and requested a GitHub push and production deployment. The new URL returned 200 for `/api/health` and `/api/ready` before this update. Supabase migration `009_invitation_usernames.sql` was missing and has now been applied. Supabase Auth Site URL and exact `/dashboard` and `/reset-password` callbacks now use the new URL. Other Auth settings were preserved. Source publication and the new deployment are in progress; the earlier resume check below describes the state before the rename was known.
+Source commit `6b8a1ff24e921fdb9b6fe6106b0f50caa23c2793` was pushed to `Samlite250/LipaHub` on `main` and deployed as `dpl_BTj5ao1FnjwPcX31rmnoNbAWAkqm`. Vercel reached `READY` and aliased the deployment to the owner's renamed production URL, `https://lipahub1.vercel.app`. Subsequent documentation-only commits may follow this deployed source commit.
+
+Supabase migration `009_invitation_usernames.sql` was applied before deployment. A subsequent database read verified the lookup function exists and no eligible accounts remain without the username backfill. Supabase Auth Site URL and exact `/dashboard` and `/reset-password` callbacks now use the new URL. Other Auth settings were preserved.
+
+Fresh public checks returned 200 for home, registration, login, forgotten-password, reset-password, admin and member-support route shells. `/api/health` confirmed authentication and disabled payment services; `/api/ready` returned 200 with `ready: true`. A temporary member successfully signed in through the new URL, and its dashboard generated primary and alternative links containing the username and new origin. Live verification covered case-insensitive username lookup, legacy UUID lookup, response privacy, denied anonymous direct RPC access, home-to-registration persistence, English/Kinyarwanda, reload and mobile layout without page errors. An intercepted signup contained the username and inviter metadata; it created no additional account and sent no email. The temporary verification member was deleted successfully.
+
+The earlier resume check below describes the state before the renamed URL was known. The old `lipahub-nine.vercel.app` address is superseded.
 
 ## Resume check — 11 November 2026
 
@@ -12,7 +18,7 @@ The uncommitted work switches shared invitation links to saved usernames, retain
 
 Local verification passed lint, both workspace builds, the frontend TypeScript check, and all 14 database/deployment tests. The full browser/API run reported 135 passing cases and one intentional skip using `npx playwright test --workers=2 --timeout=60000 --reporter=list`. The runner then stalled during shutdown and was interrupted, so this was not a clean command exit. The default 30-second run had admin timeouts; the verification run used a 60-second per-test timeout without changing repository defaults. Fresh desktop/mobile invitation screenshots were captured under `artifacts/screenshots/`.
 
-Fresh unauthenticated requests to the recorded production URL's `/api/ready` and `/api/invitations/Cynthia` returned Vercel `404 DEPLOYMENT_NOT_FOUND`. Vercel CLI nevertheless listed deployment `dpl_ABTbFPvMwf4tmFB5CAukjv3T5T3r` (`https://lipahub-c7qikzshn-samlite250s-projects.vercel.app`) as Ready, targeting production, with the recorded URL among its aliases. The direct deployment URL and project alias redirected to Vercel sign-in, rather than returning application readiness JSON. Public availability is therefore unresolved; the earlier successful checks below are historical.
+At that point, unauthenticated requests to the old production URL's `/api/ready` and `/api/invitations/Cynthia` returned Vercel `404 DEPLOYMENT_NOT_FOUND`. Vercel CLI nevertheless listed deployment `dpl_ABTbFPvMwf4tmFB5CAukjv3T5T3r` (`https://lipahub-c7qikzshn-samlite250s-projects.vercel.app`) as Ready, targeting production, with the recorded URL among its aliases. The direct deployment URL and project alias redirected to Vercel sign-in, rather than returning application readiness JSON. Public availability was unresolved until the new URL was supplied and verified above.
 
 Vercel's diagnostic `curl` command unexpectedly created one automation bypass secret. It was revoked, and a subsequent project read verified its removal. No deployment, migration, environment-variable or account changes were made during this check.
 
