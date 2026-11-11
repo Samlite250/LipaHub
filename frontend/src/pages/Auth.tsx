@@ -54,7 +54,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
           options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { display_name: String(fields.get('username')).trim(), phone, country } } })
         if (error) throw error
         if (data.session) navigate(destination)
-        else setMessage('Check your email to confirm your account before signing in.')
+        else setMessage('Sign in to access your dashboard. If you already have an account, use your existing password.')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password: String(fields.get('password')) })
         if (error) throw error
@@ -83,9 +83,9 @@ export function AuthPage({ mode }: { mode: Mode }) {
           <label>{t('email')}{isRegister && <em> *</em>}<input name="email" type="email" placeholder="you@example.com" autoComplete="email" required /></label>
           {!isForgot && <>
             <label><span className="label-row"><span>{t('password')}{isRegister && <em> *</em>}</span>{!isRegister && <Link to="/forgot-password">{t('forgot')}</Link>}</span>
-              <span className="password-field"><input aria-label={t('password')} name="password" type={visible ? 'text' : 'password'} placeholder={t('password')} minLength={isRegister ? 12 : undefined} autoComplete={isRegister ? 'new-password' : 'current-password'} required /><button type="button" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={15} /> : <Eye size={15} />}</button></span>
+              <span className="password-field"><input aria-label={t('password')} name="password" type={visible ? 'text' : 'password'} placeholder={t('password')} minLength={isRegister ? 8 : undefined} autoComplete={isRegister ? 'new-password' : 'current-password'} required /><button type="button" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={15} /> : <Eye size={15} />}</button></span>
             </label>
-            {isRegister && <label>{t('confirm')} <em>*</em><input name="confirm" type={visible ? 'text' : 'password'} placeholder={t('confirm')} minLength={12} autoComplete="new-password" required /></label>}
+            {isRegister && <label>{t('confirm')} <em>*</em><input name="confirm" type={visible ? 'text' : 'password'} placeholder={t('confirm')} minLength={8} autoComplete="new-password" required /></label>}
           </>}
           {isRegister && <>
             <CountrySelect label={t('country')} value={country} onChange={setCountry} required />
@@ -120,5 +120,5 @@ export function ResetPassword() {
     if (error) setError(error.message)
     else navigate('/dashboard')
   }
-  return <main className="auth-page"><div className="auth-wrap"><Logo /><section className="auth-card"><h1>Choose a new password</h1><p className="auth-subtitle">Use at least 12 characters.</p><form onSubmit={submit}><label>New password<input name="password" type="password" minLength={12} autoComplete="new-password" required /></label><label>Confirm password<input name="confirm" type="password" minLength={12} autoComplete="new-password" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button primary" disabled={busy || loading}>{busy ? 'Saving…' : 'Save password'}</button></form><Link className="text-link" to="/forgot-password">Request a new reset link</Link></section></div></main>
+  return <main className="auth-page"><div className="auth-wrap"><Logo /><section className="auth-card"><h1>Choose a new password</h1><p className="auth-subtitle">Use at least 8 characters.</p><form onSubmit={submit}><label>New password<input name="password" type="password" minLength={8} autoComplete="new-password" required /></label><label>Confirm password<input name="confirm" type="password" minLength={8} autoComplete="new-password" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button primary" disabled={busy || loading}>{busy ? 'Saving…' : 'Save password'}</button></form><Link className="text-link" to="/forgot-password">Request a new reset link</Link></section></div></main>
 }

@@ -41,7 +41,8 @@ test('admin API verifies trusted roles, protects self access and performs saniti
     const fields = { email: 'new@example.invalid', name: 'New Member', phone: '+25779000000', country: 'Burundi', role: 'member', status: 'active' }
     expect((await request.put(`${base}/users/${actorId}`, { headers, data: { ...fields, status: 'suspended' } })).status()).toBe(409)
     expect((await request.post(`${base}/users`, { headers, data: { ...fields, password: 'short' } })).status()).toBe(400)
-    const create = await request.post(`${base}/users`, { headers, data: { ...fields, password: 'test-password-123', email_confirm: true, app_metadata: { role: 'admin' } } })
+    expect((await request.post(`${base}/users`, { headers, data: { ...fields, password: '1234567' } })).status()).toBe(400)
+    const create = await request.post(`${base}/users`, { headers, data: { ...fields, password: 'test1234', email_confirm: true, app_metadata: { role: 'admin' } } })
     expect(create.status()).toBe(201)
     expect(createAttributes.email_confirm).toBe(false)
     expect(createAttributes.app_metadata).toEqual({ role: 'member' })

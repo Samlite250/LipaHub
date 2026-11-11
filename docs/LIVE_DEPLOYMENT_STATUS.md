@@ -31,11 +31,11 @@ Supabase project: `pzxmfdqfsoltoqgflxcm`. All 12 public application tables have 
 
 `lipahubsupport@gmail.com` has the trusted `app_metadata.role = admin`. Supabase accepted an invitation email pointing to the live password-setup page. The owner must open that email to set their password; inbox delivery and the owner's password setup have not been verified. Administrator console: https://lipahub-nine.vercel.app/admin.
 
-The support address was saved using the audited settings operation. Auth Site URL and exact dashboard/reset-password redirects use the production URL. Minimum password length is 12, with email confirmation enabled.
+The support address was saved using the audited settings operation. Auth Site URL and exact dashboard/reset-password redirects use the production URL. At the owner's request, the live minimum password length was reduced to 8 and email confirmation was disabled on 11 November 2026. New registrations receive a session immediately and can access the dashboard.
 
 ## Client-launch blockers
 
-Custom SMTP is not configured. The built-in Supabase sender is for testing and restricts recipients to project-team addresses; ordinary client confirmation and recovery delivery require a production email provider. See https://supabase.com/docs/guides/auth/auth-smtp. Keep credentials out of chat and source control; configure them privately in Supabase Auth.
+Custom SMTP is not configured. The built-in Supabase sender is for testing and restricts recipients to project-team addresses; ordinary client recovery and invitation delivery require a production email provider. Registration no longer requires confirmation email. See https://supabase.com/docs/guides/auth/auth-smtp. Keep credentials out of chat and source control; configure them privately in Supabase Auth.
 
 The terms and privacy pages remain explicitly marked as development notices. Final operator details, applicable jurisdiction, retention/deletion rules and operational policies need completion before onboarding clients.
 

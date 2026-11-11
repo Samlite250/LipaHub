@@ -1,6 +1,6 @@
 # Production authentication email
 
-Status on 11 November 2026: the recorded live setup uses the Supabase test sender. The owner has an email address but has not supplied an owned domain or email sending provider. Production SMTP and inbox delivery remain unverified.
+Status on 11 November 2026: the recorded live setup uses the Supabase test sender. The owner has an email address but has not supplied an owned domain or email sending provider. Production SMTP and inbox delivery remain unverified. Email confirmation is now disabled at the owner’s request; new registrations enter the dashboard immediately with an 8-character minimum password. Custom SMTP is still needed for reliable password recovery and invitations.
 
 The owner plans to purchase `lipahub1.com` and use `www.lipahub1.com` for the website. Purchase and DNS ownership are pending. Once owned, use `auth.lipahub1.com` as the proposed sending subdomain and `no-reply@auth.lipahub1.com` as the sender. Continue using the existing Vercel URLs until the custom domain is connected and verified.
 
@@ -27,19 +27,19 @@ Open the [LipaHub project](https://supabase.com/dashboard/project/pzxmfdqfsoltoq
 | Username | `resend` |
 | Password | The private Resend sending API key |
 
-Use a sender under the verified domain. Do not use the Gmail support address as the Resend sender. Keep email confirmation enabled. Keep these existing authentication URLs:
+Use a sender under the verified domain. Do not use the Gmail support address as the Resend sender. Keep email confirmation disabled and the minimum password length at 8, as requested by the owner. Keep these existing authentication URLs:
 
 - Site URL: `https://lipahub-nine.vercel.app`
 - Allowed redirect: `https://lipahub-nine.vercel.app/dashboard`
 - Allowed redirect: `https://lipahub-nine.vercel.app/reset-password`
 
-Disable click tracking for authentication emails so confirmation and reset links are not rewritten. Review Supabase's email rate limit and the provider's quota together before onboarding clients. SMTP credentials belong in Supabase, not frontend variables or this repository. No application redeployment is required just to change Supabase SMTP.
+Disable click tracking for authentication emails so recovery and invitation links are not rewritten. Review Supabase's email rate limit and the provider's quota together before onboarding clients. SMTP credentials belong in Supabase, not frontend variables or this repository. No application redeployment is required just to change Supabase SMTP.
 
 ## Delivery verification
 
 After saving the settings, use an inbox you control outside the Supabase project team:
 
-1. Register through the live website. Receive the confirmation email, follow its link and sign in.
+1. Register through the live website using an 8-character password. Confirm that the dashboard opens immediately without a confirmation email.
 2. Request a password reset through the website. Receive the email, follow the reset link, set a new password and sign in with it.
 3. Check the visible sender, destination URLs, spam folder and provider delivery logs. Provider acceptance alone does not prove inbox delivery.
 4. Record the result in `LIVE_DEPLOYMENT_STATUS.md`. Keep production delivery marked unverified until both flows succeed.

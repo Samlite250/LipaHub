@@ -44,7 +44,7 @@ Keep private keys in the server environment only. Rebuild/redeploy after changin
 
 ## 4. Supabase setup
 
-For a new empty database, run `Backend/setup/new-project.sql` once, or authorize Supabase so the assistant can apply it. That file contains migrations 001 through 008 in order. Existing databases must apply only their missing migrations; see [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, confirmation email delivery and the first trusted administrator.
+For a new empty database, run `Backend/setup/new-project.sql` once, or authorize Supabase so the assistant can apply it. That file contains migrations 001 through 008 in order. Existing databases must apply only their missing migrations; see [LIVE_SETUP.md](LIVE_SETUP.md). Configure email/password Auth, an 8-character minimum password, disabled email confirmation, recovery email delivery and the first trusted administrator.
 
 After Vercel returns the production `https://...vercel.app` URL, set that as the Supabase Auth Site URL and allow these redirects:
 
@@ -59,7 +59,7 @@ Use exact deployed URLs. Preview URLs require separate Auth redirect configurati
 
 1. `/api/health` must return JSON with HTTP 200. A page of HTML here means API routing is wrong.
 2. `/api/ready` must return 200 with `ready: true`. Until credentials, migrations and the private bucket are ready, it deliberately returns 503. Authorized administrators can inspect `/api/admin/system/status`.
-3. Open `/dashboard/profile` directly and verify SPA routing. Register, confirm email, sign in and test password recovery.
+3. Open `/dashboard/profile` directly and verify SPA routing. Register and verify immediate dashboard access, then sign in again and test password recovery.
 4. Check admin permissions and support persistence with two separate member accounts. Verify cross-account access is denied and suspended accounts cannot read private data.
 5. Verify balance history, content, announcements and settings against the real project. Review private proof intake separately before enabling it.
 

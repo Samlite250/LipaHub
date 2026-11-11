@@ -38,7 +38,7 @@ Every `/api/admin` request verifies its bearer token with Supabase Auth and read
 
 Administrators cannot delete themselves, remove their own administrator role or suspend their own account. Creating an administrator or changing another user's role is supported only through the authorized API. User output is whitelisted and omits raw metadata and credentials. The phone field changes display metadata, not a verified phone identity.
 
-Live account creation requires a 12–128-character initial password, does not send an email and leaves the email unconfirmed. The target project must supply an email-confirmation flow before that account can sign in. Passwords are never returned or written to audit records. Email changes are handled by Supabase's configured identity policy. Deleting accounts referenced by payment records may fail; use suspension to preserve their history. Deletion does not erase unrelated historical audit entries.
+Live account creation requires an 8–128-character initial password and does not send an email. Email confirmation is disabled in the target project, so the user can sign in immediately. The admin API still ignores client-supplied verification flags. Passwords are never returned or written to audit records. Email changes are handled by Supabase's configured identity policy. Deleting accounts referenced by payment records may fail; use suspension to preserve their history. Deletion does not erase unrelated historical audit entries.
 
 ## Concurrency and audit
 

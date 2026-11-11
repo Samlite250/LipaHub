@@ -15,7 +15,7 @@ export function userInput(body: Record<string, unknown>, create = false) {
   const phone = text(body.phone || '', 'phone number', 16)
   if (phone && !/^\+[1-9]\d{6,14}$/.test(phone)) throw new AdminInputError('Use a phone number including its country code.')
   const value = { email, phone, name: text(body.name, 'display name', 120, 2), country: choice(body.country, adminCountries, 'country'), role: choice(body.role, ['member', 'admin'], 'role'), status: choice(body.status, ['active', 'suspended'], 'account status') }
-  if (create && (typeof body.password !== 'string' || body.password.length < 12 || body.password.length > 128)) throw new AdminInputError('Use an initial password between 12 and 128 characters.')
+  if (create && (typeof body.password !== 'string' || body.password.length < 8 || body.password.length > 128)) throw new AdminInputError('Use an initial password between 8 and 128 characters.')
   return value
 }
 export function recordInput(body: Record<string, unknown>, collection: string) {
