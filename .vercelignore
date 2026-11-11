@@ -13,3 +13,6 @@ docs
 **/.env.*
 **/*.local
 **/*.tsbuildinfo
+
+.tools/
+supabase/.temp/

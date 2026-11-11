@@ -1,6 +1,8 @@
 # LipaHub
 
-The latest local audit and backend milestone is documented in [SYSTEM_AUDIT.md](docs/SYSTEM_AUDIT.md). See [BACKEND.md](docs/BACKEND.md) for the API, readiness checks and Supabase/GitHub handoff. `npm run check` runs the complete local quality checks; live integration is still pending.
+Live review site: **https://lipahub-nine.vercel.app**. See [the verified deployment status and remaining client-launch blockers](docs/LIVE_DEPLOYMENT_STATUS.md) for the current cloud state; older local milestones below describe the earlier setup.
+
+The earlier local audit and backend milestone is documented in [SYSTEM_AUDIT.md](docs/SYSTEM_AUDIT.md). See [BACKEND.md](docs/BACKEND.md) for the API and readiness checks, and [LIVE_DEPLOYMENT_STATUS.md](docs/LIVE_DEPLOYMENT_STATUS.md) for completed live integration checks and remaining launch work. `npm run check` runs the complete local quality checks.
 
 ## Moving to real accounts
 
@@ -147,7 +149,7 @@ Screenshots are written to a fresh dated directory under `artifacts/screenshots/
 
 For the requested combined Vercel deployment, use the repository root (`.`), the root `vercel.json`, and [VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). Both frontend and API run on the same Vercel domain. The older frontend-only configuration is an alternative, not the setting for this deployment.
 
-This task is a local preview; nothing has been published and no domain ownership is assumed. `npm run build` creates frontend output in `frontend/dist/` and API output in `Backend/dist/`. Set the Vercel project root to `frontend`; `frontend/vercel.json` handles client-side routes. The Express API is a separate service: use HTTPS, the correct `WEB_ORIGIN`, host-appropriate binding and a configured trusted proxy before hosting it. The current bind address is local loopback. No secrets belong in `VITE_*` variables.
+The review site is deployed at **https://lipahub-nine.vercel.app** with frontend and API hosted together from the repository root. `npm run build` creates frontend output in `frontend/dist/` and API output in `Backend/dist/`. The `frontend/vercel.json` configuration is only for the alternative frontend-only deployment with a separately hosted API. No custom domain is recorded. No secrets belong in `VITE_*` variables.
 
 Final privacy/terms, production authentication, applying/testing the supplied database policies and live financial verification/activation integrations remain future work. No earnings, business partners, users or market performance are claimed by this preview.
 

@@ -50,6 +50,8 @@ Run `npm run setup:check`. It checks configuration without printing key values o
 
 ## 3. Enable real accounts and administration
 
+For the existing deployed project, follow [the production email setup](PRODUCTION_EMAIL.md) to replace the test sender before onboarding clients.
+
 In Supabase Auth, enable email/password, require email confirmation and set the website URL and allowed redirects for `/dashboard` and `/reset-password`. Configure production email delivery and a password policy. Register and confirm your own account. Use trusted Supabase administration to set that user's **app metadata** to include `"role": "admin"`, preserving other app metadata. User metadata cannot grant administrator access. Sign out and back in after assigning the role.
 
 Start `npm run dev` and `npm run dev:api` in separate terminals. Sign in to `/admin` and publish resources, announcements and support contact details. New real account balances start at zero. Audited balance corrections appear at `/dashboard/transactions`; staff-only adjustment reasons and actor IDs are excluded from the member API.

@@ -14,3 +14,6 @@ Materials-References/
 .vercel/
 
 artifacts/
+
+.tools/
+supabase/.temp/

@@ -1,0 +1,9 @@
+{
+  "project_id": "LipaHub",
+  "auth": {
+    "site_url": "https://lipahub-nine.vercel.app",
+    "additional_redirect_urls": ["https://lipahub-nine.vercel.app/dashboard", "https://lipahub-nine.vercel.app/reset-password"],
+    "minimum_password_length": 12,
+    "email": { "enabled": true, "enable_confirmations": true }
+  }
+}
