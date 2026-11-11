@@ -33,6 +33,10 @@ Source commit `17e38be19e14e211e94fcbf1619f13c8411fb9de` is on GitHub and deploy
 
 Live mobile-browser verification registered a temporary member with an 8-character password, reached the dashboard immediately, accessed the authenticated API and signed in again without email confirmation. A 7-character password was rejected, and an authenticated password change accepted 8 characters. The temporary account was deleted. Lint, build and all 8 focused desktop/mobile authentication and admin checks passed. Public route checks and API readiness also passed.
 
+## Invited registration update
+
+Source commit `079fc71` was pushed and deployed as `dpl_35VqLysYFFNuf3WmQqEjPMsTqduA` on 11 November 2026. The invited form now matches the supplied name-banner reference. A live check verified the owner's public inviter lookup, home-to-registration persistence, English/Kinyarwanda, reloads and mobile layout. An intercepted signup request contained both invitation metadata fields; no test account was created or email sent. Lint, build and all 12 focused browser/API checks passed. See [invitation behavior and limits](INVITATIONS.md); this preserves signup context without enabling a referral ledger or rewards.
+
 ## Administrator
 
 Sign-in now routes accounts with trusted `app_metadata.role = admin` to `/admin`; members go to `/dashboard` or their requested member page. Visiting `/login` with an existing administrator session also opens `/admin`. Password reset uses the same role-based destination. User-editable metadata never determines this redirect. Lint, build and 10 focused desktop/mobile authentication and routing checks passed for this change.
