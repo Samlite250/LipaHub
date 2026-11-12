@@ -27,6 +27,6 @@ test('support in demo requires a real account and admin inbox is routed', async 
   await expect(page.getByText('Sign in with a real account', { exact: false })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Submit request' })).toHaveCount(0)
   await page.goto('/admin/support'); await page.getByRole('button', { name: 'Open admin demo' }).click()
-  await expect(page.getByRole('heading', { name: 'Support inbox', exact: true, level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Support inbox', exact: true, level: 2 })).toBeVisible()
   await expect(page.getByText('Sign in with an administrator account to respond to real member requests.')).toBeVisible()
 })

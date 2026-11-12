@@ -2,7 +2,7 @@
 
 Open `/admin/users`, choose **Balances** on a user, and select the wallet country. The editor shows available funds, the separate bonus balance and the latest 100 corrections. Enter the new totals and a reason of 10–500 characters, review the before/after amounts, then confirm. Both credits and reductions are supported; totals cannot be negative.
 
-The required primary tabs are Overview, Users, Payments, Resources, Announcements, System settings and Audit log. Payment instructions and proof submissions are sub-tabs of Payments. The former submission Activity page is redundant with the proof queue; its legacy query selects proof submissions.
+The administrative console is grouped into Overview, Payments, Withdrawals, Members, Support, Content, Audit log and Settings. Payment instructions and proof submissions are sub-tabs of Payments; resources and announcements are sub-tabs of Content. The former submission Activity page is redundant with the proof queue; its legacy query selects proof submissions. Withdrawals is a live-only review queue and stays hidden behind an access notice in the browser demo.
 
 ## Member display
 

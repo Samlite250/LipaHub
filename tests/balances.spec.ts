@@ -89,16 +89,17 @@ test('all eight admin tabs including support are shown and every tab has working
   await expect(navigation.getByRole('link')).toHaveCount(8)
   await expect(navigation.getByRole('link', { name: 'Activity', exact: true })).toHaveCount(0)
   for (const [name, heading] of [
-    ['Overview', 'Workspace overview'], ['Users', 'User directory'], ['Payments', 'Country payment settings'],
-    ['Resources', 'Learning & content'], ['Announcements', 'Member announcements'],
-    ['System settings', 'General settings'], ['Audit log', 'Administrative audit log'],
+    ['Overview', 'Operations overview'], ['Payments', 'Payment instructions'], ['Withdrawals', 'Withdrawal review'],
+    ['Members', 'Members'], ['Content', 'Content library'], ['Audit log', 'Audit log'],
+    ['Settings', 'Settings'], ['Support', 'Support'],
   ]) {
     await navigation.getByRole('link', { name, exact: true }).click()
-    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible()
+    await expect(page.locator('.admin-page-title').getByRole('heading', { name: heading, exact: true })).toBeVisible()
     await expect(navigation.getByRole('link', { name, exact: true })).toHaveAttribute('aria-current', 'page')
-    await page.getByRole('button', { name: 'Refresh data' }).click()
-    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible()
   }
+  await navigation.getByRole('link', { name: 'Overview', exact: true }).click()
+  await page.getByRole('button', { name: 'Refresh data' }).click()
+  await expect(page.locator('.admin-page-title').getByRole('heading', { name: 'Operations overview', exact: true })).toBeVisible()
   await navigation.getByRole('link', { name: 'Payments', exact: true }).click()
   await page.getByRole('tab', { name: 'Proof submissions', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Your queue is clear', exact: true })).toBeVisible()

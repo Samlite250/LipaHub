@@ -64,7 +64,7 @@ export function App() {
 <Route path=":feature" element={<PlannedPage />} />
     </Route>
     <Route path="/admin" element={<AdminPayments />} />
-    {['payments', 'users', 'resources', 'announcements', 'settings', 'audit', 'support'].map(section => <Route key={section} path={`/admin/${section}`} element={<AdminPayments />} />)}
+    {['payments', 'withdrawals', 'users', 'content', 'resources', 'announcements', 'settings', 'audit', 'support'].map(section => <Route key={section} path={`/admin/${section}`} element={<AdminPayments />} />)}
     <Route path="*" element={<NotFound />} />
   </Routes>
 }

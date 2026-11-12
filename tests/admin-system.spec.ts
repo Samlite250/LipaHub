@@ -88,7 +88,7 @@ test('announcements respect country audiences and system settings reach support 
   await page.getByRole('dialog').getByLabel('Publication status').selectOption('published')
   await page.getByRole('button', { name: 'Save record' }).click()
   await expect(page.locator('.admin-content-list')).toContainText('Rwanda member notice')
-  await page.getByRole('link', { name: 'System settings', exact: true }).click()
+  await page.getByRole('link', { name: 'Settings', exact: true }).click()
   await page.getByLabel('Site name').fill('LipaHub Test Workspace')
   await page.getByLabel('Support email').fill('support@example.invalid')
   await page.getByLabel('Support message').fill('Test support message from the system administrator.')

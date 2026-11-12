@@ -1,25 +1,28 @@
 # System administration
 
-The admin console at `/admin` uses the same mint background, light blue header, teal controls and blue/purple/pink gradients as the member dashboard. Existing payment settings and evidence review are retained.
+The admin console at `/admin` uses a dedicated, restrained operations design: a dark grouped navigation rail, compact sticky top bar, dense KPI and queue panels, and one teal accent. Tabs are limited to workflows the backend supports, grouped into Operations, Management and Governance. Existing payment settings and evidence review are retained.
 
 ## Areas
 
 | Route | Operations |
 | --- | --- |
-| `/admin/users` | Create, list, inspect, edit and delete accounts; edit profiles, access and country wallet balances with audited corrections |
-| `/admin/resources` | Full CRUD for courses, articles and ebooks; draft/published states, HTTPS resource links and country audience |
-| `/admin/announcements` | Full CRUD for member notices with draft/published states and country audience |
+| `/admin` | Overview of payment reviews, live withdrawal and support queues, published markets and recent submissions |
+| `/admin/payments` | Country payment instructions and proof submissions as sub-tabs |
+| `/admin/withdrawals` | Live-only review, approval, rejection and paid settlement of withdrawal requests; demo shows an access notice |
+| `/admin/users` | Member directory: create, inspect, edit and delete accounts; edit profiles, access and country wallet balances with audited corrections |
+| `/admin/support` | Member support inbox when live administrator access is available |
+| `/admin/resources` | Content sub-tab for courses, articles and ebooks; draft/published states, HTTPS links and country audience |
+| `/admin/announcements` | Content sub-tab for member notices with draft/published states and country audience |
 | `/admin/settings` | Read/update the member site name, support email/message and announcement visibility |
-| `/admin/audit` | Read the latest 200 user/content/settings operation records |
-| `/admin/payments` | Existing country payment instructions and proof reviews |
+| `/admin/audit` | Read and filter the latest 200 user, balance, content, payment and withdrawal operation records |
 
-Users have pages of 50. User search and filters apply to the currently loaded page, as labelled. Live content lists return the latest 500 records. Available and bonus balances have a dedicated, audited adjustment editor in Users. Payment provider verification, withdrawals and robot activation remain separate operations. See ACCOUNT_BALANCES.md for currency, concurrency, retry and ledger behavior.
+Members have pages of 50. Member search and filters apply to the currently loaded page, as labelled. Live content lists return the latest 500 records. Available and bonus balances have a dedicated, audited adjustment editor in Members. Withdrawal intake remains behind `WITHDRAWAL_REQUESTS_ENABLED`, and payout execution is still manual; provider deposit verification and trading remain separate operations. See ACCOUNT_BALANCES.md for currency, concurrency, retry and ledger behavior.
 
 Published resources appear on `/dashboard/courses`, `/dashboard/articles` and `/dashboard/ebooks`. Notices appear on the dashboard and `/dashboard/announcements`, subject to the visibility setting. Support settings appear on `/dashboard/support`, and the site name appears in the member footer. Country audiences control presentation and are not a privacy or financial authorization boundary.
 
 ## Demo
 
-Select **Open admin demo**. Demo records live in a separate browser IndexedDB database, `lipahub-system-preview`. The existing demo profile is added to its user directory with an `example.invalid` email; other users appear only when created. Demo CRUD does not create authentication accounts, send email or grant server permissions. Passwords are not stored in the demo database. Deletion requires the exact email or content title. Demo user changes update the currently open demo profile when its record is edited.
+Select **Open admin demo**. Demo records live in a separate browser IndexedDB database, `lipahub-system-preview`. The existing demo profile is added to its member directory with an `example.invalid` email; other members appear only when created. Demo CRUD does not create authentication accounts, send email or grant server permissions. Passwords are not stored in the demo database. Deletion requires the exact email or content title. Demo user changes update the currently open demo profile when its record is edited.
 
 Demo user, resource, announcement and settings changes persist until browser site data is cleared. Sign-out does not clear stored demo records. The admin demo must be opened again after a full page reload.
 
