@@ -1,0 +1,23 @@
+.wallet-welcome { font-size: 13px; line-height: 1.8; margin: 16px 0; color: #fff; }
+.wallet-install-link { display: inline; padding: 0; border: 0; background: transparent; color: #fff49b; text-decoration: underline; text-underline-offset: 2px; font: inherit; font-weight: 750; cursor: pointer; }
+.wallet-install-link:hover { color: #fff; }
+.wallet-install-link:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 2px; }
+.wallet-welcome .wallet-demo-note { display: block; font-size: 11px; color: #ffffffc0; }
+.install-app-heading { display: flex; align-items: center; gap: 16px; margin: 20px 0; }
+.install-app-heading img { flex-shrink: 0; border-radius: 13px; }
+.install-app-heading p { line-height: 1.7; margin: 0; }
+.install-app-steps { padding-left: 23px; margin: 22px 0; }
+.install-app-steps li { padding-left: 6px; margin: 17px 0; line-height: 1.7; }
+.install-app-steps strong,.install-app-steps span { display: block; }
+.install-app-steps span { color: var(--muted); font-size: 13px; }
+.install-app-message { border-radius: 9px; padding: 12px; background: var(--soft); color: var(--teal); line-height: 1.7; }
+.install-app-page { max-width: 680px; margin: auto; padding: 45px 22px; }
+.install-app-page>.logo { margin-bottom: 30px; }
+.install-app-panel { padding: clamp(24px, 5vw, 45px); margin-bottom: 24px; }
+.install-app-panel h1 { font-size: clamp(25px, 4vw, 35px); line-height: 1.25; margin: 20px 0; }
+.install-app-panel>p { color: var(--muted); line-height: 1.9; }
+.install-app-symbol { display: inline-flex; padding: 16px; border-radius: 18px; background: var(--soft); color: var(--teal); }
+.install-app-actions { display: flex; align-items: center; gap: 12px; margin: 25px 0 20px; color: var(--teal); }
+.robot-hero .wallet-welcome { margin: 18px 0 0; }
+.landing .hero-buttons { flex-wrap: wrap; }
+@media(max-width:479px) { .wallet-welcome { font-size: 12px; }.install-app-heading { align-items: flex-start; }.install-app-heading p { font-size: 13px; } }

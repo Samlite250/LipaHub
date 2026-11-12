@@ -11,6 +11,7 @@ import type { PaymentAccess, PaymentRequest } from '../domain/payments'
 import './Robots.css'
 import { useMemberBalance } from '../useMemberBalance'
 import { walletMoney } from '../domain/balances'
+import { WalletWelcome } from '../WalletWelcome'
 
 export function RobotsPage() {
   const { demo, session } = useApp()
@@ -48,7 +49,7 @@ export function RobotDashboard() {
     return matchesSearch && (filter === 'all' || (filter === 'available' && !ids.includes(robot.id) && !paymentRequests.some(row => row.country === country && row.planId === robot.id && row.status !== 'rejected')) || (filter === 'active' && ids.includes(robot.id)))
   })
   return <div className="robot-workspace">
-    <section className="wallet-hero robot-hero"><div className="wallet-top"><span className="hello-badge"><Lightbulb size={15} />{t('hello')}, {name}</span><span className="robot-region"><Globe2 size={14} />{country}</span></div><div className="robot-hero-copy"><div><span className="robot-eyebrow">YOUR ROBOT WORKSPACE</span><h2>Find your next robotic plan.</h2><p>Explore 33 plans, their activation values and one-time bonuses.</p></div><Bot size={68} strokeWidth={1.2} /></div><div className="robot-hero-bottom"><span><CheckCircle2 size={14} />{readyCount} plans available</span><span><Gift size={14} />Activation follows payment verification</span></div></section>
+    <section className="wallet-hero robot-hero"><div className="wallet-top"><span className="hello-badge"><Lightbulb size={15} />{t('hello')}, {name}</span><span className="robot-region"><Globe2 size={14} />{country}</span></div><WalletWelcome /><div className="robot-hero-copy"><div><span className="robot-eyebrow">YOUR ROBOT WORKSPACE</span><h2>Find your next robotic plan.</h2><p>Explore 33 plans, their activation values and one-time bonuses.</p></div><Bot size={68} strokeWidth={1.2} /></div><div className="robot-hero-bottom"><span><CheckCircle2 size={14} />{readyCount} plans available</span><span><Gift size={14} />Activation follows payment verification</span></div></section>
     <div className="stat-grid robot-primary-cards" aria-label="Robot account summary">
       <section className="stat-card blue"><h2>Active Plans</h2><span className="stat-icon"><Bot size={24} strokeWidth={1.5} /></span><strong data-testid="active-robot-count">{wallet.active.length}<span className="stat-value-detail"> / 33</span></strong><button className="stat-card-link" onClick={() => { setFilter('active'); setSearch(''); document.getElementById('robot-catalogue')?.scrollIntoView({ block: 'start' }) }}>View active plans <ArrowRight size={12} /></button></section>
       <section className="stat-card green"><h2>Received Bonuses</h2><span className="stat-icon"><Gift size={24} strokeWidth={1.5} /></span><strong data-testid="robot-bonus">{account.wallet ? walletMoney(account.wallet.bonusMinor, account.wallet.currency) : account.error ? 'Unavailable' : 'Loading…'}</strong><small>Account bonuses · one-time</small></section>

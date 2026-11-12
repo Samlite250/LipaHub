@@ -9,6 +9,10 @@ test('Vercel configuration sends API routes to the function before SPA fallback'
   assert.equal(config.rewrites[0].source, '/api/:path*')
   assert.equal(config.rewrites[0].destination, '/api/index')
   assert.equal(config.functions['api/index.mjs'].maxDuration, 60)
+  const spa = new RegExp(`^${config.rewrites.at(-1).source}$`)
+  for (const path of ['/sw.js', '/manifest.webmanifest', '/offline.html', '/icons/app-192.png']) assert.equal(spa.test(path), false, path)
+  assert.equal(spa.test('/install'), true)
+  assert.ok(config.headers.find(rule => rule.source === '/sw.js').headers.some(header => header.key === 'Cache-Control' && header.value.includes('no-cache')))
 })
 
 test('Vercel function exports a working API without opening its own listening port', async () => {

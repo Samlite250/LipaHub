@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "LipaHub",
+  "short_name": "LipaHub",
+  "description": "Your LipaHub account, learning, community and support in one app.",
+  "lang": "en",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f8f8",
+  "theme_color": "#14b8a6",
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/app-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

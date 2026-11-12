@@ -14,6 +14,7 @@ import { DepositPage, VoucherPage, WithdrawPage, TeamPage } from './pages/Accoun
 import { ConversationPage } from './pages/Conversations'
 import { invitationReference } from './lib/invitations'
 import { ShortInvitation } from './ShortInvitation'
+import { InstallAppPage } from './InstallApp'
 
 function MemberRoute() {
   const { session, demo, loading } = useApp()
@@ -28,6 +29,7 @@ export function App() {
   return <Routes>
     <Route path="/" element={new URLSearchParams(location.search).has('ref') ? <Navigate to={{ pathname: '/register', search: location.search, hash: location.hash }} replace /> : <Landing />} />
     <Route path="/i/:code" element={<ShortInvitation />} />
+    <Route path="/install" element={<InstallAppPage />} />
     <Route path="/login" element={<AuthPage key="login" mode="login" />} />
     <Route path="/register" element={<AuthPage key="register" mode="register" />} />
     <Route path="/forgot-password" element={<AuthPage key="forgot" mode="forgot" />} />
