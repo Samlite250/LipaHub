@@ -2,6 +2,14 @@
 
 Production: https://lipahub1.vercel.app
 
+## Installable PWA and wallet welcome — 12 November 2026
+
+Source commit `fe99b22` was pushed to GitHub and deployed as `dpl_GrHR2VhuvWUR2t1g4JQM89jXXbNj`, Ready at the production URL. Both member dashboard variants now include a LipaHub welcome line and underlined **CLICK HERE** install action, translated to **KANDA HANO** in Kinyarwanda. The original gradient wallet presentation and the member's own greeting remain in place. Public installation is available at https://lipahub1.vercel.app/install and through **Get the app** on the home page.
+
+The PWA opens the same `/dashboard` and uses the same authentication, pages and API as the website. Its manifest, original-logo PNG icons, Apple touch icon, production service worker and public offline reconnect screen are deployed. Private pages and API responses are not stored in Cache Storage. Installation uses a browser prompt when available and device-specific instructions otherwise. See [PWA behavior and installation](PWA.md).
+
+Lint, both builds and all 15 database/deployment checks passed. The eight focused desktop/mobile PWA checks completed successfully; dashboard, responsive-route and country catalogue regressions also passed. Live checks verified static asset MIME/update headers, service-worker registration and Chrome manifest parsing. Chrome's installability diagnostics returned no errors in a fresh regular test profile. A temporary member completed sign-in, displayed the welcome text and own greeting, opened the install dialog, saw the offline reconnect screen and recovered online without page errors. Cache Storage contained only the public offline page and icons. The account and generated browser test profile were removed, with no email sent. Live screenshots are under `artifacts/screenshots/pwa-live-1794465116227/`. Actual installation on the owner's phone requires their browser confirmation and has not been performed by automation.
+
 ## Direct registration and hashed Alternative links — 12 November 2026
 
 Source commit `89b3ffc` was pushed to GitHub and deployed as `dpl_9Kcv1knRdqQGQyujgAmGqkfGNwCP`, Ready at the production URL. Migration `010_short_invitation_codes.sql` was applied before deployment. Previously shared `/?ref=Ish` links now open registration directly. The primary link remains `/register?ref=Ish`; the Alternative link is `/i/t9TWSmPl`, which resolves the short username hash and opens the same canonical registration URL.
