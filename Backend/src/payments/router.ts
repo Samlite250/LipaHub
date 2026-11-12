@@ -8,12 +8,15 @@ const bucket = 'robot-payment-proofs'
 function fail(message: string, status = 500): never { throw Object.assign(new Error(message), { status }) }
 function databaseError(error: { code?: string } | null) {
   if (!error) return
+  if (error.code === '42501') fail('This payment review is not permitted.', 403)
+  if (error.code === 'P0002') fail('Payment request not found.', 404)
+  if (['22023', '23514'].includes(error.code || '')) fail('Invalid payment review or saved bonus. Check the request details.', 400)
   if (error.code === '23505' || error.code === '40001') fail('A request already exists or the instructions changed. Reload before continuing.', 409)
   fail('Payment storage is unavailable. Check the server configuration and migration.', 503)
 }
 type Row = Record<string, unknown>
 function mapRequest(row: Row) {
-  return { id: row.id, userId: row.user_id, country: row.country, planId: row.plan_id, status: row.status, fullName: row.full_name, phone: row.phone, transactionReference: row.transaction_reference, instructionVersion: row.instruction_version, paymentMethod: row.payment_method, quote: row.quote, submittedAt: row.submitted_at, reviewNote: row.review_note,
+  return { id: row.id, userId: row.user_id, country: row.country, planId: row.plan_id, status: row.status, fullName: row.full_name, phone: row.phone, transactionReference: row.transaction_reference, instructionVersion: row.instruction_version, paymentMethod: row.payment_method, quote: row.quote, submittedAt: row.submitted_at, reviewNote: row.review_note, reviewVersion: row.review_version || 1, reviewedAt: row.reviewed_at, bonusCreditedMinor: Number(row.bonus_credited_minor || 0),
     files: ((row.robot_payment_proofs || []) as Row[]).map(file => ({ id: file.id, name: file.original_name, type: file.mime_type, size: file.size_bytes })) }
 }
 export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseClient | null, proofIntake?: boolean) {
@@ -107,11 +110,12 @@ export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseCli
     databaseError(error); res.status(201).json(mapRequest(row!))
   })
   router.patch('/admin/requests/:id', admin, express.json({ limit: '8kb' }), async (req, res) => {
-    if (!['under_review', 'rejected'].includes(req.body?.status)) throw new InputError('Review cannot confirm payment or activate a robot.')
-    const note = text(req.body?.note || '', 'review note', 1000, req.body.status === 'rejected' ? 3 : 0)
+    if (!['under_review', 'rejected', 'verified'].includes(req.body?.status)) throw new InputError('Choose approve, reject or under review.')
+    const note = text(req.body?.note || '', 'review note', 1000, req.body.status === 'under_review' ? 0 : 3)
+    if (!Number.isInteger(req.body?.version) || req.body.version < 1) throw new InputError('Reload this submission before reviewing it.')
     const id = text(req.params.id, 'request ID', 36, 36)
     if (!/^[0-9a-f-]{36}$/i.test(id)) throw new InputError('Invalid request ID.')
-    const { error } = await db!.rpc('review_robot_activation_request', { p_id: id, p_status: req.body.status, p_note: note, p_actor: (res.locals.user as User).id })
+    const { error } = await db!.rpc('review_robot_activation_request', { p_id: id, p_status: req.body.status, p_note: note, p_actor: (res.locals.user as User).id, p_expected_version: req.body.version })
     databaseError(error); res.status(204).end()
   })
   router.get('/requests/:id/files/:fileId', async (req, res) => {

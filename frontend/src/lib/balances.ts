@@ -2,19 +2,13 @@ import { platformApi } from './platform'
 import type { PaymentAccess } from '../domain/payments'
 import { parseWalletAmount, storedDemoBaseline, type AccountBalance, type BalanceAdjustment, type BalanceEntry, type BalanceView } from '../domain/balances'
 import type { Country } from '../domain/countries'
+import { openDemoDatabase } from './demo-database'
 
 async function api<T>(access: PaymentAccess, path: string, init: RequestInit = {}): Promise<T> {
   if (!('accessToken' in access)) throw new Error('Live authentication required.')
   return platformApi<T>(access.accessToken, path, init)
 }
-function database(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('lipahub-balance-preview', 1)
-    request.onupgradeneeded = () => { request.result.createObjectStore('wallets', { keyPath: 'id' }); request.result.createObjectStore('entries', { keyPath: 'requestId' }) }
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(new Error('Balance storage is unavailable in this browser.'))
-  })
-}
+const database = openDemoDatabase
 function result<T>(request: IDBRequest<T>): Promise<T> { return new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error) }) }
 export async function getBalance(access: PaymentAccess, userId: string, country: Country): Promise<BalanceView> {
   if ('accessToken' in access) return api(access, `/api/admin/users/${userId}/balances?country=${encodeURIComponent(country)}`)

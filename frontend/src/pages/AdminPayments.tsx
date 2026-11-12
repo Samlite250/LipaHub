@@ -12,6 +12,7 @@ import './Admin.css'
 import { AdminSystem, type SystemSection } from './AdminSystem'
 import './AdminSystem.css'
 import { demoEnabled } from '../lib/platform'
+import { formatRobotMoney } from '../domain/robots'
 
 type AdminTab = 'overview' | 'instructions' | 'proofs' | SystemSection
 const sections = [
@@ -24,7 +25,7 @@ const sections = [
   { id: 'support', label: 'Support inbox', icon: FileCheck2, color: 'blue', path: '/admin/support' },
   { id: 'audit', label: 'Audit log', icon: ScrollText, color: 'red', path: '/admin/audit' },
 ] as const
-const statusLabels = { pending_review: 'Pending review', under_review: 'Under review', rejected: 'Rejected', verified: 'Verified' }
+const statusLabels = { pending_review: 'Pending review', under_review: 'Under review', rejected: 'Rejected', verified: 'Approved' }
 function submittedDate(value: string) { return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Johannesburg' }) }
 
 export function AdminPayments() {
@@ -148,13 +149,45 @@ function ProofReview({ row, access, openImage, updated }: { row: PaymentRequest;
   const [note, setNote] = useState(row.reviewNote)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  async function review(status: 'under_review' | 'rejected') {
-    if (status === 'rejected' && note.trim().length < 3) { setError('Enter a reason before rejecting a proof.'); return }
+  const [confirming, setConfirming] = useState(false)
+  const [checked, setChecked] = useState(false)
+  const reviewable = ['pending_review', 'under_review'].includes(row.status)
+  async function review(status: 'under_review' | 'rejected' | 'verified') {
+    if (status !== 'under_review' && note.trim().length < 3) { setError('Enter a review note before approving or rejecting a proof.'); return }
+    if (status === 'verified' && !checked) return
     setBusy(true); setError('')
-    try { await reviewProof(access, row.id, status, note); updated() } catch (err) { setError(err instanceof Error ? err.message : 'Review failed.') } finally { setBusy(false) }
+    try {
+      await reviewProof(access, row.id, status, note, row.reviewVersion || 1)
+      setConfirming(false); setChecked(false)
+      window.dispatchEvent(new CustomEvent('lipahub-balance-changed', { detail: { userId: row.userId, country: row.country } }))
+      const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('lipahub-balances') : null
+      channel?.postMessage({userId: row.userId, country: row.country}); channel?.close()
+      updated()
+    } catch (err) { setError(err instanceof Error ? err.message : 'Review failed. Refresh before retrying.') }
+    finally { setBusy(false) }
   }
-  return <article className="panel admin-proof-card"><div className="admin-proof-heading"><h3>{row.planId.replace('robot-', 'Robot ')} · {row.country}</h3><span className="pill">{row.status.replaceAll('_', ' ')}</span></div><dl className="admin-proof-details"><div><dt>Request ID</dt><dd>{row.id}</dd></div><div><dt>Submitted</dt><dd>{new Date(row.submittedAt).toLocaleString('en-GB', { timeZone: 'Africa/Johannesburg' })}</dd></div><div><dt>Full names</dt><dd>{row.fullName}</dd></div><div><dt>Phone number</dt><dd>{row.phone}</dd></div><div><dt>Method / instruction version</dt><dd>{row.paymentMethod.name} · v{row.instructionVersion}</dd></div><div><dt>Transaction reference</dt><dd>{row.transactionReference || 'Not provided'}</dd></div></dl><div className="admin-proof-files">{row.files.map((file, i) => <button className="button secondary" key={file.id} onClick={() => openImage(file.id)}><Image size={14} />Screenshot {i + 1}</button>)}</div>{error && <p className="form-error" role="alert">{error}</p>}<div className="admin-proof-review"><label>Review note<textarea value={note} onChange={event => setNote(event.target.value)} maxLength={1000} disabled={row.status === 'verified' || row.status === 'rejected'} /></label><div><button className="button secondary" disabled={busy || !['pending_review', 'under_review'].includes(row.status)} onClick={() => void review('under_review')}>Mark under review</button><button className="button secondary" disabled={busy || !['pending_review', 'under_review'].includes(row.status)} onClick={() => void review('rejected')}>Reject proof</button></div></div></article>
+  return <article className="panel admin-proof-card">
+    <div className="admin-proof-heading"><h3>{row.planId.replace('robot-', 'Robot ')} · {row.country}</h3><span className="pill">{row.status === 'verified' ? 'Approved' : row.status.replaceAll('_', ' ')}</span></div>
+    <dl className="admin-proof-details">
+      <div><dt>Request ID</dt><dd>{row.id}</dd></div><div><dt>Submitted</dt><dd>{new Date(row.submittedAt).toLocaleString('en-GB', {timeZone: 'Africa/Johannesburg'})}</dd></div>
+      <div><dt>Full names</dt><dd>{row.fullName}</dd></div><div><dt>Phone number</dt><dd>{row.phone}</dd></div>
+      <div><dt>Payment amount</dt><dd>{formatRobotMoney(row.quote.value, row.country)}</dd></div><div><dt>One-time bonus on approval</dt><dd>{formatRobotMoney(row.quote.bonus, row.country)}</dd></div>
+      <div><dt>Recipient at submission</dt><dd>{row.paymentMethod.recipient || 'Not provided'}</dd></div><div><dt>Asset / network</dt><dd>{[row.paymentMethod.asset, row.paymentMethod.network].filter(Boolean).join(' / ') || 'Not applicable'}</dd></div>
+      <div><dt>Method / instruction version</dt><dd>{row.paymentMethod.name} · v{row.instructionVersion}</dd></div><div><dt>Transaction reference</dt><dd>{row.transactionReference || 'Not provided'}</dd></div>
+    </dl>
+    <div className="admin-proof-files">{row.files.map((file, i) => <button className="button secondary" key={file.id} onClick={() => openImage(file.id)}><Image size={14} />Screenshot {i + 1}</button>)}</div>
+    {error && <p className="form-error" role="alert">{error}</p>}
+    {row.status === 'verified' && <p className="payment-review-note">Approved. The robot is active and its one-time bonus has been credited.</p>}
+    <div className="admin-proof-review"><label>Review note<textarea value={note} onChange={event => setNote(event.target.value)} maxLength={1000} disabled={busy || !reviewable} /></label>
+      {reviewable && !confirming && <div><button className="button primary" disabled={busy} onClick={() => { setConfirming(true); setChecked(false); setError('') }}>Approve payment</button><button className="button secondary" disabled={busy} onClick={() => void review('under_review')}>Mark under review</button><button className="button secondary" disabled={busy} onClick={() => void review('rejected')}>Reject proof</button></div>}
+    </div>
+    {confirming && reviewable && <section className="approval-confirmation"><h4>Confirm payment approval</h4><p>This activates {row.planId.replace('robot-', 'Robot ')} and credits <strong>{formatRobotMoney(row.quote.bonus, row.country)}</strong> to this member's bonus balance once.</p>
+      <label className="check-label"><input type="checkbox" checked={checked} onChange={event => setChecked(event.target.checked)} disabled={busy} /><span>I checked the screenshot and matched the payment to the recipient's records.</span></label>
+      <div><button className="button primary" disabled={busy || !checked} onClick={() => void review('verified')}>{busy ? 'Approving…' : 'Confirm approval'}</button><button className="button secondary" disabled={busy} onClick={() => setConfirming(false)}>Cancel</button></div>
+    </section>}
+  </article>
 }
+
 function ProofImage({ access, row, fileId, close }: { access: PaymentAccess; row: PaymentRequest; fileId: string; close: () => void }) {
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')

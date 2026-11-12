@@ -93,6 +93,6 @@ Custom SMTP is not configured. The built-in Supabase sender is for testing and r
 
 The terms and privacy pages remain explicitly marked as development notices. Final operator details, applicable jurisdiction, retention/deletion rules and operational policies need completion before onboarding clients.
 
-Deposits, withdrawals, vouchers, referral rewards, paid robot activation, real trading and community rewards are not implemented services. Deploying does not enable them. Payment proof intake remains disabled. Provider accounts and product rules are required before implementing and verifying those services.
+Automated deposit verification, withdrawals, vouchers, referral rewards, real trading and community rewards remain unimplemented. Manual robot payment approval, activation and one-time bonus accounting are implemented separately. Proof submission requires published operator payment instructions. Provider accounts and product rules are required for the remaining services.
 
 The public site is available for review. Database readiness does not establish full business or client-launch readiness.

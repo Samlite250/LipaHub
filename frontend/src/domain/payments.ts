@@ -6,8 +6,9 @@ export type PaymentInstructions = { country: Country; version: number; methods: 
 export type ProofStatus = 'pending_review' | 'under_review' | 'rejected' | 'verified'
 export type ProofAttachment = { id: string; name: string; type: string; size: number; blob?: Blob }
 export type PaymentRequest = {
+  reviewVersion?: number; reviewedAt?: string | null; bonusCreditedMinor?: number
   id: string; userId: string; country: Country; planId: string; status: ProofStatus; fullName: string; phone: string; transactionReference: string
-  instructionVersion: number; paymentMethod: PaymentMethod; quote: { value: number; bonus: number; currency: string }; files: ProofAttachment[]; submittedAt: string; reviewNote: string
+  instructionVersion: number; paymentMethod: PaymentMethod; quote: { value: number; bonus: number; currency: string; bonusMinor?: number; valueMinor?: number }; files: ProofAttachment[]; submittedAt: string; reviewNote: string
 }
 export type PaymentAccess = { demoId: string } | { accessToken: string }
 export type SubmitProof = { country: Country; planId: string; methodId: string; instructionVersion: number; fullName: string; phone: string; transactionReference: string; files: File[] }

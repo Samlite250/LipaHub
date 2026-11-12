@@ -7,7 +7,7 @@ test('admin counts and filters saved submissions and opens a specific request fr
   await expect(page.locator('.admin-market-grid > button')).toHaveCount(countries.length)
   await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const open = indexedDB.open('lipahub-payment-preview', 1)
+      const open = indexedDB.open('lipahub-balance-preview', 2)
       open.onsuccess = () => resolve(open.result)
       open.onerror = () => reject(open.error)
     })

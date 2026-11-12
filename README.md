@@ -59,7 +59,7 @@ Select Burundi, Uganda, Kenya, South Africa or International in Registration bef
 
 Burundi plans span **60,000–1,000,000 Fbu**, with one-time demo bonuses spanning **261,000–8,000,000 Fbu**. All 33 tiers interpolate between the owner-supplied endpoints. Uganda uses UGX, Kenya KES, South Africa ZAR and International USD, converted using the checked-in reference rates dated 9 November 2026. See [all plan values and conversion rules](docs/ROBOT_PLANS.md).
 
-Demo activation deducts virtual funding and records the bonus once in a separate demo ledger. It survives reloads, rejects repeated activation and keeps each country's wallet separate. Search, available/active filters and demo reset are included. No funds, real trades or withdrawable rewards are created; live activation is disabled.
+Demo activation deducts virtual funding and records the bonus once in a separate demo ledger. It survives reloads, rejects repeated activation and keeps each country's wallet separate. Search, available/active filters and demo reset are included. No funds, real trades or withdrawable rewards are created; live activation and the listed one-time bonus require an audited administrator approval of a submitted payment proof.
 
 The robot dashboard uses four primary gradient cards styled like the Rwanda dashboard: **Active Plans**, **Received Bonuses**, **Total Activated Value** and **Available Funds**. Totals use the country's currency and update from the demo activation state. **View active plans** filters the catalogue to activated robots.
 
@@ -80,7 +80,7 @@ Run the optional API in a second terminal:
 npm run dev:api
 ```
 
-API: `http://127.0.0.1:3001/api/health`. `GET /api/me` requires a Supabase access token verified with Supabase Auth. Payment instruction and proof-review endpoints live under `/api/robot-payments`; they require server-verified authentication and admin roles where appropriate. They cannot confirm a payment, activate a robot or credit a balance.
+API: `http://127.0.0.1:3001/api/health`. `GET /api/me` requires a Supabase access token verified with Supabase Auth. Payment instruction and proof-review endpoints live under `/api/robot-payments`; they require server-verified authentication and admin roles where appropriate. Authorized administrators can manually approve or reject payment proofs. Approval activates the robot and credits its saved one-time bonus atomically; provider verification and payouts remain separate.
 
 ## Admin dashboard
 
@@ -95,11 +95,11 @@ The seven primary admin tabs are Overview, Users, Payments, Resources, Announcem
 
 Open **http://127.0.0.1:5173/admin/payments** and click **Open admin demo**. For Burundi, enter and publish **Lumicash** and/or **Code** details, then save. Rwanda has an editable manual-instructions option. Uganda, Kenya, South Africa and International have **Binance TRC** options; publishing requires the recipient address, crypto asset, network and instructions. No recipient or token is invented.
 
-Return to the member dashboard (select Burundi or another non-Rwandan country). Click **Activate robot**, read the published instructions, continue to the proof form and provide **full names**, **phone number including country code**, and **1?3 PNG/JPEG screenshots**. Transaction reference is optional. Use test information in the demo. A request becomes **pending review**, persists across reloads and can be viewed in the admin proof queue. Admins can inspect screenshots, record an under-review state or reject with a reason. Proof never confirms a payment or grants a bonus by itself.
+Return to the member dashboard (select Burundi or another non-Rwandan country). **Activate robot** opens one form with published payment instructions, full names, international phone number, optional payment reference and 1-3 PNG/JPEG screenshots (3 MiB combined). Submit once for admin review. An admin can inspect private screenshots, reject with a reason, or confirm approval. Approval activates the robot and credits its saved one-time bonus to the bonus balance exactly once. Submission alone does not activate or credit anything.
 
 Demo settings and proof images persist in this browser's IndexedDB until the site data is cleared; signing out does not erase those demo submissions. A new demo profile has a separate member ID. The admin preview deliberately sees local test submissions but grants no backend privileges.
 
-For actual private storage, apply `Backend/migrations/001_robot_payment_proofs.sql` to the intended Supabase project and configure `SUPABASE_SERVICE_ROLE_KEY` **only in `Backend/.env`**, alongside the existing URL/auth keys. Assign live administrators through trusted auth administration with `app_metadata.role = 'admin'`; user metadata never grants this role. Keep `PAYMENT_PROOF_INTAKE_ENABLED=false` until the migration, private storage, role checks and actual payment instructions have been integration-tested. The migration is supplied but has not been applied in this checkout because project credentials are unavailable.
+For actual private storage, apply `Backend/migrations/001_robot_payment_proofs.sql` to the intended Supabase project and configure `SUPABASE_SERVICE_ROLE_KEY` **only in `Backend/.env`**, alongside the existing URL/auth keys. Assign live administrators through trusted auth administration with `app_metadata.role = 'admin'`; user metadata never grants this role. Set `PAYMENT_PROOF_INTAKE_ENABLED=true` to accept proofs for published payment methods after applying and checking the migrations and private storage. Members cannot submit until the operator publishes their actual recipient details. Existing projects also require migration 011 for approval, activation and bonus credits. The operator supplies actual payment instructions through the admin panel.
 
 `VITE_API_URL` points the frontend to the separately hosted API. No browser demo falls back to the live API, and real accounts never silently fall back to browser-local storage. See [payment architecture, endpoints and verification limits](docs/PAYMENT_PROOFS.md).
 

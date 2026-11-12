@@ -27,8 +27,8 @@ export async function submitProof(access: PaymentAccess, input: SubmitProof): Pr
   const files = await Promise.all(input.files.map(async file => ({ name: file.name, type: file.type, contentBase64: await base64(file) })))
   return api(access, '/requests', { method: 'POST', body: JSON.stringify({ ...input, files }) })
 }
-export function reviewProof(access: PaymentAccess, id: string, status: 'under_review' | 'rejected', note: string) {
-  return 'demoId' in access ? reviewDemoProof(id, status, note) : api<void>(access, `/admin/requests/${id}`, { method: 'PATCH', body: JSON.stringify({ status, note }) })
+export function reviewProof(access: PaymentAccess, id: string, status: 'under_review' | 'rejected' | 'verified', note: string, version = 1) {
+  return 'demoId' in access ? reviewDemoProof(id, status, note, version, access.demoId) : api<void>(access, `/admin/requests/${id}`, { method: 'PATCH', body: JSON.stringify({ status, note, version }) })
 }
 export async function proofImageUrl(access: PaymentAccess, request: PaymentRequest, fileId: string): Promise<string> {
   if ('demoId' in access) {

@@ -1,60 +1,35 @@
-# Robot payment instructions and proofs
+# Robot payments and manual approval
 
-## Member and administrator flow
+## Member flow
 
-1. Open `/admin/payments`. **Open admin demo** explicitly enters a browser-local preview; a real admin account uses the authenticated backend instead.
-2. Select the country and configure the requested methods: **Lumicash + Code** for Burundi, manual instructions for Rwanda, and **Binance TRC** for Uganda, Kenya, South Africa and International. Recipient details are blank by default. Crypto requires the asset, network and precise payment instructions. Methods remain unpublished until their fields are complete and the admin enables them.
-3. In a non-Rwandan member dashboard, **Activate robot** opens the admin's published method options and instruction revision. It no longer immediately awards a demo bonus.
-4. After reading the instructions, continue to proof submission. Required: full names, phone with country code, and 1–3 PNG/JPEG screenshots (5 MB maximum each). Transaction reference is optional.
-5. Submission creates a **pending_review** request. It does not establish that a payment occurred, activate a robot or credit any bonus/balance. The member can reopen its status after reload.
-6. The admin's **Proof submissions** tab shows payer details and private screenshots. Review can set **under_review** or **rejected** (with a reason). A rejected request may be resubmitted. There is no manual paid/verified/credit action in this module.
+**Activate robot** opens one form with three sections: published payment instructions, full names and international phone number, then screenshot upload and **Submit payment proof**. The payment reference is optional. Screenshots must be PNG/JPEG, 1–3 files and at most 3 MiB combined. Selected images can be previewed and removed.
 
-An instruction revision change invalidates an open proof form; the member must reopen and review the updated instructions. The submitted method and quote are immutable snapshots. A unique open-request constraint prevents duplicate requests for one member/country/plan.
+The form uses the administrator's country-specific published methods. Burundi supports Lumicash/Code; other robot markets use the configured Binance TRC method, with recipient, asset and network supplied by the operator. No recipient is invented. Rwanda retains its separate dashboard. Instructions and proof intake must be enabled before members can submit. A changed instruction revision requires reopening the form.
 
-Rwanda's existing member dashboard remains unchanged and has no robot purchase route. Its instruction configuration is prepared for future payment services.
+Submission stores private proof files and a pending request, using a server-generated immutable plan quote and payment-method snapshot. It does not activate the plan or credit any funds. Members can reopen pending/under-review requests. Rejection includes a reason and permits a new submission. Approved requests show the active robot and the credited one-time bonus. The member view refreshes on focus and periodically; balances use the existing balance refresh mechanism.
 
-## Browser-local preview
+## Administrator flow
 
-Demo instructions and proofs live in the `lipahub-payment-preview` IndexedDB database. Files are stored as browser-local blobs, not in public frontend assets, sessionStorage, source control or the live API. Each demo member has a session ID, and the member view filters requests by that ID. Starting a new demo creates a different ID. The explicit admin preview can review this browser's test submissions.
+Open **Admin → Payments → Proof submissions**. Each submission shows the payer's name and phone, saved recipient, method, asset/network, payment reference, plan amount and one-time bonus. Private screenshots can be opened individually. Admins can mark a request under review, reject with a reason, or choose **Approve payment**.
 
-Use test information. Browser-local demo data is not an authenticated production admin system; another person using the same browser profile could open the admin preview. Signing out does not erase the IndexedDB test submissions; clear this site's browser storage to remove them. The UI and development privacy notice disclose this behavior. No invented payment recipient or receipt is supplied; automated tests use a canvas image explicitly labelled **TEST IMAGE / Not a payment receipt**.
+Approval requires a review note and confirmation that the payment was matched against the recipient's records. **Confirm approval** atomically records the decision, activates the robot and credits the saved one-time bonus to the member's bonus balance. Available funds are unchanged. Approval is a trusted manual decision, not automatic verification of an uploaded image or a provider callback. Trading, payouts and recurring earnings remain separate services.
 
-## Authenticated backend setup
+The API accepts `under_review`, `rejected` or `verified` (displayed as **Approved**) with `note` and expected review `version`. Trusted current admin metadata is checked both in the API and in SQL. Browser-supplied bonus values or actor IDs are ignored. A stale or conflicting review returns 409. Approved and rejected decisions are final. Retrying the identical decision by the same administrator is idempotent.
 
-The code and migration are supplied, but the migration has **not been run** and real private uploads have **not been integration-tested** because no Supabase project credentials are configured.
+## Database and ledger
 
-- Apply `Backend/migrations/001_robot_payment_proofs.sql` once to the intended project. It creates instruction revisions, activation requests, proof metadata, audit events, RLS policies and the private `robot-payment-proofs` storage bucket.
-- Set `SUPABASE_URL`, `SUPABASE_ANON_KEY` and server-only `SUPABASE_SERVICE_ROLE_KEY` in `Backend/.env`. Never put a service-role credential in a `VITE_*` variable or frontend file.
-- Set `VITE_API_URL` in `frontend/.env` to the API origin, and set `WEB_ORIGIN` on the API to the exact frontend origin. Restart after configuration changes.
-- Assign administrators through trusted auth administration: `app_metadata.role = 'admin'`. Neither a profile edit, user metadata nor a request-body role can grant access. The API verifies the session with Supabase Auth before reading roles; admin database RPCs also check trusted auth metadata.
-- Keep `PAYMENT_PROOF_INTAKE_ENABLED=false` until schema/storage/role checks, actual recipient and crypto amount instructions, retention/deletion policy and integration review have been completed. The flag enables proof intake, not payment verification, trading, payouts or wallet credits.
+Existing installations require `011_robot_payment_approval.sql` after migrations 001–010. It adds review versions and the bonus-credit receipt, and replaces the review RPC with the five-argument version. Readiness checks the new columns. For new empty projects, `Backend/setup/new-project.sql` contains the complete migration chain.
 
-## Endpoints
+The SQL transaction locks the request and serializes bonus credits with the clearing/wallet locks used by existing balance adjustments. It credits only the bonus minor units in the saved server quote, validates the currency and balance ceiling, records a balanced immutable adjustment, and increments the wallet/review versions. The payment request ID is the ledger's unique request ID. The open-plan unique index prevents a second approved request for the same member/country/plan. Payment and system audit records identify the reviewer. Any failure rolls back the decision and credit together. No direct browser writes to balances or requests are allowed.
 
-All endpoints below are under `/api/robot-payments` and require a real Bearer session. Browser demo sessions cannot authenticate to them.
+Proof objects remain in the private `robot-payment-proofs` bucket, accessible to the owner and trusted administrators through short-lived signed URLs. API responses use no-store headers. The PWA does not cache private pages or proof/API responses.
 
-| Method | Path | Behavior |
-| --- | --- | --- |
-| GET | `/instructions/:country` | Country method options, revision and intake-enabled state |
-| GET | `/requests` | Only the authenticated member's submissions |
-| POST | `/requests` | Validated details + base64 PNG/JPEG images; pending request only; intake flag required |
-| GET | `/requests/:id/files/:fileId` | Owner/admin check followed by a signed private image URL, valid for 60 seconds |
-| PUT | `/admin/instructions/:country` | Admin-only, optimistic revision update and audit event |
-| GET | `/admin/requests` | Admin-only review queue, newest 200 records |
-| PATCH | `/admin/requests/:id` | Admin-only `under_review` or `rejected` plus note; cannot set `verified` |
+## Configuration
 
-## Storage and validation
+The existing Supabase project, private bucket, server-only service key and trusted administrator role are required. `PAYMENT_PROOF_INTAKE_ENABLED=true` enables submission only when the member also has a valid published method. The operator will enter the real recipient details in Admin → Payments; the live project had no saved instructions when this enhancement was prepared. Neither code nor tests populate fictitious production recipients.
 
-The backend recomputes the plan quote from the public `shared/robot-catalog.json`. Client-supplied price, bonus, user ID or status fields are never authoritative. Frontend and server quote parity is tested across every plan and supported country. Backend builds copy the catalogue into `Backend/dist/config/` so packaged server artifacts have their own immutable public data snapshot.
+## Browser preview and verification
 
-Authentication runs before the large upload body parser. Limits: three screenshots, 5 MB per file, PNG/JPEG allowlist, canonical base64, matching image magic bytes, valid image dimensions and a 20-million-pixel cap. Paths use authenticated user IDs and random request/file UUIDs; uploaded filenames are display metadata only. SVG/HTML or renamed non-images are rejected. The browser also decodes and checks selected images before preview.
+The demo uses IndexedDB `lipahub-balance-preview` version 2, with proof requests, instruction revisions, wallets and ledger entries in one database so approvals commit atomically. Existing wallets remain in place and old `lipahub-payment-preview` data is migrated once. Demo credit is local test data and grants no live privileges. Automated screenshots are explicitly marked as test images rather than payment receipts.
 
-Uploads go into a private bucket. RLS restricts metadata and storage reads to the owner or trusted admins; restrictive storage guards also constrain broader pre-existing policies. Clients cannot directly insert/update/delete proof objects. Signed URL requests recheck ownership or admin access. API responses are not cached. Database RPCs are executable only by the backend service role, and admin changes are audited.
-
-The request and metadata commit atomically in a database RPC. If upload or commit fails, the API attempts to delete uploaded files; operators should periodically reconcile any orphan private objects left by failed cleanup. A unique partial index prevents duplicate open requests, including concurrent submissions.
-
-## Verification boundary
-
-Uploaded images and typed names are user claims, not trusted provider verification. Neither submission nor review grants an active robot, earnings, bonus or a withdrawal balance. Trusted payment-provider verification, settlement/reconciliation, a persistent wallet/ledger and activation logic remain separate future work. The old virtual activation arithmetic is retained only as an isolated model with invariant tests; the new member flow does not call it.
-
-Automated validation covers the browser preview, stale revisions, pending status, admin review, image display, blocked SVG uploads, image signature/dimension checks, unauthenticated API rejection and a server-side test proving that forged user metadata/body roles cannot grant admin access. Real Supabase RLS, storage signing and RPC transactions still require integration testing against the configured project.
+Checks cover one-form submission, image/phone/instruction validation, private access, admin role enforcement, rejection/resubmission, approval/activation, duplicate approval, stale decisions, exact currency precision, balanced clearing, overflow rollback, demo migration and concurrent local approvals. The proposed production financial test was blocked by automatic approval review because it would create temporary accounts/proofs and mutate ledger/clearing balances. It was not executed; local PostgreSQL and browser/API checks are the financial validation for this change.

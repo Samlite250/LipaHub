@@ -1,20 +1,10 @@
 import { getRobotTerms } from '../domain/robots'
 import { defaultInstructions, validateInstructions, type PaymentInstructions, type PaymentRequest, type SubmitProof } from '../domain/payments'
 import type { Country } from '../domain/countries'
+import { openDemoDatabase, idbResult as result, idbComplete as complete } from './demo-database'
+import { storedDemoBaseline, type AccountBalance, type BalanceEntry } from '../domain/balances'
 
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('lipahub-payment-preview', 1)
-    request.onupgradeneeded = () => {
-      request.result.createObjectStore('instructions', { keyPath: 'country' })
-      request.result.createObjectStore('requests', { keyPath: 'id' })
-    }
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(new Error('Browser storage is unavailable. No proof was saved.'))
-  })
-}
-function result<T>(request: IDBRequest<T>): Promise<T> { return new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error) }) }
-function complete(tx: IDBTransaction): Promise<void> { return new Promise((resolve, reject) => { tx.oncomplete = () => resolve(); tx.onabort = () => reject(tx.error || new Error('Unable to save this preview.')); tx.onerror = () => reject(tx.error) }) }
+const openDatabase = openDemoDatabase
 
 export async function demoInstructions(country: Country): Promise<PaymentInstructions> {
   const db = await openDatabase()
@@ -54,12 +44,26 @@ export async function submitDemoProof(userId: string, input: SubmitProof): Promi
     tx.objectStore('requests').put(row); await done; return row
   } finally { db.close() }
 }
-export async function reviewDemoProof(id: string, status: 'under_review' | 'rejected', note: string): Promise<void> {
+export async function reviewDemoProof(id: string, status: 'under_review' | 'rejected' | 'verified', note: string, version: number, actorId: string): Promise<void> {
+  if (status !== 'under_review' && note.trim().length < 3) throw new Error('Enter a review note before approving or rejecting.')
   const db = await openDatabase()
   try {
-    const tx = db.transaction('requests', 'readwrite'); const done = complete(tx); const store = tx.objectStore('requests')
+    const tx = db.transaction(['requests', 'wallets', 'entries'], 'readwrite'); const done = complete(tx); const store = tx.objectStore('requests')
     const row = await result<PaymentRequest | undefined>(store.get(id))
-    if (!row || !['pending_review', 'under_review'].includes(row.status)) { tx.abort(); await done.catch(() => {}); throw new Error('This request cannot be changed.') }
-    store.put({ ...row, status, reviewNote: note.trim() }); await done
+    if (row && row.status === status && row.reviewNote === note.trim() && (row.reviewVersion || 1) === version + 1) { await done; return }
+    if (!row || !['pending_review', 'under_review'].includes(row.status) || (row.reviewVersion || 1) !== version) { tx.abort(); await done.catch(() => {}); throw new Error('This request was already reviewed or changed. Reload it.') }
+    let bonusCreditedMinor = 0
+    if (status === 'verified') {
+      const baseline = storedDemoBaseline(row.userId, row.country)
+      const wallet = await result<AccountBalance | undefined>(tx.objectStore('wallets').get(`${row.userId}:${row.country}`)) || baseline
+      bonusCreditedMinor = row.quote.bonusMinor || Math.round(row.quote.bonus * (['RWF', 'BIF', 'UGX'].includes(wallet.currency) ? 1 : 100))
+      if (!row.files.length || !Number.isSafeInteger(bonusCreditedMinor) || bonusCreditedMinor < 1 || wallet.bonusMinor + bonusCreditedMinor > 1_000_000_000_000) { tx.abort(); await done.catch(() => {}); throw new Error('Invalid payment proof or saved bonus.') }
+      const now = new Date().toISOString()
+      const entry: BalanceEntry = { id: crypto.randomUUID(), userId: row.userId, country: row.country, currency: wallet.currency, availableBefore: wallet.availableMinor, availableAfter: wallet.availableMinor, bonusBefore: wallet.bonusMinor, bonusAfter: wallet.bonusMinor + bonusCreditedMinor, clearingDelta: -bonusCreditedMinor, reason: `Robot activation bonus: ${row.planId} (${row.id})`, actorId, requestId: row.id, createdAt: now }
+      tx.objectStore('entries').add(entry)
+      tx.objectStore('wallets').put({ ...wallet, id: `${row.userId}:${row.country}`, bonusMinor: wallet.bonusMinor + bonusCreditedMinor, version: wallet.version + 1, updatedAt: now })
+    }
+    store.put({ ...row, status, reviewNote: note.trim(), reviewVersion: version + 1, reviewedAt: new Date().toISOString(), bonusCreditedMinor }); await done
+    window.dispatchEvent(new CustomEvent('lipahub-balance-changed', { detail: { userId: row.userId, country: row.country } }))
   } finally { db.close() }
 }

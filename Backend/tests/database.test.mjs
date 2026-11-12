@@ -190,3 +190,66 @@ test('payment instruction RPC rejects suspended administrators', async () => {
   await role('service_role')
   await rejected(`select public.save_robot_payment_instructions('Burundi','[]',1,$1)`, [banned], '42501')
 })
+
+async function paymentQuote(value = {currency: 'BIF', bonusMinor: 261000, bonus: 261000, value: 60000}) {
+  await db.query(`update public.robot_activation_requests set quote=$1::jsonb where id=$2`, [JSON.stringify(value), ticket])
+}
+test('payment approval atomically credits the saved bonus exactly once and conserves clearing', async () => {
+  await paymentQuote()
+  await role('service_role')
+  await db.query(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin])
+  const wallet = (await db.query(`select * from public.system_balance_accounts where user_id=$1 and country='Burundi'`, [member])).rows[0]
+  assert.equal(Number(wallet.bonus_minor), 261000)
+  assert.equal(Number(wallet.available_minor), 0)
+  await db.query(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin])
+  assert.equal((await db.query(`select * from public.system_balance_adjustments where request_id=$1`, [ticket])).rows.length, 1)
+  const state = (await db.query(`select status,review_version,bonus_credited_minor from public.robot_activation_requests where id=$1`, [ticket])).rows[0]
+  assert.equal(state.status, 'verified'); assert.equal(state.review_version, 2); assert.equal(Number(state.bonus_credited_minor), 261000)
+  await role('postgres')
+  const clearing = (await db.query(`select balance_minor from public.system_balance_clearing where currency='BIF'`)).rows[0]
+  assert.equal(Number(clearing.balance_minor) + Number(wallet.bonus_minor), 0)
+  assert.equal((await db.query(`select * from public.robot_payment_audit where target_id=$1 and action='payment_approved_bonus_credited'`, [ticket])).rows.length, 1)
+  await rejected(`select public.review_robot_activation_request($1,'rejected','Different decision',$2,2)`, [ticket, admin], '40001')
+})
+test('payment reviews reject unauthorized actors, missing proof and stale decisions', async () => {
+  await paymentQuote()
+  await role('service_role')
+  for (const actor of [member, banned]) await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, actor], '42501')
+  await rejected(`select public.review_robot_activation_request($1,'verified','',$2,1)`, [ticket, admin], '22023')
+  await db.query(`select public.review_robot_activation_request($1,'under_review','Checking',$2,1)`, [ticket, admin])
+  await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin], '40001')
+  await role('postgres')
+  await db.query(`delete from public.robot_payment_proofs where request_id=$1`, [ticket])
+  await role('service_role')
+  await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,2)`, [ticket, admin], '22023')
+  assert.equal((await db.query(`select * from public.system_balance_adjustments`)).rows.length, 0)
+})
+test('rejection never credits a bonus and a final rejection cannot be approved', async () => {
+  await paymentQuote()
+  await role('service_role')
+  await db.query(`select public.review_robot_activation_request($1,'rejected','Payment not received',$2,1)`, [ticket, admin])
+  await rejected(`select public.review_robot_activation_request($1,'verified','Changed decision',$2,2)`, [ticket, admin], '40001')
+  assert.equal((await db.query(`select * from public.system_balance_accounts`)).rows.length, 0)
+})
+test('approval preserves minor-unit precision and rolls back invalid bonuses', async () => {
+  await paymentQuote({currency: 'BIF', bonusMinor: -1, bonus: -1, value: 60000})
+  await role('service_role')
+  await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin], '22023')
+  assert.equal((await db.query(`select * from public.system_balance_accounts`)).rows.length, 0)
+  await role('postgres')
+  await db.query(`insert into public.robot_payment_instructions(country,version,methods,updated_by) values('International',1,'[]',$1)`, [admin])
+  await db.query(`update public.robot_activation_requests set country='International' where id=$1`, [ticket])
+  await paymentQuote({currency: 'USD', bonusMinor: 12345, bonus: 123.45, value: 30})
+  await role('service_role')
+  await db.query(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin])
+  const wallet = (await db.query(`select * from public.system_balance_accounts where user_id=$1`, [member])).rows[0]
+  assert.equal(wallet.currency, 'USD'); assert.equal(Number(wallet.bonus_minor), 12345)
+})
+test('a bonus balance limit failure leaves the payment pending and the ledger unchanged', async () => {
+  await paymentQuote()
+  await role('service_role')
+  await db.query(`select public.adjust_system_balance($1,$2,'Burundi',0,1000000000000,'Test existing bonus balance',0,$3)`, [admin, member, requestId])
+  await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin], '22023')
+  assert.equal((await db.query(`select status from public.robot_activation_requests where id=$1`, [ticket])).rows[0].status, 'pending_review')
+  assert.equal((await db.query(`select * from public.system_balance_adjustments`)).rows.length, 1)
+})

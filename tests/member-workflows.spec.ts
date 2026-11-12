@@ -7,7 +7,7 @@ test('member balance history shows saved corrections after a reload', async ({ p
   await expect(page.getByRole('heading', { name: 'No balance changes yet' })).toBeVisible()
   await page.evaluate(async () => {
     const profile = JSON.parse(sessionStorage.getItem('lipahub-demo')!)
-    const db = await new Promise<IDBDatabase>((resolve, reject) => { const opening = indexedDB.open('lipahub-balance-preview', 1); opening.onsuccess = () => resolve(opening.result); opening.onerror = () => reject(opening.error) })
+    const db = await new Promise<IDBDatabase>((resolve, reject) => { const opening = indexedDB.open('lipahub-balance-preview', 2); opening.onsuccess = () => resolve(opening.result); opening.onerror = () => reject(opening.error) })
     const tx = db.transaction(['wallets', 'entries'], 'readwrite')
     const entryId = crypto.randomUUID(); const now = new Date().toISOString()
     tx.objectStore('wallets').put({ id: `${profile.id}:Rwanda`, userId: profile.id, country: 'Rwanda', currency: 'RWF', availableMinor: 7050, bonusMinor: 0, version: 1, updatedAt: now })
