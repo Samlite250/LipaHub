@@ -19,6 +19,7 @@ export function loadRequests(access: PaymentAccess, admin = false): Promise<Paym
 }
 function base64(file: File): Promise<string> { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]); reader.onerror = () => reject(new Error('Unable to read screenshot.')); reader.readAsDataURL(file) }) }
 export async function submitProof(access: PaymentAccess, input: SubmitProof): Promise<PaymentRequest> {
+  if ('demoId' in access && input.purpose === 'account_activation') throw new Error('A real registered account is required for account activation.')
   if (input.fullName.trim().length < 2 || input.fullName.trim().length > 120 || [...input.fullName].some(char => char.charCodeAt(0) < 32)) throw new Error('Enter your full name (2–120 characters).')
   if (!/^\+[1-9]\d{6,14}$/.test(input.phone.trim())) throw new Error('Enter a phone number including its country code, such as +25712345678.')
   if (input.transactionReference.length > 100) throw new Error('The payment reference is too long.')

@@ -10,6 +10,8 @@ test('trusted administrators land in admin and members retain their requested da
   expect(accountDestination(member)).toBe('/dashboard')
   expect(accountDestination(member, '/dashboard/support')).toBe('/dashboard/support')
   expect(accountDestination(member, '/admin')).toBe('/dashboard')
+  expect(accountDestination({app_metadata: {activation_required: true}}, '/dashboard/profile')).toBe('/activate-account')
+  expect(accountDestination({app_metadata: {role: 'admin', activation_required: true}})).toBe('/admin')
 })
 
 test('sign-in destinations reject external URLs and paths outside the intended route', () => {

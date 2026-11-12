@@ -7,6 +7,7 @@ process.env.LIPAHUB_SCREENSHOT_RUN ??= new Date().toISOString().replace(/[:.]/g,
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: ['**/activation/**'],
   fullyParallel: true,
   workers: 2,
   reporter: [['list'], ['html', { open: 'never' }]],

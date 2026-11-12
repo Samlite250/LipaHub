@@ -12,6 +12,7 @@ import { adminRouter, memberContentRouter } from './admin/router.js'
 import { memberBalanceRouter } from './admin/balances.js'
 import { supportRouter } from './support/router.js'
 import { invitationRouter } from './invitations.js'
+import { accountActivationRouter, requireAccountActivation } from './account-activation.js'
 
 export function createApp(config: BackendConfig, clients: { auth?: SupabaseClient | null; service?: SupabaseClient | null } = {}) {
   const timedFetch: typeof fetch = (input, init = {}) => fetch(input, { ...init, signal: init.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(config.upstreamTimeoutMs)]) : AbortSignal.timeout(config.upstreamTimeoutMs) })
@@ -32,6 +33,12 @@ export function createApp(config: BackendConfig, clients: { auth?: SupabaseClien
   app.get('/api/health', (_req, res) => { res.json({ service: 'LipaHub API', phase: 1, authenticationConfigured: !!auth, paymentsEnabled: false, paymentProofIntakeEnabled: config.proofIntake && !!auth && !!db, tradingMode: 'simulation' }) })
   app.get('/api/ready', async (_req, res) => { const status = await ready(); res.status(status.ready ? 200 : 503).json({ ready: status.ready }) })
   app.get('/api/admin/system/status', authenticate(auth), requireAdmin, async (_req, res) => { const status = await ready(); res.status(status.ready ? 200 : 503).json(status) })
+  app.use('/api/account-activation', accountActivationRouter(auth, db, config.proofIntake))
+  app.use(['/api/me', '/api/robot-payments', '/api/member-content', '/api/member-balances', '/api/support'], authenticate(auth), (req, res, next) => {
+    // Account-activation proof submission is validated separately after JSON parsing.
+    if (req.baseUrl === '/api/robot-payments' && (req.path.startsWith('/admin/') || (req.method === 'POST' && req.path === '/requests'))) { next(); return }
+    requireAccountActivation(db)(req, res, next)
+  })
   app.get('/api/me', authenticate(auth), (_req, res) => { const user = res.locals.user as User; res.json({ id: user.id, email: user.email }) })
   app.use('/api/robot-payments', paymentRouter(auth, db, config.proofIntake))
   app.use('/api/admin', adminRouter(auth, db))

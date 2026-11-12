@@ -63,7 +63,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         const { data, error } = await supabase.auth.signUp({ email, password: String(fields.get('password')),
           options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { username: String(fields.get('username')).trim(), display_name: String(fields.get('username')).trim(), phone, country, ...(invitation.reference ? { invitation_reference: invitation.reference } : {}), ...(invitation.inviter ? { invited_by: invitation.inviter.id, invited_by_username: invitation.inviter.username || invitation.inviter.name } : {}) } } })
         if (error) throw error
-        if (data.session) { clearInvitation(); navigate(accountDestination(data.session.user, requestedDestination), { replace: true }) }
+        if (data.session) { clearInvitation(); navigate(country === 'Rwanda' && data.session.user.app_metadata.role !== 'admin' ? '/activate-account' : accountDestination(data.session.user, requestedDestination), { replace: true }) }
         else setMessage('Sign in to access your dashboard. If you already have an account, use your existing password.')
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password: String(fields.get('password')) })

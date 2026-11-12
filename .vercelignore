@@ -6,6 +6,7 @@ Materials-References
 artifacts
 playwright-report
 test-results
+test-results-activation
 tests
 Backend/tests
 docs

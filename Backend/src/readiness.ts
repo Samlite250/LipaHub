@@ -42,7 +42,11 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
         try { return { name: 'payment_review_version', ready: !(await db.from('robot_activation_requests').select('review_version,bonus_credited_minor', { head: true }).limit(1)).error } }
         catch { return { name: 'payment_review_version', ready: false } }
       })()
-      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck, codeCheck, reviewCheck]))
+      const activationCheck = (async () => {
+        try { return {name: 'rwanda_account_activation', ready: !(await db.from('rwanda_account_activations').select('user_id,activated_at', {head: true}).limit(1)).error} }
+        catch { return {name: 'rwanda_account_activation', ready: false} }
+      })()
+      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck, codeCheck, reviewCheck, activationCheck]))
     }
     return { ready: checks.every(check => check.ready), checks, checkedAt: new Date().toISOString() }
   }

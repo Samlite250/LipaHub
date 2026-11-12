@@ -161,8 +161,11 @@ test('proof validation and changed instruction versions prevent invalid submissi
 test('admin supports Rwanda instructions and Binance TRC asset/network details', async ({ page }) => {
   await admin(page)
   await page.getByLabel('Payment country').selectOption('Rwanda')
-  await page.getByLabel('Instructions for Payment instructions').fill('RWANDA TEST INSTRUCTIONS. Do not send a payment.')
-  await page.getByLabel('Publish Payment instructions').check()
+  const mtn = page.locator('.admin-method-editor').filter({has: page.getByRole('heading', {name:'MTN',exact:true})})
+  await mtn.getByLabel('Recipient phone / code / wallet address').fill('TEST-NOT-REAL')
+  await mtn.getByLabel('Activation amount (RWF) for MTN').fill('6500')
+  await mtn.getByLabel('Instructions for MTN').fill('RWANDA TEST INSTRUCTIONS. Do not send a payment.')
+  await mtn.getByLabel('Publish MTN').check()
   await page.getByRole('button', { name: 'Save payment instructions' }).click()
   await expect(page.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
   await page.getByLabel('Payment country').selectOption('International')

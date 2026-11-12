@@ -15,9 +15,10 @@
     "setup:check": "node Backend/scripts/check-setup.mjs",
     "test": "npm run build --workspace Backend && playwright test",
     "test:db": "node --test Backend/tests/*.test.mjs",
-    "check": "npm run lint && npm run build && npm run test:db && npm test",
+    "check": "npm run lint && npm run build && npm run test:db && npm test && npm run test:activation",
     "backend:check": "node Backend/scripts/check-backend.mjs",
-    "setup:sql": "node Backend/scripts/build-setup.mjs"
+    "setup:sql": "node Backend/scripts/build-setup.mjs",
+    "test:activation": "playwright test --config playwright.activation.config.ts"
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": {

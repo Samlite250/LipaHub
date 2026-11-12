@@ -15,11 +15,17 @@ import { ConversationPage } from './pages/Conversations'
 import { invitationReference } from './lib/invitations'
 import { ShortInvitation } from './ShortInvitation'
 import { InstallAppPage } from './InstallApp'
+import { AccountActivation } from './pages/AccountActivation'
+import { useAccountActivation } from './lib/account-activation'
 
 function MemberRoute() {
   const { session, demo, loading } = useApp()
   const location = useLocation()
+  const activation = useAccountActivation(session?.access_token, !!session && session.user.app_metadata?.role !== 'admin' && session.user.app_metadata?.activation_required === true)
   if (loading) return <div className="loading-page" role="status">Opening LipaHub…</div>
+  if (activation.loading) return <div className="loading-page" role="status">Checking account activation…</div>
+  if (activation.error) return <main className="loading-page"><p role="alert">{activation.error}</p><button className="button primary" onClick={activation.refresh}>Retry activation check</button></main>
+  if (activation.data?.required && !activation.data.active) return <Navigate to="/activate-account" replace />
   return session || demo ? <DashboardLayout /> : <Navigate to="/login" state={{ from: location.pathname }} replace />
 }
 export function App() {
@@ -30,6 +36,7 @@ export function App() {
     <Route path="/" element={new URLSearchParams(location.search).has('ref') ? <Navigate to={{ pathname: '/register', search: location.search, hash: location.hash }} replace /> : <Landing />} />
     <Route path="/i/:code" element={<ShortInvitation />} />
     <Route path="/install" element={<InstallAppPage />} />
+    <Route path="/activate-account" element={<AccountActivation />} />
     <Route path="/login" element={<AuthPage key="login" mode="login" />} />
     <Route path="/register" element={<AuthPage key="register" mode="register" />} />
     <Route path="/forgot-password" element={<AuthPage key="forgot" mode="forgot" />} />

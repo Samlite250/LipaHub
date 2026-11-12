@@ -23,7 +23,7 @@ export function quote(planId: unknown, region: string) {
   return { value: valueMinor / factor, bonus: bonusMinor / factor, valueMinor, bonusMinor, currency, rateDate: catalog.fx.date, catalogVersion: catalog.version }
 }
 export function defaultMethods(region: string) {
-  const names = region === 'Burundi' ? ['Lumicash', 'Code'] : region === 'Rwanda' ? ['Payment instructions'] : ['Binance TRC']
+  const names = region === 'Burundi' ? ['Lumicash', 'Code'] : region === 'Rwanda' ? ['MTN', 'Airtel'] : ['Binance TRC']
   return names.map((name, index) => ({ id: `${region.toLowerCase().replaceAll(' ', '-')}-${index + 1}`, name, recipient: '', accountName: '', asset: '', network: name === 'Binance TRC' ? 'TRC' : '', instructions: '', enabled: false }))
 }
 export function instructions(input: Record<string, unknown>, region: string) {
@@ -33,8 +33,10 @@ export function instructions(input: Record<string, unknown>, region: string) {
     const method = (input.methods as Record<string, unknown>[]).find(method => method && method.id === template.id)
     if (!method || method.name !== template.name || typeof method.enabled !== 'boolean') throw new InputError('Invalid payment method.')
     const next = { ...template, recipient: text(method.recipient, 'recipient', 200), accountName: text(method.accountName, 'recipient name', 120), asset: text(method.asset, 'asset', 40), network: text(method.network, 'network', 80), instructions: text(method.instructions, 'instructions', 4000), enabled: method.enabled }
+    const amountMinor = region === 'Rwanda' ? method.amountMinor : undefined
+    if (region === 'Rwanda' && next.enabled && (!Number.isSafeInteger(amountMinor) || Number(amountMinor) < 1 || Number(amountMinor) > 999999999999 || !next.recipient)) throw new InputError('Published Rwanda methods require the activation amount in RWF and recipient details.')
     if (next.enabled && (next.instructions.length < 10 || (region !== 'Rwanda' && !next.recipient) || (next.name === 'Binance TRC' && (!next.asset || !next.network)))) throw new InputError('Published methods require complete recipient, payment and crypto network instructions.')
-    return next
+    return region === 'Rwanda' ? {...next, amountMinor: Number.isSafeInteger(amountMinor) ? Number(amountMinor) : null} : next
   })
   return { version: Number(input.version), methods }
 }

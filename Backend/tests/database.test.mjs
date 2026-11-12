@@ -102,7 +102,7 @@ test('short username hashes match the browser algorithm and reject duplicate or 
 test('all migrations apply and every application table enables RLS', async () => {
   const { rows } = await db.query(`select relname,relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace
     where n.nspname='public' and c.relkind='r'`)
-  assert.equal(rows.length, 12)
+  assert.equal(rows.length, 13)
   assert.ok(rows.every(row => row.relrowsecurity), JSON.stringify(rows))
   const bucket = (await db.query(`select * from storage.buckets where id='robot-payment-proofs'`)).rows[0]
   assert.equal(bucket.public, false)
@@ -252,4 +252,53 @@ test('a bonus balance limit failure leaves the payment pending and the ledger un
   await rejected(`select public.review_robot_activation_request($1,'verified','Payment matched',$2,1)`, [ticket, admin], '22023')
   assert.equal((await db.query(`select status from public.robot_activation_requests where id=$1`, [ticket])).rows[0].status, 'pending_review')
   assert.equal((await db.query(`select * from public.system_balance_adjustments`)).rows.length, 1)
+})
+
+const newRwanda = '55555555-5555-4555-8555-555555555555'
+const activationRequest = '66666666-6666-4666-8666-666666666666'
+async function newRwandaAccount() {
+  await db.query(`insert into auth.users(id,raw_user_meta_data) values($1,'{"country":"Rwanda","role":"admin","paid":true}')`, [newRwanda])
+  await db.query(`insert into public.robot_payment_instructions(country,version,methods,updated_by) values('Rwanda',1,$1::jsonb,$2)`, [JSON.stringify([{id:'rwanda-1',name:'MTN',recipient:'TEST-NOT-REAL',enabled:true,amountMinor:6500}]), admin])
+}
+function accountPayload(id = activationRequest) {
+  return {id,country:'Rwanda',plan_id:'account-activation',purpose:'account_activation',full_name:'Test Account',phone:'+250790000000',instruction_version:1,method_id:'rwanda-1',quote:{value:6500,valueMinor:6500,bonus:0,bonusMinor:0,currency:'RWF'},files:[{id:'77777777-7777-4777-8777-777777777777',object_path:`${newRwanda}/${id}/test.png`,original_name:'TEST-NOT-PAYMENT.png',mime_type:'image/png',size_bytes:100}]}
+}
+test('new Rwanda users require activation and editable country or paid metadata cannot bypass it', async () => {
+  await newRwandaAccount()
+  assert.equal((await db.query(`select raw_app_meta_data->>'activation_required' required from auth.users where id=$1`, [newRwanda])).rows[0].required, 'true')
+  await db.query(`update auth.users set raw_user_meta_data='{"country":"Kenya","paid":true,"activation_required":false}' where id=$1`, [newRwanda])
+  await role('authenticated',newRwanda)
+  assert.equal((await db.query(`select public.is_active_member() active`)).rows[0].active, false)
+  await rejected(`select * from public.rwanda_account_activations`, [], '42501')
+  await role('authenticated',member)
+  assert.equal((await db.query(`select public.is_active_member() active`)).rows[0].active, true, 'existing members are grandfathered')
+})
+test('account activation approval unlocks access atomically without crediting a robot bonus', async () => {
+  await newRwandaAccount()
+  await role('service_role')
+  await db.query(`select public.submit_robot_activation_request($1,$2::jsonb)`, [newRwanda,JSON.stringify(accountPayload())])
+  assert.equal((await db.query(`select activated_at from public.rwanda_account_activations where user_id=$1`, [newRwanda])).rows[0].activated_at,null)
+  await db.query(`select public.review_robot_activation_request($1,'verified','Matched activation payment',$2,1)`, [activationRequest,admin])
+  await db.query(`select public.review_robot_activation_request($1,'verified','Matched activation payment',$2,1)`, [activationRequest,admin])
+  assert.ok((await db.query(`select activated_at from public.rwanda_account_activations where user_id=$1`, [newRwanda])).rows[0].activated_at)
+  assert.equal((await db.query(`select * from public.system_balance_adjustments where user_id=$1`, [newRwanda])).rows.length,0)
+  await role('postgres')
+  assert.equal((await db.query(`select raw_app_meta_data->>'activation_required' required from auth.users where id=$1`, [newRwanda])).rows[0].required,'false')
+  await role('authenticated',newRwanda)
+  assert.equal((await db.query(`select public.is_active_member() active`)).rows[0].active,true)
+})
+test('Rwanda payment requires the configured amount and screenshots, and rejection keeps the account locked', async () => {
+  await newRwandaAccount()
+  await role('service_role')
+  await rejected(`select public.submit_robot_activation_request($1,$2::jsonb)`, [newRwanda,JSON.stringify({...accountPayload(),files:[]})], '23514')
+  await rejected(`select public.submit_robot_activation_request($1,$2::jsonb)`, [newRwanda,JSON.stringify({...accountPayload(),quote:{currency:'RWF',valueMinor:1,bonusMinor:0}})], '22023')
+  await db.query(`select public.submit_robot_activation_request($1,$2::jsonb)`, [newRwanda,JSON.stringify(accountPayload())])
+  await db.query(`select public.review_robot_activation_request($1,'rejected','Payment not found',$2,1)`, [activationRequest,admin])
+  assert.equal((await db.query(`select activated_at from public.rwanda_account_activations where user_id=$1`, [newRwanda])).rows[0].activated_at,null)
+})
+test('new non-Rwanda members and trusted administrators do not receive an activation requirement', async () => {
+  const next = '88888888-8888-4888-8888-888888888888'
+  await db.query(`insert into auth.users(id,raw_app_meta_data,raw_user_meta_data) values($1,'{"role":"admin"}','{"country":"Rwanda"}')`, [newRwanda])
+  await db.query(`insert into auth.users(id,raw_user_meta_data) values($1,'{"country":"Kenya"}')`, [next])
+  assert.equal((await db.query(`select * from public.rwanda_account_activations where user_id in ($1,$2)`, [newRwanda,next])).rows.length,0)
 })

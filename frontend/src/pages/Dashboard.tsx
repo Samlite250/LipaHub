@@ -7,6 +7,7 @@ import { CountryFlag } from '../CountryFlag'
 import { AccountMenu } from '../AccountMenu'
 import { UserDetails } from '../UserDetails'
 import { InviteLink } from '../InviteLink'
+import { useAccountActivation } from '../lib/account-activation'
 import { WalletWelcome } from '../WalletWelcome'
 import { ServiceBalance } from '../ServiceBalance'
 import { allNavigation, navigationForCountry, navigationChildren, type NavigationChild } from '../navigation'
@@ -96,13 +97,15 @@ export function DashboardHome() {
 function StandardDashboard() {
   const account = useMemberBalance()
   const { t, demo, session } = useApp()
+  const activation = useAccountActivation(session?.access_token, !!session && session.user.user_metadata.country === 'Rwanda')
   const [hidden, setHidden] = useState(false)
   const name = demo?.name || session?.user.user_metadata.display_name || 'Member'
 
   const amount = (value: number) => hidden ? '••••••' : `RF ${(demo ? value : 0).toLocaleString('en-US')}`
+  const expense = hidden ? '••••••' : demo ? amount(6500) : activation.error ? 'Unavailable' : activation.loading ? 'Loading…' : `RF ${(activation.data?.request?.status === 'verified' ? activation.data.request.quote.value : 0).toLocaleString('en-US')}`
   const balanceAmount = (bonus = false) => hidden ? '••••••' : account.wallet ? walletMoney(bonus ? account.wallet.bonusMinor : account.wallet.availableMinor, account.wallet.currency) : account.error ? 'Unavailable' : 'Loading…'
   return <>
-    <section className="wallet-hero"><div className="wallet-top"><span className="hello-badge"><Lightbulb size={15} />{t('hello')}, {name} 👋</span><button className="wallet-visibility" onClick={() => setHidden(!hidden)} aria-label={hidden ? 'Show balances' : 'Hide balances'}>{t('wallet')}{hidden ? <EyeOff size={16} /> : <Eye size={16} />}</button></div><WalletWelcome /><div className="wallet-tiles"><div className="wallet-tile total-tile"><div><span>{t('total')}</span><strong>{amount(78488)}</strong></div><span className="tile-trend"><TrendingUp size={23} /></span></div><div className="wallet-tile expense-tile"><span>{t('expense')}</span><strong>{amount(6500)}</strong><small>{t('once')}{!demo && ' · no transactions'}</small></div></div></section>
+    <section className="wallet-hero"><div className="wallet-top"><span className="hello-badge"><Lightbulb size={15} />{t('hello')}, {name} 👋</span><button className="wallet-visibility" onClick={() => setHidden(!hidden)} aria-label={hidden ? 'Show balances' : 'Hide balances'}>{t('wallet')}{hidden ? <EyeOff size={16} /> : <Eye size={16} />}</button></div><WalletWelcome /><div className="wallet-tiles"><div className="wallet-tile total-tile"><div><span>{t('total')}</span><strong>{amount(78488)}</strong></div><span className="tile-trend"><TrendingUp size={23} /></span></div><div className="wallet-tile expense-tile"><span>{t('expense')}</span><strong>{expense}</strong><small>{t('once')}{!demo && activation.data?.request?.status !== 'verified' && ' · no transactions'}</small></div></div></section>
     {account.error && <p className="form-error" role="alert">{account.error} <button className="text-link" onClick={account.refresh}>Retry balance</button></p>}
     <div className="stat-grid">{demoStats.map(stat => <section key={stat.key} className={`stat-card ${stat.color}`}><div><h2>{t(stat.key)}</h2><strong data-testid={stat.key === 'balance' ? 'member-balance' : stat.key === 'bonus' ? 'member-bonus' : undefined}>{stat.key === 'balance' ? balanceAmount() : stat.key === 'bonus' ? balanceAmount(true) : amount(stat.value)}</strong><small>{t('allTime')}</small></div><span className="stat-icon"><stat.icon size={24} strokeWidth={1.5} /></span></section>)}</div>
     <div className="dashboard-features"><Link to="/dashboard/trading" className="dashboard-feature"><IconChip icon={Bot} color="indigo" /><div><h2>{t('trading')}</h2><p>Explore strategies with virtual funds.</p></div><span className="pill indigo-pill">{t('simulated')}</span><ArrowRight size={18} /></Link><Link to="/dashboard/chat" className="dashboard-feature"><IconChip icon={MessageCircle} color="pink" /><div><h2>{t('chat')}</h2><p>A world of conversations to discover.</p></div><span className="pill">Community</span><ArrowRight size={18} /></Link></div>

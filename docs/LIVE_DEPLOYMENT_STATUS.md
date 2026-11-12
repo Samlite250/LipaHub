@@ -87,6 +87,12 @@ The existing invited owner account needed a one-time confirmation after email co
 
 The support address was saved using the audited settings operation. Auth Site URL and exact dashboard/reset-password redirects use the production URL. At the owner's request, the live minimum password length was reduced to 8 and email confirmation was disabled on 11 November 2026. New registrations receive a session immediately and can access the dashboard.
 
+## Rwanda activation update — 12 November 2026
+
+Migration `012_rwanda_account_activation.sql` was applied to the existing production database. New Rwanda registrations require reviewed payment before dashboard access; existing accounts are grandfathered. The page provides MTN/Airtel options, official names, phone and screenshot submission. Account approval unlocks access without a robot bonus. The owner will publish recipients, fees and instructions in Admin → Payments. See [Rwanda activation](RWANDA_ACTIVATION.md).
+
+Local verification passed lint and builds, all 24 database checks, six desktop/mobile activation browser checks and targeted API/payment regressions. Tests use local databases and controlled browser/API mocks; no production financial test submissions were created. Source publication and deployment are recorded below once verified.
+
 ## Client-launch blockers
 
 Custom SMTP is not configured. The built-in Supabase sender is for testing and restricts recipients to project-team addresses; ordinary client recovery and invitation delivery require a production email provider. Registration no longer requires confirmation email. See https://supabase.com/docs/guides/auth/auth-smtp. Keep credentials out of chat and source control; configure them privately in Supabase Auth.

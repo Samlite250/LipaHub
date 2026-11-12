@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import express from 'express'
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js'
 import { countries, country, defaultMethods, InputError, instructions, quote, screenshot, text, proofLimits } from './validation.js'
+import { ensureAccountActivated } from '../activation-access.js'
 
 const bucket = 'robot-payment-proofs'
 function fail(message: string, status = 500): never { throw Object.assign(new Error(message), { status }) }
@@ -15,8 +16,8 @@ function databaseError(error: { code?: string } | null) {
   fail('Payment storage is unavailable. Check the server configuration and migration.', 503)
 }
 type Row = Record<string, unknown>
-function mapRequest(row: Row) {
-  return { id: row.id, userId: row.user_id, country: row.country, planId: row.plan_id, status: row.status, fullName: row.full_name, phone: row.phone, transactionReference: row.transaction_reference, instructionVersion: row.instruction_version, paymentMethod: row.payment_method, quote: row.quote, submittedAt: row.submitted_at, reviewNote: row.review_note, reviewVersion: row.review_version || 1, reviewedAt: row.reviewed_at, bonusCreditedMinor: Number(row.bonus_credited_minor || 0),
+export function mapRequest(row: Row) {
+  return { id: row.id, userId: row.user_id, country: row.country, planId: row.plan_id, purpose: row.purpose || 'robot_activation', status: row.status, fullName: row.full_name, phone: row.phone, transactionReference: row.transaction_reference, instructionVersion: row.instruction_version, paymentMethod: row.payment_method, quote: row.quote, submittedAt: row.submitted_at, reviewNote: row.review_note, reviewVersion: row.review_version || 1, reviewedAt: row.reviewed_at, bonusCreditedMinor: Number(row.bonus_credited_minor || 0),
     files: ((row.robot_payment_proofs || []) as Row[]).map(file => ({ id: file.id, name: file.original_name, type: file.mime_type, size: file.size_bytes })) }
 }
 export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseClient | null, proofIntake?: boolean) {
@@ -62,7 +63,11 @@ export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseCli
   })
   router.post('/requests', (_req, res, next) => { if (!enabled) { res.status(503).json({ error: 'Live payment proof intake is disabled' }); return } next() }, express.json({ limit: '4300kb' }), async (req, res) => {
     const input = req.body || {}; const user = res.locals.user as User
-    const region = country(input.country); const serverQuote = quote(input.planId, region)
+    const region = country(input.country)
+    const accountActivation = input.purpose === 'account_activation'
+    if (accountActivation && (region !== 'Rwanda' || input.planId !== 'account-activation')) throw new InputError('Invalid account activation request.')
+    if (!accountActivation) await ensureAccountActivated(db, user)
+    let serverQuote = accountActivation ? null : quote(input.planId, region)
     const fullName = text(input.fullName, 'full name', 120, 2); const phone = text(input.phone, 'phone', 16, 8)
     if (!/^\+[1-9]\d{6,14}$/.test(phone)) throw new InputError('Phone number must include its country code.')
     if (!Number.isInteger(input.instructionVersion) || input.instructionVersion < 1) throw new InputError('Invalid instruction version.')
@@ -75,6 +80,14 @@ export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseCli
     databaseError(configError)
     const method = (config?.methods as Row[] | undefined)?.find(method => method.id === methodId && method.enabled === true)
     if (!config || !method || config.version !== input.instructionVersion) fail('Payment instructions changed or are unavailable. Reopen the plan before submitting.', 409)
+    if (accountActivation) {
+      const eligibility = await db!.from('rwanda_account_activations').select('activated_at').eq('user_id', user.id).maybeSingle()
+      databaseError(eligibility.error)
+      if (!eligibility.data || eligibility.data.activated_at) fail('This account does not require an activation payment.', 403)
+      if (!['MTN', 'Airtel'].includes(String(method.name)) || !Number.isSafeInteger(method.amountMinor) || Number(method.amountMinor) < 1 || Number(method.amountMinor) > 999999999999) throw new InputError('The admin must configure the Rwanda activation amount.')
+      const amount = Number(method.amountMinor)
+      serverQuote = {value: amount, valueMinor: amount, bonus: 0, bonusMinor: 0, currency: 'RWF', rateDate: '', catalogVersion: 'rwanda-account-activation-v1'}
+    }
     const id = randomUUID(); const uploaded: string[] = []
     let submissionStarted = false; let rollbackConfirmed = false
     try {
@@ -86,7 +99,7 @@ export function paymentRouter(auth: SupabaseClient | null, service?: SupabaseCli
         uploaded.push(path); metadata.push({ id: fileId, object_path: path, original_name: file.name, mime_type: file.type, size_bytes: file.bytes.length })
       }
       submissionStarted = true
-      const { error } = await db!.rpc('submit_robot_activation_request', { p_actor: user.id, p_payload: { id, country: region, plan_id: input.planId, full_name: fullName, phone, transaction_reference: transactionReference, instruction_version: input.instructionVersion, method_id: methodId, quote: serverQuote, files: metadata } })
+      const { error } = await db!.rpc('submit_robot_activation_request', { p_actor: user.id, p_payload: { id, country: region, plan_id: input.planId, purpose: accountActivation ? 'account_activation' : 'robot_activation', full_name: fullName, phone, transaction_reference: transactionReference, instruction_version: input.instructionVersion, method_id: methodId, quote: serverQuote, files: metadata } })
       rollbackConfirmed = !!error?.code && ['23505', '23514', '23502', '23503', '40001', '42501', '22023'].includes(error.code)
       databaseError(error)
     } catch (err) {

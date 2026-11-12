@@ -6,6 +6,7 @@ dist/
 !.env.example
 *.local
 test-results/
+test-results-activation/
 playwright-report/
 *.tsbuildinfo
 # Supplied browser captures contain third-party personal information.
