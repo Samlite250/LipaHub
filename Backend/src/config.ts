@@ -1,6 +1,6 @@
 export type BackendConfig = {
   host: string; port: number; webOrigin: string; trustProxy: number; upstreamTimeoutMs: number
-  supabaseUrl: string; anonKey: string; serviceKey: string; proofIntake: boolean
+  supabaseUrl: string; anonKey: string; serviceKey: string; proofIntake: boolean; withdrawalRequests: boolean
 }
 function invalid(name: string): never { throw new Error(`Invalid ${name}. Check Backend/.env and docs/LIVE_SETUP.md.`) }
 function number(value: string | undefined, fallback: number, min: number, max: number, name: string) {
@@ -35,10 +35,13 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): BackendConfig 
   if (serviceKey && !(serviceKey.startsWith('sb_secret_') || keyRole(serviceKey) === 'service_role')) invalid('SUPABASE_SERVICE_ROLE_KEY (server key required)')
   if (env.PAYMENT_PROOF_INTAKE_ENABLED && !['true', 'false'].includes(env.PAYMENT_PROOF_INTAKE_ENABLED)) invalid('PAYMENT_PROOF_INTAKE_ENABLED')
   if (env.PAYMENT_PROOF_INTAKE_ENABLED === 'true' && (!anonKey || !serviceKey)) invalid('PAYMENT_PROOF_INTAKE_ENABLED (configure both Supabase clients first)')
+  if (env.WITHDRAWAL_REQUESTS_ENABLED && !['true', 'false'].includes(env.WITHDRAWAL_REQUESTS_ENABLED)) invalid('WITHDRAWAL_REQUESTS_ENABLED')
+  if (env.WITHDRAWAL_REQUESTS_ENABLED === 'true' && (!anonKey || !serviceKey)) invalid('WITHDRAWAL_REQUESTS_ENABLED (configure both Supabase clients first)')
   return {
     host: env.HOST || '127.0.0.1', port: number(env.PORT, 3001, 1, 65535, 'PORT'), webOrigin,
     trustProxy: number(env.TRUST_PROXY_HOPS, 0, 0, 5, 'TRUST_PROXY_HOPS'),
     upstreamTimeoutMs: number(env.UPSTREAM_TIMEOUT_MS, 10000, 1000, 30000, 'UPSTREAM_TIMEOUT_MS'),
     supabaseUrl, anonKey, serviceKey, proofIntake: env.PAYMENT_PROOF_INTAKE_ENABLED === 'true',
+    withdrawalRequests: env.WITHDRAWAL_REQUESTS_ENABLED === 'true',
   }
 }

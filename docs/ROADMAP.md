@@ -13,3 +13,5 @@ The local implementation now includes the member frontend, Express API, configur
 No production accounts, cloud projects, provider registrations, domains, database migrations or deployments have been created by this local milestone.
 
 The local audit/backend milestone adds a testable API factory, shared authentication and configuration validation, dependency readiness, bulk payment settings, request tracing, bounded HTTP requests, proof failure recovery, embedded PostgreSQL tests and migration 007 for fresh payment authorization. See SYSTEM_AUDIT.md and BACKEND.md. These changes prepare integration; they do not complete the live/provider phases above.
+
+A local-only manual-review withdrawal state machine (migration 013, `WITHDRAWAL_REQUESTS_ENABLED`) now holds, cancels, rejects and pays wallet funds with idempotent, versioned RPCs. It has not been applied to the live project, no payout provider is connected, and only the main wallet channel is funded.

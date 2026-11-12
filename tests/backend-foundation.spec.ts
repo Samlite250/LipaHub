@@ -34,7 +34,7 @@ async function start(clients: { auth?: SupabaseClient | null; service?: Supabase
 async function stop(server: Server) { await new Promise<void>((resolve, reject) => { server.close(error => error ? reject(error) : resolve()); server.closeIdleConnections() }) }
 
 test('configuration rejects unsafe keys, malformed origins, invalid limits and premature intake', () => {
-  expect(readConfig({})).toMatchObject({ host: '127.0.0.1', port: 3001, proofIntake: false, trustProxy: 0 })
+  expect(readConfig({})).toMatchObject({ host: '127.0.0.1', port: 3001, proofIntake: false, withdrawalRequests: false, trustProxy: 0 })
   for (const patch of [
     { PORT: 'NaN' }, { PORT: '65536' }, { TRUST_PROXY_HOPS: 'true' }, { UPSTREAM_TIMEOUT_MS: '0' },
     { WEB_ORIGIN: 'https://user:password@example.com' }, { WEB_ORIGIN: 'https://example.com/path' },
@@ -42,6 +42,7 @@ test('configuration rejects unsafe keys, malformed origins, invalid limits and p
     { SUPABASE_URL: 'https://example.com', SUPABASE_ANON_KEY: 'sb_secret_server-only' },
     { SUPABASE_URL: 'https://example.com', SUPABASE_ANON_KEY: 'sb_publishable_public', SUPABASE_SERVICE_ROLE_KEY: 'sb_publishable_public' },
     { PAYMENT_PROOF_INTAKE_ENABLED: 'true' }, { PAYMENT_PROOF_INTAKE_ENABLED: 'yes' },
+    { WITHDRAWAL_REQUESTS_ENABLED: 'true' }, { WITHDRAWAL_REQUESTS_ENABLED: 'yes' },
   ]) expect(() => readConfig(patch)).toThrow()
   expect(readConfig({ SUPABASE_URL: 'http://127.0.0.1:54321', SUPABASE_ANON_KEY: 'sb_publishable_local' }).supabaseUrl).toContain('54321')
 })
@@ -55,7 +56,7 @@ test('API applies security headers, fresh identity verification and consistent a
     expect(health.headers()['x-content-type-options']).toBe('nosniff')
     expect(health.headers()['x-request-id']).toMatch(/^[0-9a-f-]{36}$/)
     expect(health.headers()['x-powered-by']).toBeUndefined()
-    for (const path of ['/api/me', '/api/admin/users', '/api/robot-payments/instructions', '/api/member-content', '/api/member-balances?country=Rwanda', '/api/support']) {
+    for (const path of ['/api/me', '/api/admin/users', '/api/robot-payments/instructions', '/api/member-content', '/api/member-balances?country=Rwanda', '/api/support', '/api/withdrawals', '/api/withdrawals/admin/requests']) {
       expect((await request.get(`${base}${path}`)).status()).toBe(401)
       expect((await request.get(`${base}${path}`, { headers: { Authorization: 'Bearer banned-token' } })).status()).toBe(403)
       const offline = await request.get(`${base}${path}`, { headers: { Authorization: 'Bearer offline-token' } })

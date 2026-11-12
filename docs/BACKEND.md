@@ -36,6 +36,7 @@ Copy the workspace environment examples described in [LIVE_SETUP.md](LIVE_SETUP.
 | `TRUST_PROXY_HOPS` | Known proxy hop count, 0 by default; set only after checking the hosting topology |
 | `UPSTREAM_TIMEOUT_MS` | Per-request Supabase timeout, 10000ms by default, between 1000 and 30000 |
 | `PAYMENT_PROOF_INTAKE_ENABLED` | False until the private bucket, instructions and real integration checks are complete |
+| `WITHDRAWAL_REQUESTS_ENABLED` | False until migration 013 is applied and payout operating rules are approved |
 
 Invalid key types, partial Auth credentials, malformed origins, invalid numeric limits and premature proof intake cause startup validation to fail. All Supabase clients share the same bounded HTTP transport. The frontend API transport has a 20-second request timeout and handles successful 204 responses.
 
@@ -69,6 +70,8 @@ Readiness probes the application tables, migration 007 authorization helpers, sc
 | Payment instructions | `GET /api/robot-payments/instructions`, `GET /api/robot-payments/instructions/:country` | Active signed-in user |
 | Payment submissions | `GET/POST /api/robot-payments/requests`, `GET /api/robot-payments/requests/:id/files/:fileId` | Owner; submission also requires enabled intake |
 | Payment administration | `/api/robot-payments/admin/instructions/:country`, `/api/robot-payments/admin/requests` | Administrator; review can only mark under review or rejected |
+| Withdrawals | `GET/POST /api/withdrawals`, `POST /api/withdrawals/:id/cancel` | Owner; submission requires enabled intake and holds available funds |
+| Withdrawal administration | `GET/PATCH /api/withdrawals/admin/requests`, `/api/withdrawals/admin/requests/:id` | Administrator; optimistic version required for every decision |
 | System administration | `/api/admin/users`, `/records/:collection`, `/settings`, `/audit`, `/users/:id/balances` | Administrator; validation, version checks and audit records apply |
 
 The bulk instruction endpoint returns all supported countries after one database read. The administrator frontend uses it instead of issuing a separate HTTP request for each of 252 country options.
@@ -77,9 +80,17 @@ The bulk instruction endpoint returns all supported countries after one database
 
 ## Database rules and tests
 
-Migration 009 preserves registration usernames and adds a service-only invitation lookup. Migration 008 makes raw payment-instruction JSON server-only: members receive enabled methods from the API, while administrators can inspect/edit drafts. Apply migrations 001 through 011 once, in order, in the intended Supabase project. Migration 007 checks current database account status and administrator roles for browser-readable proof data, rather than relying on a role captured in an older JWT. It also rejects suspended actors in payment RPCs. Existing projects should apply only their missing migrations after backup/review.
+Migration 009 preserves registration usernames and adds a service-only invitation lookup. Migration 008 makes raw payment-instruction JSON server-only: members receive enabled methods from the API, while administrators can inspect/edit drafts. Migration 013 adds the manual-review withdrawal state machine. Apply migrations 001 through 013 once, in order, in the intended Supabase project. Migration 007 checks current database account status and administrator roles for browser-readable proof data, rather than relying on a role captured in an older JWT. It also rejects suspended actors in payment RPCs. Existing projects should apply only their missing migrations after backup/review.
 
 `npm run test:db` executes the complete migration chain in [PGlite](https://pglite.dev/docs/api), an embedded PostgreSQL engine. The fixture supplies minimal Auth/Storage schemas and roles, then verifies actual SQL grants, row-level policies, support ownership, stale versions, idempotent retries, country constraints and balance/clearing conservation. The test fixture does not implement Supabase Auth, PostgREST, signed URLs, Storage HTTP operations or production multi-connection concurrency. Repeat the [live RLS checks](https://supabase.com/docs/guides/database/postgres/testing-row-level-security) against your real project.
+
+## Withdrawal state machine
+
+`request_withdrawal` moves the requested amount out of the member's available wallet into the currency clearing account in the same transaction as the request and its history receipt. Requests are idempotent by caller-supplied UUID, reject stale or reused details, and only the `main` wallet channel is funded today. Members can cancel `requested` or `under_review` requests for a refund.
+
+Administrators move requests `requested → under_review → approved → paid`, or reject them from `requested`, `under_review` or `approved`. Rejection and cancellation refund the hold; marking an approved request `paid` records the manual payout without changing the wallet again because the hold already moved funds. Every decision requires the current version and writes a transition plus an admin audit record. Reconciliation stays `wallets + clearing = 0`. The API is inert until `WITHDRAWAL_REQUESTS_ENABLED=true`; no payout provider is contacted.
+
+`review_withdrawal`, `cancel_withdrawal` and `request_withdrawal` are service-role RPCs. Browser roles cannot read the withdrawal tables directly. `npm run test:db` covers holds, idempotency, refunds, transition rules, authorization, stale versions and clearing conservation; these are local PGlite checks, not live provider tests.
 
 ## Payment-proof failure recovery
 

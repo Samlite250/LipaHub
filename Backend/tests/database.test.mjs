@@ -102,7 +102,7 @@ test('short username hashes match the browser algorithm and reject duplicate or 
 test('all migrations apply and every application table enables RLS', async () => {
   const { rows } = await db.query(`select relname,relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace
     where n.nspname='public' and c.relkind='r'`)
-  assert.equal(rows.length, 13)
+  assert.equal(rows.length, 15)
   assert.ok(rows.every(row => row.relrowsecurity), JSON.stringify(rows))
   const bucket = (await db.query(`select * from storage.buckets where id='robot-payment-proofs'`)).rows[0]
   assert.equal(bucket.public, false)
@@ -184,6 +184,97 @@ test('worldwide country constraints and USD fallback survive the complete migrat
   assert.equal(value.country, 'Japan')
   assert.equal(value.currency, 'USD')
   await rejected(`select public.adjust_system_balance($1,$2,'Unknown',100,0,'Verified correction',0,$3)`, [admin, member, ticket], '22023')
+})
+
+const withdrawalFunding = '99999999-9999-4999-8999-999999999990'
+const withdrawalA = '99999999-9999-4999-8999-999999999991'
+const withdrawalB = '99999999-9999-4999-8999-999999999992'
+function withdrawalPayload(id, amountMinor = 40000, patch = {}) {
+  return { id, country: 'Rwanda', channel: 'main', amountMinor, destination: { method: 'mobile_money', account: '+250788000000', holder: 'Test Member' }, ...patch }
+}
+async function fundRwanda(amount = 100000) {
+  await db.query(`select public.adjust_system_balance($1,$2,'Rwanda',$3,0,'Withdrawal test funding credit',0,$4)`, [admin, member, amount, withdrawalFunding])
+}
+async function memberWallet() {
+  return (await db.query(`select * from public.system_balance_accounts where user_id=$1 and country='Rwanda'`, [member])).rows[0]
+}
+
+test('withdrawal requests hold funds idempotently and member cancellation refunds atomically', async () => {
+  await role('service_role')
+  await fundRwanda()
+  const request = `select public.request_withdrawal($1,$2::jsonb) item`
+  const payload = withdrawalPayload(withdrawalA)
+  const saved = (await db.query(request, [member, JSON.stringify(payload)])).rows[0].item
+  assert.equal(saved.status, 'requested'); assert.equal(Number(saved.amount_minor), 40000); assert.equal(saved.currency, 'RWF')
+  assert.equal(Number((await memberWallet()).available_minor), 60000)
+  assert.equal((await db.query(request, [member, JSON.stringify(payload)])).rows[0].item.id, withdrawalA)
+  await rejected(request, [member, JSON.stringify(withdrawalPayload(withdrawalA, 50000))], '23505')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [other, JSON.stringify(withdrawalPayload(withdrawalB, 1000000000001))], '22023')
+  await rejected(`select public.cancel_withdrawal($1,$2,'Not mine',1)`, [other, withdrawalA], '42501')
+  await rejected(`select public.cancel_withdrawal($1,$2,'Stale',2)`, [member, withdrawalA], '40001')
+  const cancelled = (await db.query(`select public.cancel_withdrawal($1,$2,'Changed my mind',1) item`, [member, withdrawalA])).rows[0].item
+  assert.equal(cancelled.status, 'cancelled'); assert.equal(cancelled.version, 2)
+  assert.equal((await db.query(`select public.cancel_withdrawal($1,$2,'Changed my mind',1) item`, [member, withdrawalA])).rows[0].item.version, 2)
+  await rejected(`select public.cancel_withdrawal($1,$2,'Again',2)`, [member, withdrawalA], '40001')
+  assert.equal(Number((await memberWallet()).available_minor), 100000)
+  await role('postgres')
+  assert.equal(Number((await db.query(`select balance_minor from public.system_balance_clearing where currency='RWF'`)).rows[0].balance_minor), -100000)
+  assert.equal((await db.query(`select * from public.system_balance_adjustments where user_id=$1 and country='Rwanda'`, [member])).rows.length, 3)
+  const total = (await db.query(`select (select sum(available_minor+bonus_minor) from public.system_balance_accounts where currency='RWF') +
+    (select balance_minor from public.system_balance_clearing where currency='RWF') total`)).rows[0].total
+  assert.equal(Number(total), 0)
+})
+
+test('withdrawal review enforces transitions, authorization and payout reconciliation', async () => {
+  await role('service_role')
+  await fundRwanda()
+  await db.query(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 25000))])
+  await rejected(`select public.review_withdrawal($1,'paid','Paying out',$2,1)`, [withdrawalA, admin], '40001')
+  await rejected(`select public.review_withdrawal($1,'under_review','Checking',$2,1)`, [withdrawalA, member], '42501')
+  await rejected(`select public.review_withdrawal($1,'under_review','Checking',$2,1)`, [withdrawalA, banned], '42501')
+  await db.query(`select public.review_withdrawal($1,'under_review','Checking',$2,1)`, [withdrawalA, admin])
+  assert.equal(Number((await memberWallet()).available_minor), 75000)
+  await rejected(`select public.review_withdrawal($1,'paid','Paying out',$2,2)`, [withdrawalA, admin], '40001')
+  await db.query(`select public.review_withdrawal($1,'approved','Payout approved',$2,2)`, [withdrawalA, admin])
+  await rejected(`select public.review_withdrawal($1,'under_review','Back again',$2,3)`, [withdrawalA, admin], '40001')
+  const refunded = (await db.query(`select public.review_withdrawal($1,'rejected','Payout failed',$2,3) item`, [withdrawalA, admin])).rows[0].item
+  assert.equal(refunded.status, 'rejected'); assert.equal(refunded.version, 4)
+  assert.equal(Number((await memberWallet()).available_minor), 100000)
+  await rejected(`select public.review_withdrawal($1,'approved','Try again',$2,4)`, [withdrawalA, admin], '40001')
+
+  await db.query(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalB, 30000))])
+  await rejected(`select public.review_withdrawal($1,'approved','Skip review',$2,1)`, [withdrawalB, admin], '40001')
+  await db.query(`select public.review_withdrawal($1,'under_review','Checking',$2,1)`, [withdrawalB, admin])
+  await db.query(`select public.review_withdrawal($1,'approved','Payout approved',$2,2)`, [withdrawalB, admin])
+  const paid = (await db.query(`select public.review_withdrawal($1,'paid','Sent by operator',$2,3) item`, [withdrawalB, admin])).rows[0].item
+  assert.equal(paid.status, 'paid'); assert.equal(paid.version, 4); assert.ok(paid.paid_at)
+  assert.equal((await db.query(`select public.review_withdrawal($1,'paid','Sent by operator',$2,3) item`, [withdrawalB, admin])).rows[0].item.version, 4)
+  await rejected(`select public.review_withdrawal($1,'rejected','Reverse payout',$2,4)`, [withdrawalB, admin], '40001')
+  assert.equal(Number((await memberWallet()).available_minor), 70000)
+  await role('postgres')
+  assert.equal(Number((await db.query(`select balance_minor from public.system_balance_clearing where currency='RWF'`)).rows[0].balance_minor), -70000)
+  assert.equal((await db.query(`select * from public.withdrawal_transitions where request_id=$1 order by created_at`, [withdrawalB])).rows.length, 4)
+  const total = (await db.query(`select (select sum(available_minor+bonus_minor) from public.system_balance_accounts where currency='RWF') +
+    (select balance_minor from public.system_balance_clearing where currency='RWF') total`)).rows[0].total
+  assert.equal(Number(total), 0)
+})
+
+test('withdrawals reject unconfigured channels, invalid payouts, insufficient funds and browser access', async () => {
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [banned, JSON.stringify(withdrawalPayload(withdrawalA))], '42501')
+  await role('service_role')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA))], '22023')
+  await fundRwanda()
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 40000, { channel: 'youtube' }))], '22023')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 40000, { destination: { method: 'cheque', account: '+250788000000' } }))], '22023')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 40000, { destination: { method: 'bank', account: 'x' } }))], '22023')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 1000000000001))], '22023')
+  await rejected(`select public.request_withdrawal($1,$2::jsonb)`, [member, JSON.stringify(withdrawalPayload(withdrawalA, 200000))], '22023')
+  assert.equal((await db.query(`select * from public.withdrawal_requests`)).rows.length, 0)
+  await rejected(`select public.review_withdrawal($1,'approved','',$2,1)`, [withdrawalA, admin], '22023')
+  await rejected(`select public.review_withdrawal($1,'under_review','Checking',$2,1)`, [withdrawalA, admin], 'P0002')
+  await role('authenticated')
+  await rejected(`select * from public.withdrawal_requests`, [], '42501')
+  await rejected(`select * from public.withdrawal_transitions`, [], '42501')
 })
 
 test('payment instruction RPC rejects suspended administrators', async () => {

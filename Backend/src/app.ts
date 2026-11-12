@@ -11,6 +11,7 @@ import { paymentRouter } from './payments/router.js'
 import { adminRouter, memberContentRouter } from './admin/router.js'
 import { memberBalanceRouter } from './admin/balances.js'
 import { supportRouter } from './support/router.js'
+import { withdrawalRouter } from './withdrawals/router.js'
 import { invitationRouter } from './invitations.js'
 import { accountActivationRouter, requireAccountActivation } from './account-activation.js'
 
@@ -34,7 +35,7 @@ export function createApp(config: BackendConfig, clients: { auth?: SupabaseClien
   app.get('/api/ready', async (_req, res) => { const status = await ready(); res.status(status.ready ? 200 : 503).json({ ready: status.ready }) })
   app.get('/api/admin/system/status', authenticate(auth), requireAdmin, async (_req, res) => { const status = await ready(); res.status(status.ready ? 200 : 503).json(status) })
   app.use('/api/account-activation', accountActivationRouter(auth, db, config.proofIntake))
-  app.use(['/api/me', '/api/robot-payments', '/api/member-content', '/api/member-balances', '/api/support'], authenticate(auth), (req, res, next) => {
+  app.use(['/api/me', '/api/robot-payments', '/api/member-content', '/api/member-balances', '/api/support', '/api/withdrawals'], authenticate(auth), (req, res, next) => {
     // Account-activation proof submission is validated separately after JSON parsing.
     if (req.baseUrl === '/api/robot-payments' && (req.path.startsWith('/admin/') || (req.method === 'POST' && req.path === '/requests'))) { next(); return }
     requireAccountActivation(db)(req, res, next)
@@ -45,6 +46,7 @@ export function createApp(config: BackendConfig, clients: { auth?: SupabaseClien
   app.use('/api/member-content', memberContentRouter(auth, db))
   app.use('/api/member-balances', memberBalanceRouter(auth, db))
   app.use('/api/support', supportRouter(auth, db))
+  app.use('/api/withdrawals', withdrawalRouter(auth, db, config.withdrawalRequests))
   app.use('/api/invitations', invitationRouter(db))
   app.use((_req, res) => { res.status(404).json({ error: 'Not found', requestId: res.locals.requestId }) })
   app.use(apiError())
