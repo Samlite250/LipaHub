@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowDownLeft, ArrowRight, Banknote, BookOpen, ChevronRight, CreditCard, FileCheck2, Globe2, Image, LayoutDashboard, LifeBuoy, LogOut, Megaphone, RefreshCw, ScrollText, Search, Settings2, ShieldCheck, SlidersHorizontal, Users } from 'lucide-react'
+import { ArrowDownLeft, ArrowRight, Banknote, BookOpen, ChevronRight, CreditCard, FileCheck2, Globe2, Image, LayoutDashboard, LifeBuoy, LogOut, Menu, Megaphone, RefreshCw, ScrollText, Search, Settings2, ShieldCheck, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Logo, Modal } from '../components'
 import { CountryFlag } from '../CountryFlag'
 import { countries, type Country } from '../domain/countries'
@@ -74,6 +74,7 @@ export function AdminPayments() {
   else if (['users', 'settings', 'audit', 'support'].includes(segment)) tab = segment as SystemSection
   const isSystemTab = ['users', 'settings', 'audit', 'support'].includes(tab)
   const isPaymentsDataTab = tab === 'overview' || tab === 'instructions' || tab === 'proofs'
+  const [menuOpen, setMenuOpen] = useState(false)
   const [preview, setPreview] = useState(false)
   const [country, setCountry] = useState<Country>('Burundi')
   const [config, setConfig] = useState<PaymentInstructions | null>(null)
@@ -97,7 +98,17 @@ export function AdminPayments() {
   const liveAccess = useMemo<PaymentAccess | null>(() => access && 'accessToken' in access ? access : null, [access])
   const adminName = preview ? 'Demo administrator' : String(session?.user.user_metadata.display_name || 'Administrator')
   const adminInitial = adminName.charAt(0).toUpperCase()
-  useEffect(() => { setMessage(''); setError('') }, [location.pathname, location.search])
+  useEffect(() => { setMessage(''); setError(''); setMenuOpen(false) }, [location.pathname, location.search])
+  useEffect(() => {
+    if (!menuOpen) return
+    const previous = document.body.style.overflow
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false) }
+    const desktop = () => { if (window.innerWidth > 900) setMenuOpen(false) }
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', close)
+    window.addEventListener('resize', desktop)
+    return () => { document.body.style.overflow = previous; document.removeEventListener('keydown', close); window.removeEventListener('resize', desktop) }
+  }, [menuOpen])
   useEffect(() => {
     if (!access || !isPaymentsDataTab) return
     let active = true
@@ -186,14 +197,15 @@ export function AdminPayments() {
   ]
   return <div className="admin-shell">
     <a className="skip-link" href="#admin-main">Skip to admin content</a>
-    <aside className="admin-sidebar" aria-label="Admin navigation">
-      <div className="admin-brand"><Logo /><span>ADMIN</span></div>
+    {menuOpen && <button className="admin-nav-scrim" type="button" aria-label="Close admin navigation" onClick={() => setMenuOpen(false)} />}
+    <aside className={`admin-sidebar${menuOpen ? ' open' : ''}`} id="admin-sidebar" aria-label="Admin navigation">
+      <div className="admin-brand"><Logo /><span>ADMIN</span><button className="admin-sidebar-close" type="button" aria-label="Close admin navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button></div>
       <div className="admin-profile"><span className="admin-profile-avatar">{adminInitial}</span><div><strong>{adminName}</strong><small>{preview ? 'Demo workspace' : access ? 'Workspace administrator' : 'Restricted access'}</small></div><span className={`admin-profile-status ${access && !preview ? 'live' : ''}`} aria-hidden="true" /></div>
-      <div className="admin-nav-groups">{groups.map(group => <div className="admin-nav-group" key={group}><p className="admin-nav-caption">{group}</p><nav aria-label={`${group} navigation`}>{navigation.filter(item => item.group === group).map(item => <Link key={item.id} to={item.path} aria-current={isCurrent(item.id) ? 'page' : undefined}><span className={`admin-nav-icon tone-${item.tone}`}><item.icon size={17} /></span><span>{item.label}</span>{badge(item.id) ? <b>{badge(item.id)}</b> : null}</Link>)}</nav></div>)}</div>
-      <div className="admin-sidebar-bottom"><Link to={demo || session ? '/dashboard' : '/login'}><ArrowDownLeft size={18} />Member dashboard</Link>{access && <button onClick={() => void logout()}><LogOut size={18} />Sign out</button>}<small>LipaHub administration</small></div>
+      <div className="admin-nav-groups">{groups.map(group => <div className="admin-nav-group" key={group}><p className="admin-nav-caption">{group}</p><nav aria-label={`${group} navigation`}>{navigation.filter(item => item.group === group).map(item => <Link key={item.id} to={item.path} aria-current={isCurrent(item.id) ? 'page' : undefined} onClick={() => setMenuOpen(false)}><span className={`admin-nav-icon tone-${item.tone}`}><item.icon size={17} /></span><span>{item.label}</span>{badge(item.id) ? <b>{badge(item.id)}</b> : null}</Link>)}</nav></div>)}</div>
+      <div className="admin-sidebar-bottom"><Link to={demo || session ? '/dashboard' : '/login'} onClick={() => setMenuOpen(false)}><ArrowDownLeft size={18} />Member dashboard</Link>{access && <button onClick={() => void logout()}><LogOut size={18} />Sign out</button>}<small>LipaHub administration</small></div>
     </aside>
     <div className="admin-body">
-      <header className="admin-topbar"><div className="admin-breadcrumb"><span>Admin</span><ChevronRight size={14} /><strong>{title}</strong></div><div className="admin-topbar-actions"><Link className="admin-member-link" to={demo || session ? '/dashboard' : '/login'} aria-label="Back to dashboard" title="Back to dashboard"><ArrowDownLeft size={18} /></Link><button className="admin-appearance" onClick={() => setDark(!dark)} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}><SlidersHorizontal size={17} /></button>{access && <button className="admin-mobile-logout" aria-label="Sign out" onClick={() => void logout()}><LogOut size={17} /></button>}<span className={`admin-access-badge ${preview ? 'demo' : ''}`}><span />{access ? preview ? 'Demo workspace' : 'Administrator' : 'Restricted access'}</span><span className="admin-avatar" aria-label="Administrator profile">{adminInitial}</span></div></header>
+      <header className="admin-topbar"><button className="admin-menu-toggle" type="button" aria-label={menuOpen ? 'Close admin navigation' : 'Open admin navigation'} aria-expanded={menuOpen} aria-controls="admin-sidebar" onClick={() => setMenuOpen(value => !value)}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</button><div className="admin-breadcrumb"><span>Admin</span><ChevronRight size={14} /><strong>{title}</strong></div><div className="admin-topbar-actions"><Link className="admin-member-link" to={demo || session ? '/dashboard' : '/login'} aria-label="Back to dashboard" title="Back to dashboard"><ArrowDownLeft size={18} /></Link><button className="admin-appearance" onClick={() => setDark(!dark)} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}><SlidersHorizontal size={17} /></button>{access && <button className="admin-mobile-logout" aria-label="Sign out" onClick={() => void logout()}><LogOut size={17} /></button>}<span className={`admin-access-badge ${preview ? 'demo' : ''}`}><span />{access ? preview ? 'Demo workspace' : 'Administrator' : 'Restricted access'}</span><span className="admin-avatar" aria-label="Administrator profile">{adminInitial}</span></div></header>
       <main className="admin-content" id="admin-main">
         <div className={`admin-page-title${tab === 'overview' && access ? ' admin-page-hero' : ''}`}><div><span className="admin-eyebrow">LIPAHUB / ADMINISTRATION</span><h1>{title}</h1><p>{tabDescription(tab)}</p></div>{access && (tab === 'overview' || tab === 'instructions' || tab === 'proofs') && <button className="button secondary small" disabled={loading || busy} onClick={() => { setMessage(''); setRevision(value => value + 1) }}><RefreshCw size={15} className={loading ? 'admin-spin' : ''} />Refresh data</button>}</div>
         {!access ? <section className="admin-access-panel panel"><div className="admin-access-art"><ShieldCheck size={48} /><span>SECURE OPERATIONS</span><h2>Run LipaHub with a complete audit trail.</h2><p>Review payments and payouts, manage members and balances, publish content and respond to support requests.</p></div><div className="admin-access-copy"><span className="admin-eyebrow">ADMINISTRATOR ACCESS</span><h2>Admin workspace</h2><p>{session && !isAdmin ? 'Your account does not have the administrator role.' : 'Sign in with an administrator account to access live operations' + (demoEnabled ? ', or explore the workspace with local demo data.' : '.')}</p>{demoEnabled && <button className="button primary" onClick={() => { if (!demo) startDemo(); setPreview(true) }}>Open admin demo<ArrowRight size={16} /></button>}{!session && <Link className="text-link" to="/login">Sign in as administrator<ChevronRight size={14} /></Link>}{demoEnabled && <small>The demo uses this browser only and does not grant live admin permissions.</small>}</div></section> : <>

@@ -6,6 +6,11 @@ async function admin(page: Page, section: string) {
   await page.getByRole('button', { name: 'Open admin demo' }).click()
   await expect(page.locator('.admin-environment')).toContainText('Demo workspace')
 }
+async function adminLink(page: Page, name: string) {
+  const toggle = page.getByRole('button', { name: 'Open admin navigation' })
+  if (await toggle.isVisible()) await toggle.click()
+  await page.getByRole('link', { name, exact: true }).click()
+}
 test('user CRUD persists, prevents duplicate emails and protects the current administrator', async ({ page }) => {
   await admin(page, 'users')
   await expect(page.locator('.admin-user-table tbody tr')).toHaveCount(1)
@@ -46,7 +51,7 @@ test('user CRUD persists, prevents duplicate emails and protects the current adm
   await page.getByLabel('Deletion confirmation').fill('member@example.invalid')
   await page.getByRole('button', { name: 'Permanently delete' }).click()
   await expect(user).toHaveCount(0)
-  await page.getByRole('link', { name: 'Audit log', exact: true }).click()
+  await adminLink(page, 'Audit log')
   for (const action of ['users.create', 'users.update', 'users.delete']) await expect(page.locator('.admin-audit-table')).toContainText(action)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
 })
@@ -88,7 +93,7 @@ test('announcements respect country audiences and system settings reach support 
   await page.getByRole('dialog').getByLabel('Publication status').selectOption('published')
   await page.getByRole('button', { name: 'Save record' }).click()
   await expect(page.locator('.admin-content-list')).toContainText('Rwanda member notice')
-  await page.getByRole('link', { name: 'Settings', exact: true }).click()
+  await adminLink(page, 'Settings')
   await page.getByLabel('Site name').fill('LipaHub Test Workspace')
   await page.getByLabel('Support email').fill('support@example.invalid')
   await page.getByLabel('Support message').fill('Test support message from the system administrator.')
