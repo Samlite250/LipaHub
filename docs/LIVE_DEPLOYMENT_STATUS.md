@@ -1,6 +1,12 @@
-# Live deployment status — 11 November 2026
+# Live deployment status — 12 November 2026
 
 Production: https://lipahub1.vercel.app
+
+## Direct registration and hashed Alternative links — 12 November 2026
+
+Source commit `89b3ffc` was pushed to GitHub and deployed as `dpl_9Kcv1knRdqQGQyujgAmGqkfGNwCP`, Ready at the production URL. Migration `010_short_invitation_codes.sql` was applied before deployment. Previously shared `/?ref=Ish` links now open registration directly. The primary link remains `/register?ref=Ish`; the Alternative link is `/i/t9TWSmPl`, which resolves the short username hash and opens the same canonical registration URL.
+
+Lint, both workspace builds, all 15 database/deployment tests and all 22 focused desktop/mobile browser/API tests passed. The browser runner completed with a clean exit. Coverage includes direct entry, code hashing, copying, retries, invalid codes, duplicate/suspended inviters, service-only lookup permissions and retained legacy ID links. Fresh live browser pages verified all three public Ish URL forms reach `/register?ref=Ish` and display `Invited by: Ish`; both lookup endpoints returned 200. A combined temporary-account live check initially timed out during its short-link redirect, and the account was deleted in cleanup. The subsequent isolated public Ish checks completed successfully for every link form. No invitation email was sent.
 
 ## Visible username correction — 11 November 2026
 
