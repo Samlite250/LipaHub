@@ -14,6 +14,7 @@
 .admin-brand .logo{color:#f8fafc;font-size:24px;letter-spacing:-.8px}
 .admin-brand .logo img{width:32px;height:32px}
 .admin-brand>span{font-size:8px;letter-spacing:2px;color:#5eead4;border:1px solid #5eead433;background:#5eead40f;border-radius:999px;padding:4px 8px}
+.admin-nav-groups{display:block}
 .admin-nav-group{margin-bottom:16px}
 .admin-nav-caption{padding:0 12px 8px;margin:0;font-size:9px;letter-spacing:1.6px;color:var(--admin-sidebar-muted);font-weight:700;background:none}
 .admin-sidebar nav{display:flex;flex-direction:column;gap:3px}
@@ -59,12 +60,15 @@
 .admin-environment>span{font-size:8px;letter-spacing:1.1px;white-space:nowrap;border-left:1px solid #f59e0b33;padding-left:12px;font-weight:700;color:#9a6a12}
 
 .admin-shell .panel{border-radius:var(--admin-radius);border:1px solid var(--line);box-shadow:0 1px 2px #0b1d2608;background:var(--surface)}
+.admin-shell .icon-chip{background:var(--soft);color:var(--teal);box-shadow:none}
+[data-theme=dark] .admin-sidebar nav a:hover,[data-theme=dark] .admin-sidebar nav a[aria-current=page]{color:#f0fdfa}
 .admin-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
 .admin-metrics .admin-metric{padding:17px 18px 15px;border:1px solid var(--line);border-top:1px solid var(--line);border-radius:var(--admin-radius);background:var(--surface);transition:border-color .15s,transform .15s}
 .admin-metrics .admin-metric:hover{border-color:#0d94883d;transform:translateY(-1px)}
 .admin-metric>div{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .admin-metric>div>span:first-child{font-size:10.5px;color:var(--muted);font-weight:600;line-height:1.45}
 .admin-metric-icon{display:grid;place-items:center;width:31px;height:31px;flex-shrink:0;border-radius:8px;background:var(--soft);color:var(--teal);box-shadow:none}
+.admin-metric-icon.teal{background:var(--soft);color:var(--teal)}
 .admin-metric-icon.amber{background:#f59e0b14;color:#b4740b}
 .admin-metric-icon.indigo{background:#6366f114;color:#5b5bd6}
 .admin-metric-icon.blue{background:#3b82f614;color:#2563b8}
@@ -105,6 +109,7 @@
 .admin-market-grid>button>span{grid-column:2;font-size:9px;color:var(--muted)}
 .admin-market-grid>button>svg:last-child{grid-column:3;grid-row:1/3;color:var(--muted)}
 .admin-market-grid>button>svg:first-child{grid-row:1/3}
+.admin-market-empty{padding:38px 20px}
 
 .admin-table-scroll{overflow-x:auto}
 .admin-table{border-collapse:collapse;width:100%;font-size:11.5px;text-align:left}
@@ -300,9 +305,10 @@
   .admin-brand{padding:0 4px 10px;margin-bottom:8px;border-bottom:1px solid var(--admin-sidebar-line)}
   .admin-brand .logo{font-size:22px}
   .admin-brand .logo img{width:28px;height:28px}
-  .admin-nav-group{margin:0 0 6px}
+  .admin-nav-groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:4px}
+  .admin-nav-group{display:contents}
   .admin-nav-caption,.admin-sidebar-bottom{display:none}
-  .admin-sidebar nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  .admin-sidebar nav{display:contents}
   .admin-sidebar nav a{flex-direction:column;justify-content:center;gap:4px;min-height:52px;padding:8px 4px;font-size:9px;text-align:center;border:1px solid var(--admin-sidebar-line)}
   .admin-sidebar nav a[aria-current=page]{box-shadow:none;border-color:#2dd4bf66}
   .admin-sidebar .admin-nav-icon{width:23px;height:23px;border-radius:6px}
@@ -319,14 +325,16 @@
   .admin-withdrawal-toolbar,.admin-queue-toolbar,.admin-audit-toolbar{grid-template-columns:1fr 1fr}
   .admin-withdrawal-toolbar .admin-search,.admin-queue-toolbar .admin-search,.admin-audit-toolbar .admin-search{grid-column:1/-1}
   .admin-queue-summary{grid-template-columns:1fr 1fr 1fr}
+  .admin-user-table th,.admin-user-table td{padding-inline:9px}
+  .admin-user-table td:first-child{min-width:210px;max-width:280px}
 }
 @media(max-width:600px){
   .admin-sidebar{padding:10px 12px 8px}
-  .admin-sidebar nav{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .admin-nav-groups{grid-template-columns:repeat(3,minmax(0,1fr))}
   .admin-sidebar nav a{font-size:8px;min-height:48px}
   .admin-topbar{padding:0 14px}
   .admin-breadcrumb>span,.admin-breadcrumb>svg{display:none}
-  .admin-access-badge{font-size:9px;padding:5px 8px}
+  .admin-access-badge{display:none}
   .admin-appearance{padding-right:8px;width:26px}
   .admin-avatar{height:29px;width:29px}
   .admin-content{padding:18px 14px 0}
@@ -386,4 +394,18 @@
   .admin-user-table td:last-child{grid-column:1/-1;align-items:flex-end;border-top:1px solid var(--line);padding:11px 0 0;margin-top:4px}
   .admin-row-actions .icon-button{height:34px;width:34px}
   .admin-pagination{padding:12px 15px;flex-wrap:wrap}
+  .admin-audit-panel .admin-table-scroll{overflow-x:visible}
+  .admin-audit-panel .admin-table,.admin-audit-panel .admin-table tbody{display:block;width:100%}
+  .admin-audit-panel .admin-table thead{display:none}
+  .admin-audit-panel .admin-table tbody{padding:12px}
+  .admin-audit-panel .admin-table tr{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;border:1px solid var(--line);border-radius:9px;padding:13px;margin-bottom:10px;background:var(--surface)}
+  .admin-audit-panel .admin-table tr:last-child{margin-bottom:0}
+  .admin-audit-panel .admin-table td{display:flex;flex-direction:column;border:0;padding:0;min-width:0;max-width:none;white-space:normal;font-size:10.5px;overflow-wrap:anywhere}
+  .admin-audit-panel .admin-table td:first-child{grid-column:1/-1;padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--line)}
+  .admin-audit-panel .admin-table td:nth-child(2)::before,.admin-audit-panel .admin-table td:nth-child(3)::before,.admin-audit-panel .admin-table td:nth-child(4)::before,.admin-audit-panel .admin-table td:nth-child(5)::before{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .admin-audit-panel .admin-table td:nth-child(2)::before{content:'Target'}
+  .admin-audit-panel .admin-table td:nth-child(3)::before{content:'Actor'}
+  .admin-audit-panel .admin-table td:nth-child(4)::before{content:'Outcome'}
+  .admin-audit-panel .admin-table td:nth-child(5)::before{content:'Time'}
+  .admin-audit-panel .admin-table td:nth-child(5){color:var(--muted)}
 }
