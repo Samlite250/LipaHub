@@ -96,7 +96,7 @@ test('Airtel, language selection and 320px payment layout are usable', async ({p
   await page.getByRole('button',{name:'PAY WITH AIRTEL'}).click()
   await expect(page.getByRole('heading',{name:'Rwanda Airtel'})).toBeVisible()
   await page.getByRole('button',{name:'Kinyarwanda',exact:true}).click()
-  await expect(page.getByRole('heading',{name:'Fungura konti yawe'})).toBeVisible()
+  await expect(page.getByLabel('Izina rya mbere',{exact:true})).toBeVisible()
   await page.setViewportSize({width:320,height:740})
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth<=innerWidth)).toBeTruthy()
 })

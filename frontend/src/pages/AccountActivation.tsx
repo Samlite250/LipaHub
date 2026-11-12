@@ -62,11 +62,9 @@ export function AccountActivation() {
     try { await navigator.clipboard.writeText(method?.recipient || ''); setCopied(true) }
     catch { setError('Copy is unavailable. Select and copy the recipient details below.') }
   }
-  return <main className="account-activation-page"><Logo /><section className="account-activation-card">
-    <Languages />
-    <h1>{tr('Welcome!', 'Murakaza neza!')}</h1>
-    <h2>{tr('Activate your account', 'Fungura konti yawe')}</h2>
-    <p className="activation-account-name">{session.user.user_metadata.username || session.user.user_metadata.display_name || 'LipaHub member'}</p>
+  return <main className={`account-activation-page ${selected && !pending ? 'activation-payment-page' : 'activation-welcome-page'}`}><Logo /><section className="account-activation-card">
+    {(!selected || pending) && <header className="activation-welcome-heading"><h1>{tr('Welcome!', 'Murakaza neza!')}</h1>
+    <h2>{tr('Activate your account', 'Fungura konti yawe')}</h2></header>}
     {status.loading && <p role="status">{tr('Loading payment options…', 'Tegereza uburyo bwo kwishyura…')}</p>}
     {(error || status.error) && <p className="form-error" role="alert">{error || status.error} {status.error && <button className="text-link" onClick={status.refresh}>Retry</button>}</p>}
     {pending ? <section className="account-activation-pending"><Clock3 size={34} /><h3>{request.status === 'under_review' ? tr('Payment under review', 'Ubwishyu buragenzurwa') : tr('Payment proof submitted', 'Ikimenyetso cy’ubwishyu cyoherejwe')}</h3>
@@ -76,9 +74,10 @@ export function AccountActivation() {
       <button className="button primary" onClick={status.refresh}>{tr('Check payment status', 'Reba uko ubwishyu buhagaze')}</button>
     </section> : data && <>
       {request?.status === 'rejected' && <p className="activation-review-note">{tr('Payment proof rejected:', 'Ikimenyetso cy’ubwishyu cyanzwe:')} {request.reviewNote}</p>}
-      {!selected ? <div className="activation-provider-options"><button className="activation-provider-button mtn" onClick={() => choose('MTN')}>PAY WITH MTN</button><button className="activation-provider-button airtel" onClick={() => choose('Airtel')}>PAY WITH AIRTEL</button></div> : <>
-        <button className="activation-back text-link" onClick={() => setSelected(null)} disabled={busy}><ArrowLeft size={15} />{tr('Payment options', 'Uburyo bwo kwishyura')}</button>
+      {!selected ? <div className="activation-provider-options"><button className="activation-provider-button mtn" onClick={() => choose('MTN')}>PAY WITH MTN</button><button className="activation-provider-button airtel" onClick={() => choose('Airtel')}>PAY WITH AIRTEL</button><button className="activation-provider-button dashboard" disabled>{tr('Go To Dashboard', 'Jya ku ncamake')}</button></div> : <>
         <h3 className="activation-provider-title">Rwanda {selected.name}</h3>
+        <p className="activation-payment-caption">PAY WITH {selected.name.toUpperCase()} RWANDA</p>
+        <Languages />
         {ready ? <>
           <p className="activation-amount">{tr('Activation payment', 'Amafaranga yo gufungura konti')}: <strong>RF {Number(method.amountMinor).toLocaleString('en-US')}</strong></p>
           <section className="activation-instructions"><p>{tr('Send payment to:', 'Ohereza ubwishyu kuri:')}</p><div className="activation-recipient"><strong>{method.recipient}</strong><button type="button" onClick={() => void copyRecipient()}>{copied ? 'Copied' : 'Copy'}</button></div>
@@ -86,8 +85,8 @@ export function AccountActivation() {
           </section>
           <form className="activation-proof-form" onSubmit={submit}>
             <p>{tr('Enter your official names as registered on your mobile money account:', 'Shyiramo amazina yawe yanditse kuri konti ya mobile money:')}</p>
-            <label>{tr('First name', 'Izina rya mbere')}<input autoComplete="given-name" value={firstName} onChange={event => setFirstName(event.target.value)} minLength={1} maxLength={60} disabled={busy} required /></label>
-            <label>{tr('Last name', 'Izina ry’umuryango')}<input autoComplete="family-name" value={lastName} onChange={event => setLastName(event.target.value)} minLength={1} maxLength={59} disabled={busy} required /></label>
+            <div className="activation-name-fields"><label><span className="sr-only">{tr('First name', 'Izina rya mbere')}</span><input placeholder={tr('First name', 'Izina rya mbere')} autoComplete="given-name" value={firstName} onChange={event => setFirstName(event.target.value)} minLength={1} maxLength={60} disabled={busy} required /></label>
+            <label><span className="sr-only">{tr('Last name', 'Izina ry’umuryango')}</span><input placeholder={tr('Last name', 'Izina ry’umuryango')} autoComplete="family-name" value={lastName} onChange={event => setLastName(event.target.value)} minLength={1} maxLength={59} disabled={busy} required /></label></div>
             <label>{tr('Phone number', 'Nimero ya telefoni')}<input type="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+250790000000" pattern="[+][1-9][0-9]{6,14}" disabled={busy} required /></label>
             <label>{tr('Transaction reference (optional)', 'Nimero y’ubwishyu (si ngombwa)')}<input name="reference" maxLength={100} disabled={busy} /></label>
             <label className="activation-upload"><ImagePlus size={25} /><span>{tr('Payment screenshots', 'Amafoto y’ubwishyu')}</span><small>1–3 PNG/JPEG · 3 MB total</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void images(Array.from(event.target.files || []))} /></label>
@@ -95,7 +94,9 @@ export function AccountActivation() {
             <label className="check-label"><input type="checkbox" disabled={busy} required /><span>{tr('These details match my payment. I understand that admin approval is required.', 'Aya makuru ahuye n’ubwishyu bwanjye. Nzi ko umuyobozi agomba kubwemeza.')}</span></label>
             <button className="button primary" disabled={busy || !files.length}>{busy ? tr('Submitting…', 'Birimo koherezwa…') : tr('Submit payment proof', 'Ohereza ikimenyetso cy’ubwishyu')}</button>
           </form>
+          <section className="activation-transactions"><h4>{tr('Transactions can be seen here', 'Reba ubwishyu bwawe hano')}</h4><p>{request ? tr('Your last submission was rejected. Submit corrected payment proof above.', 'Ubwishyu bwawe bwa nyuma ntibwemejwe. Ohereza ikimenyetso gikosoye hejuru.') : tr('No payment submitted yet.', 'Nta bwishyu urohereza.')}</p></section>
         </> : <div className="activation-not-ready"><LockKeyhole size={26} /><p>{changed ? tr('Payment instructions changed. Go back and review the latest steps before submitting.', 'Amabwiriza yo kwishyura yahindutse. Subira inyuma urebe amashya.') : tr('The admin has not published this payment option and activation amount yet. Please check again later.', 'Umuyobozi ntaratangaza ubu buryo n’amafaranga yo gufungura konti. Wongere urebe nyuma.')}</p><button className="text-link" onClick={() => {setSelected(null); status.refresh()}}>Check again</button></div>}
+        <button className="activation-back text-link" onClick={() => setSelected(null)} disabled={busy}><ArrowLeft size={15} />{tr('Payment options', 'Uburyo bwo kwishyura')}</button>
       </>}
       <p className="activation-access-note">{tr('Payment approval is required before you can open the dashboard.', 'Kwemezwa k’ubwishyu ni ngombwa kugira ngo ufungure incamake.')}</p>
     </>}

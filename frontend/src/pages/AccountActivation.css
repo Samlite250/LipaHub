@@ -1,1 +1,41 @@
 .account-activation-page{min-height:100svh;padding:46px 20px 60px;background:radial-gradient(ellipse at 50% 0,#d9f7f1 0,transparent 60%),var(--bg);display:flex;flex-direction:column;align-items:center;gap:35px}.account-activation-page>.logo{font-size:29px}.account-activation-card{width:100%;max-width:450px;background:var(--surface);padding:35px clamp(23px,6vw,66px) 38px;border-radius:20px;border-top:4px solid var(--teal);box-shadow:0 20px 50px #0d948822;min-width:0}.account-activation-card>.language-buttons{justify-content:flex-end;margin-bottom:22px}.account-activation-card>h1{font-size:32px;line-height:1.2;margin:8px 0}.account-activation-card>h2{font-size:24px;color:var(--teal);font-weight:500;line-height:1.4;margin-bottom:8px}.activation-account-name{font-size:13px;color:var(--muted);overflow-wrap:anywhere}.activation-provider-options{display:grid;gap:19px;margin:38px 0}.activation-provider-button{width:100%;border-radius:8px;padding:14px 12px;font-size:14px;font-weight:700;min-height:47px}.activation-provider-button.mtn{background:linear-gradient(100deg,#22c8bb,#0d9488);color:#062e2a;box-shadow:0 7px 17px #14b8a633}.activation-provider-button.airtel{background:#ed5139;color:#fff}.activation-back{display:inline-flex;align-items:center;gap:7px;margin:25px 0 16px;font-size:12px}.activation-provider-title{font-size:21px;margin-bottom:12px}.activation-amount{font-size:14px;margin:12px 0 19px}.activation-instructions{background:var(--soft);padding:16px;border-radius:10px;font-size:13px;line-height:1.75;overflow-wrap:anywhere}.activation-recipient{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0}.activation-recipient strong{font-size:18px;user-select:all}.activation-recipient button{border:1px solid var(--line);padding:3px 10px;border-radius:5px;background:var(--surface);font-size:12px}.activation-procedure{white-space:pre-wrap;margin-top:12px}.activation-proof-form{display:grid;gap:13px;margin-top:27px}.activation-proof-form>p{font-size:13px;line-height:1.7}.activation-proof-form>label{font-size:12px}.activation-proof-form input:not([type=checkbox]){margin-top:6px;font-size:15px}.activation-proof-form>.button{width:100%;margin-top:7px}.activation-upload{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 10px;border:1px dashed var(--teal);border-radius:9px;color:var(--teal);background:var(--soft)}.activation-upload small{font-size:11px}.activation-upload input{max-width:100%;font-size:12px!important}.activation-image-previews{display:flex;gap:12px;flex-wrap:wrap}.activation-image-previews>div{display:grid;gap:5px;font-size:11px}.activation-image-previews img{width:80px;height:70px;object-fit:cover;border:1px solid var(--line);border-radius:6px}.activation-image-previews button{color:var(--teal)}.activation-access-note{font-size:12px;line-height:1.7;color:var(--muted);margin:25px 0 0}.activation-signout{display:block;margin:25px auto 0;font-size:12px}.activation-not-ready,.account-activation-pending{margin:25px 0;font-size:13px;line-height:1.8}.account-activation-pending>svg,.activation-not-ready>svg{color:var(--teal)}.account-activation-pending>h3{font-size:19px;margin:10px 0}.account-activation-pending>.button{margin-top:17px;width:100%}.activation-review-note{padding:13px;border-radius:8px;background:var(--soft);margin:18px 0;overflow-wrap:anywhere}@media(max-width:479px){.account-activation-page{padding:30px 18px 40px;gap:28px}.account-activation-card>h1{font-size:28px}.account-activation-card>h2{font-size:23px}.activation-proof-form input:not([type=checkbox]){font-size:16px}}
+.account-activation-page{padding:65px 20px 44px;background:radial-gradient(ellipse at 50% 0,#ddf8f3 0,transparent 72%),#f1fbf9;gap:62px;color:#202b30}
+.account-activation-page>.logo{color:#202b30}
+.account-activation-card{background:#fff;padding:68px 67px 32px;border-top-color:#14b8a6;box-shadow:0 20px 38px #0d948820}
+.activation-welcome-heading h1{font-size:34px;line-height:1.2;margin:0 0 8px;font-weight:750}
+.activation-welcome-heading h2{font-size:25px;color:#009d94;font-weight:500;line-height:1.4}
+.activation-provider-options{margin:45px 0 24px}
+.activation-provider-button{padding:12px;font-size:15px;min-height:45px}
+.activation-provider-button.dashboard{background:linear-gradient(100deg,#26c9bc,#0b998d);color:#092d2d}
+.activation-provider-button.dashboard:disabled{opacity:1;color:#155b55;background:#c8eee8;box-shadow:none}
+.activation-access-note{font-size:11px;color:#64747c;margin-top:18px}
+.activation-signout{margin-top:22px;font-size:11px}
+.activation-payment-page{padding-top:30px;gap:44px}
+.activation-payment-page .account-activation-card{max-width:334px;padding:38px 37px 25px;border-radius:18px}
+.activation-provider-title{font-size:21px;line-height:1.4;font-weight:500;margin:0 0 3px}
+.activation-payment-caption{font-size:10px;color:#00aece;text-decoration:underline;font-weight:700;line-height:1.5}
+.account-activation-card>.language-buttons{justify-content:flex-end;margin:19px 0 15px}
+.account-activation-card>.language-buttons button{font-family:inherit;font-size:10px;padding:4px 11px;min-height:25px}
+.activation-amount{font-size:12px;margin:12px 0}
+.activation-instructions{background:transparent;padding:0;border-radius:0;font-size:11px;line-height:1.65}
+.activation-recipient{gap:10px;margin:4px 0}
+.activation-recipient strong{font-size:16px}
+.activation-recipient button{border:1px solid #c9ced3;padding:2px 8px;background:#f3f3f3;font-size:10px;color:#182c34;border-radius:0}
+.activation-proof-form{gap:13px;margin-top:40px}
+.activation-proof-form>p{font-size:11px;line-height:1.5;margin-bottom:-13px}
+.activation-proof-form>label{font-size:11px}
+.activation-proof-form input:not([type=checkbox]){margin-top:4px;font-size:12px;padding:8px 12px;background:#fff;color:#202b30;border-color:#e3e9ef}
+.activation-name-fields input{min-height:30px;padding:7px 15px!important;font-size:11px!important;margin:0!important}
+.activation-name-fields label+label input{border-top:0}
+.activation-proof-form>.button{margin-top:12px;font-size:12px;min-height:34px;padding:9px;color:#092d2d}
+.activation-upload{align-items:flex-start;gap:6px;padding:10px;border:1px solid #e3e9ef;border-radius:5px;color:#40545e;background:transparent}
+.activation-upload>svg{display:none}
+.activation-upload small{font-size:10px;color:#71838d}
+.activation-upload input{font-size:10px!important;padding:5px!important}
+.activation-image-previews img{width:65px;height:55px}
+.activation-proof-form .check-label{font-size:10px;line-height:1.5}
+.activation-back{margin:19px 0 0;font-size:11px}
+.activation-transactions{border:1px solid #e3e9ef;border-radius:5px;padding:12px 9px;font-size:11px}
+.activation-transactions h4{font-size:12px;margin:0 0 8px;border-left:3px solid #99e2d9;padding-left:6px}
+.activation-transactions p{line-height:1.6;color:#64747c}
+@media(max-width:479px){.account-activation-page{padding:32px 20px;gap:44px}.account-activation-card{padding:56px 36px 26px}.activation-welcome-heading h1{font-size:32px}.activation-welcome-heading h2{font-size:24px}.activation-payment-page{padding-top:30px;gap:42px}.activation-payment-page .account-activation-card{padding:35px 30px 25px}.activation-proof-form input:not([type=checkbox]){font-size:16px!important}.activation-name-fields input{min-height:36px}}
