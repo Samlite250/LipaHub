@@ -91,7 +91,9 @@ The support address was saved using the audited settings operation. Auth Site UR
 
 Migration `012_rwanda_account_activation.sql` was applied to the existing production database. New Rwanda registrations require reviewed payment before dashboard access; existing accounts are grandfathered. The page provides MTN/Airtel options, official names, phone and screenshot submission. Account approval unlocks access without a robot bonus. The owner will publish recipients, fees and instructions in Admin → Payments. See [Rwanda activation](RWANDA_ACTIVATION.md).
 
-Local verification passed lint and builds, all 24 database checks, six desktop/mobile activation browser checks and targeted API/payment regressions. Tests use local databases and controlled browser/API mocks; no production financial test submissions were created. Source publication and deployment are recorded below once verified.
+Local verification passed lint and builds, all 24 database checks, six desktop/mobile activation browser checks and 32 targeted API/payment regressions (two desktop cases passed on rerun after test-output interference). Tests use local databases and controlled browser/API mocks; no production financial test submissions were created.
+
+Source commit `5fa3218` was pushed to GitHub and deployed as `dpl_DsfRRvWP9CZ3RZszSAiQgFnUrwdQ`, READY and aliased to https://lipahub1.vercel.app. Public checks confirmed the new activation JavaScript and route return 200, `/api/ready` returns `ready: true`, proof intake is enabled, and unauthenticated activation/balance APIs return 401. The private activation table has RLS enabled and both signup triggers exist. Recipient configuration and a real operator payment have not been tested; the owner will configure payment details in the admin panel.
 
 ## Client-launch blockers
 
