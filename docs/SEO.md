@@ -13,15 +13,29 @@ npm run build
 
 `www.lipahub.com` is controlled by a different site. Do not use it as the canonical domain or copy its content.
 
+## Positioning
+
+LipaHub is presented as a global learning and community platform built in East Africa. Public copy must say it is open worldwide while keeping country-specific payment, activation and withdrawal claims accurate.
+
+Primary keyword themes:
+
+- LipaHub, LipaHub1, LipaHub Global, LipaHub Business
+- online work worldwide, remote work, digital skills
+- earn online, Akazikeza
+- best-paying jobs in the whole world, best-paying jobs in East Africa
+- LipaHub Rwanda, Uganda, Kenya and Burundi
+
+Do not promise jobs, guaranteed income, investment returns or payment coverage that is not live.
+
 ## Implemented
 
 - Unique titles, descriptions, canonical links, Open Graph and Twitter metadata for public routes.
-- Public content routes: `/about`, `/east-africa`, `/online-work`, `/business`.
+- Public content routes: `/about`, `/global`, `/east-africa`, `/online-work`, `/business`.
 - JSON-LD for the organization, website, web application, FAQ and public guide pages.
 - Generated `robots.txt` and `sitemap.xml` from `frontend/vite-seo.ts`.
 - `noindex,nofollow` and `X-Robots-Tag` protection for auth, member, admin, invitation and API routes.
 - 1200x630 social image at `frontend/public/og-image.png`.
-- Internal links from the homepage navigation, East Africa section and footer.
+- Internal links from the homepage navigation, global section and footer.
 
 ## Search engines
 
@@ -38,10 +52,10 @@ Technical SEO makes the site eligible to rank; it does not guarantee position 1.
 
 Prioritize:
 
-- Accurate, original pages for LipaHub Rwanda, Uganda, Kenya and Burundi.
+- Accurate, original global and country pages for LipaHub.
 - Practical online-work and digital-skills content that answers real questions without promising income.
-- Consistent use of the LipaHub and LipaHub Business names.
-- Links from relevant directories, community organizations, learning providers and partners.
+- Consistent use of the LipaHub, LipaHub Global and LipaHub Business names.
+- Links from relevant directories, community organizations, learning providers and partners worldwide.
 - Regular publishing of useful guides rather than thin keyword pages.
 - Search Console monitoring to improve pages that already receive impressions.
 

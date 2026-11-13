@@ -14,33 +14,39 @@ type SeoEntry = {
 
 const pages: Record<string, SeoEntry> = {
   '/': {
-    title: 'LipaHub | Online Learning, Digital Skills & Community in East Africa',
-    description: 'LipaHub is an East African learning and community hub for digital skills, online earning education, trading simulations and member support. No guaranteed earnings.',
+    title: 'LipaHub | Online Work, Digital Skills & Earn Online Worldwide',
+    description: 'LipaHub is a global learning and community hub for digital skills, online work, Akazikeza, earn-online education and trading simulations. Built in East Africa, open worldwide. No guaranteed earnings.',
     path: '/',
   },
   '/about': {
-    title: 'About LipaHub | Learning and Community in East Africa',
-    description: 'Learn what LipaHub is, where it operates and how it approaches digital skills, community, simulations and transparent online opportunities in East Africa.',
+    title: 'About LipaHub | Global Learning Hub Built in East Africa',
+    description: 'Learn what LipaHub is, how it works globally, and how it approaches digital skills, community, simulations and transparent online opportunities.',
     path: '/about',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About LipaHub', url: `${siteUrl}/about`, description: 'LipaHub is an East African learning and community hub.', isPartOf: { '@id': `${siteUrl}/#website` } },
+    jsonLd: { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About LipaHub', url: `${siteUrl}/about`, description: 'LipaHub is a global learning and community hub built in East Africa.', isPartOf: { '@id': `${siteUrl}/#website` } },
+  },
+  '/global': {
+    title: 'LipaHub Global | Online Work & Digital Skills Worldwide',
+    description: 'LipaHub works globally. Explore learning, community, digital skills, online work and Akazikeza guidance from anywhere in the world. No guaranteed earnings.',
+    path: '/global',
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub Global', url: `${siteUrl}/global`, description: 'LipaHub is a global learning, community and digital-skills platform built in East Africa and open worldwide.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` }, audience: { '@type': 'Audience', audienceType: 'Global learners and online workers' } },
   },
   '/east-africa': {
-    title: 'LipaHub in East Africa | Rwanda, Uganda, Kenya & Burundi',
-    description: 'Explore LipaHub across East Africa, including Rwanda, Uganda, Kenya and Burundi, with learning resources, community and local opportunity guidance.',
+    title: 'LipaHub East Africa | Rwanda, Uganda, Kenya & Burundi',
+    description: 'Explore LipaHub across East Africa, including Rwanda, Uganda, Kenya and Burundi, with learning resources, community and global opportunity guidance.',
     path: '/east-africa',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub in East Africa', url: `${siteUrl}/east-africa`, description: 'LipaHub learning and community across Rwanda, Uganda, Kenya and Burundi.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub East Africa', url: `${siteUrl}/east-africa`, description: 'LipaHub learning and community across Rwanda, Uganda, Kenya and Burundi, connected to a global platform.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
   },
   '/online-work': {
-    title: 'Online Work & Digital Skills in East Africa | LipaHub',
-    description: 'A practical guide to online work, digital skills, Akazikeza searches and earning opportunities in East Africa, with clear warnings about income promises.',
+    title: 'Online Work Worldwide | Akazikeza & Digital Skills | LipaHub',
+    description: 'A practical global guide to online work, digital skills, Akazikeza searches, remote jobs and earn-online opportunities, with clear warnings about income promises.',
     path: '/online-work',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'Article', headline: 'Online work and digital skills in East Africa', description: 'Practical guidance for evaluating online work, Akazikeza searches and digital-skills opportunities in East Africa.', url: `${siteUrl}/online-work`, author: { '@id': `${siteUrl}/#organization` }, publisher: { '@id': `${siteUrl}/#organization` }, inLanguage: 'en' },
+    jsonLd: { '@context': 'https://schema.org', '@type': 'Article', headline: 'Online work and digital skills worldwide', description: 'Practical guidance for evaluating online work, Akazikeza searches and digital-skills opportunities worldwide.', url: `${siteUrl}/online-work`, author: { '@id': `${siteUrl}/#organization` }, publisher: { '@id': `${siteUrl}/#organization` }, inLanguage: 'en' },
   },
   '/business': {
-    title: 'LipaHub Business | Partnerships, Content & Community',
-    description: 'Learn about LipaHub Business, future partnership opportunities, learning content and community collaboration across East Africa.',
+    title: 'LipaHub Business | Global Learning & Community Partnerships',
+    description: 'Learn about LipaHub Business, future partnership opportunities, learning content and community collaboration across East Africa and worldwide.',
     path: '/business',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub Business', url: `${siteUrl}/business`, description: 'Planned LipaHub learning, content and community partnerships across East Africa.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub Business', url: `${siteUrl}/business`, description: 'Planned LipaHub learning, content and community partnerships across East Africa and worldwide.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
   },
   '/install': {
     title: 'Install the LipaHub App | Learn and Connect on Mobile',

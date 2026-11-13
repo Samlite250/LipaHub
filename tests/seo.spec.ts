@@ -2,11 +2,12 @@ import { expect, test } from '@playwright/test'
 
 const site = 'https://lipahub1.vercel.app'
 const publicPages = [
-  ['/', 'LipaHub | Online Learning, Digital Skills & Community in East Africa'],
-  ['/about', 'About LipaHub | Learning and Community in East Africa'],
-  ['/east-africa', 'LipaHub in East Africa | Rwanda, Uganda, Kenya & Burundi'],
-  ['/online-work', 'Online Work & Digital Skills in East Africa | LipaHub'],
-  ['/business', 'LipaHub Business | Partnerships, Content & Community'],
+  ['/', 'LipaHub | Online Work, Digital Skills & Earn Online Worldwide'],
+  ['/about', 'About LipaHub | Global Learning Hub Built in East Africa'],
+  ['/global', 'LipaHub Global | Online Work & Digital Skills Worldwide'],
+  ['/east-africa', 'LipaHub East Africa | Rwanda, Uganda, Kenya & Burundi'],
+  ['/online-work', 'Online Work Worldwide | Akazikeza & Digital Skills | LipaHub'],
+  ['/business', 'LipaHub Business | Global Learning & Community Partnerships'],
 ] as const
 
 test('public SEO pages expose unique metadata, canonicals and crawlable content', async ({ page }) => {
@@ -26,6 +27,18 @@ test('public SEO pages expose unique metadata, canonicals and crawlable content'
   expect(await page.locator('script#lipahub-page-jsonld').textContent()).toContain('"@type":"Article"')
 })
 
+test('global positioning and target keywords are visible', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('meta[name="keywords"]')).toHaveAttribute('content', /LipaHub Global/)
+  await expect(page.locator('meta[name="keywords"]')).toHaveAttribute('content', /best paying jobs in the whole world/)
+  await expect(page.getByRole('heading', { name: 'One hub. Global access.' })).toBeVisible()
+  await page.goto('/global')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('global learning')
+  for (const text of ['Open worldwide', 'earn online', 'Akazikeza', 'best-paying jobs in the whole world', 'LipaHub Business']) await expect(page.locator('main')).toContainText(text)
+  await page.goto('/online-work')
+  await expect(page.locator('main')).toContainText('best-paying jobs in East Africa, Africa or the whole world')
+})
+
 test('private and auth routes are excluded from search', async ({ page }) => {
   for (const path of ['/login', '/register', '/forgot-password', '/reset-password', '/activate-account', '/dashboard', '/admin', '/i/abc12345', '/this-does-not-exist']) {
     await page.goto(path)
@@ -43,7 +56,7 @@ test('robots.txt, sitemap.xml and social image are published', async ({ request 
   const sitemap = await request.get('/sitemap.xml')
   expect(sitemap.ok()).toBeTruthy()
   const sitemapText = await sitemap.text()
-  for (const path of ['/', '/about', '/east-africa', '/online-work', '/business']) expect(sitemapText).toContain(`<loc>${site}${path}</loc>`)
+  for (const path of ['/', '/about', '/global', '/east-africa', '/online-work', '/business']) expect(sitemapText).toContain(`<loc>${site}${path}</loc>`)
 
   const image = await request.get('/og-image.png')
   expect(image.ok()).toBeTruthy()

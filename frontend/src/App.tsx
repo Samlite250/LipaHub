@@ -17,7 +17,7 @@ import { ShortInvitation } from './ShortInvitation'
 import { InstallAppPage } from './InstallApp'
 import { AccountActivation } from './pages/AccountActivation'
 import { useAccountActivation } from './lib/account-activation'
-import { AboutPage, BusinessPage, EastAfricaPage, OnlineWorkPage } from './pages/Guides'
+import { AboutPage, BusinessPage, EastAfricaPage, GlobalPage, OnlineWorkPage } from './pages/Guides'
 import { SeoManager } from './lib/seo'
 
 function MemberRoute() {
@@ -38,6 +38,7 @@ export function App() {
     <Route path="/" element={new URLSearchParams(location.search).has('ref') ? <Navigate to={{ pathname: '/register', search: location.search, hash: location.hash }} replace /> : <Landing />} />
     <Route path="/i/:code" element={<ShortInvitation />} />
     <Route path="/about" element={<AboutPage />} />
+    <Route path="/global" element={<GlobalPage />} />
     <Route path="/east-africa" element={<EastAfricaPage />} />
     <Route path="/online-work" element={<OnlineWorkPage />} />
     <Route path="/business" element={<BusinessPage />} />

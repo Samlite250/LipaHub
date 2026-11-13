@@ -5,6 +5,7 @@ type SeoRoute = { path: string; priority: string; changefreq: 'daily' | 'weekly'
 const routes: SeoRoute[] = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/about', priority: '0.8', changefreq: 'monthly' },
+  { path: '/global', priority: '0.9', changefreq: 'monthly' },
   { path: '/east-africa', priority: '0.8', changefreq: 'monthly' },
   { path: '/online-work', priority: '0.8', changefreq: 'monthly' },
   { path: '/business', priority: '0.7', changefreq: 'monthly' },
