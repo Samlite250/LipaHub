@@ -17,6 +17,8 @@ import { ShortInvitation } from './ShortInvitation'
 import { InstallAppPage } from './InstallApp'
 import { AccountActivation } from './pages/AccountActivation'
 import { useAccountActivation } from './lib/account-activation'
+import { AboutPage, BusinessPage, EastAfricaPage, OnlineWorkPage } from './pages/Guides'
+import { SeoManager } from './lib/seo'
 
 function MemberRoute() {
   const { session, demo, loading } = useApp()
@@ -31,10 +33,14 @@ function MemberRoute() {
 export function App() {
   const location = useLocation()
   useEffect(() => { invitationReference(location.search) }, [location.search])
-  useEffect(() => { window.scrollTo(0, 0); document.title = `${location.pathname === '/' ? 'Learn. Connect. Explore.' : location.pathname.split('/').filter(Boolean).pop()?.replaceAll('-', ' ')} | LipaHub` }, [location.pathname])
-  return <Routes>
+  useEffect(() => { window.scrollTo(0, 0) }, [location.pathname])
+  return <><SeoManager /><Routes>
     <Route path="/" element={new URLSearchParams(location.search).has('ref') ? <Navigate to={{ pathname: '/register', search: location.search, hash: location.hash }} replace /> : <Landing />} />
     <Route path="/i/:code" element={<ShortInvitation />} />
+    <Route path="/about" element={<AboutPage />} />
+    <Route path="/east-africa" element={<EastAfricaPage />} />
+    <Route path="/online-work" element={<OnlineWorkPage />} />
+    <Route path="/business" element={<BusinessPage />} />
     <Route path="/install" element={<InstallAppPage />} />
     <Route path="/activate-account" element={<AccountActivation />} />
     <Route path="/login" element={<AuthPage key="login" mode="login" />} />
@@ -66,5 +72,5 @@ export function App() {
     <Route path="/admin" element={<AdminPayments />} />
     {['payments', 'withdrawals', 'users', 'content', 'resources', 'announcements', 'settings', 'audit', 'support'].map(section => <Route key={section} path={`/admin/${section}`} element={<AdminPayments />} />)}
     <Route path="*" element={<NotFound />} />
-  </Routes>
+  </Routes></>
 }

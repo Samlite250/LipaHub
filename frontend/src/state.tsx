@@ -34,12 +34,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(!!supabase)
   useEffect(() => {
-    if (!supabase) return
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
+    const client = supabase
+    if (!client) return
+    let active = true
+    const applySession = (next: Session | null) => {
+      if (!active) return
       setSession(next); setLoading(false)
       if (next) { setDemo(null); sessionStorage.removeItem('lipahub-demo') }
-    })
-    return () => subscription.unsubscribe()
+    }
+    void client.auth.getSession().then(({ data }) => applySession(data.session)).catch(() => { if (active) setLoading(false) })
+    const { data: { subscription } } = client.auth.onAuthStateChange((_event, next) => applySession(next))
+    const syncSession = (event: StorageEvent) => {
+      if (!event.key?.includes('-auth-token')) return
+      void client.auth.getSession().then(({ data }) => applySession(data.session))
+    }
+    window.addEventListener('storage', syncSession)
+    return () => { active = false; subscription.unsubscribe(); window.removeEventListener('storage', syncSession) }
   }, [])
   useEffect(() => { localStorage.setItem('lipahub-language', language); document.documentElement.lang = language }, [language])
   useEffect(() => { localStorage.setItem('lipahub-theme', dark ? 'dark' : 'light'); document.documentElement.dataset.theme = dark ? 'dark' : 'light' }, [dark])
