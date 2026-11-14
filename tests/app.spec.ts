@@ -20,7 +20,7 @@ async function capture(page: Page, path: string, fullPage = true) {
 }
 test('landing, protected routes and missing routes', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Make your next move')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('explore something new')
   await page.getByRole('button', { name: 'Is this real crypto trading?' }).click()
   await expect(page.getByText('No. Crypto Robotic Trading is an educational simulation.')).toBeVisible()
   await page.goto('/dashboard/profile')

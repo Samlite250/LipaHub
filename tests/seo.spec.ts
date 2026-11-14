@@ -39,6 +39,20 @@ test('global positioning and target keywords are visible', async ({ page }) => {
   await expect(page.locator('main')).toContainText('best-paying jobs in East Africa, Africa or the whole world')
 })
 
+test('welcome page keeps the responsive landing layout and navigation usable', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('Take LipaHub with you')).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Learn, connect and explore something new/ })).toBeVisible()
+  await expect(page.locator('.landing-feature')).toHaveCount(4)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+  if ((page.viewportSize()?.width ?? 0) <= 700) {
+    await page.getByRole('button', { name: 'Open navigation' }).click()
+    await expect(page.getByRole('link', { name: 'Create account' })).toBeVisible()
+    await page.getByRole('link', { name: 'How it works' }).click()
+    await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible()
+  }
+})
+
 test('private and auth routes are excluded from search', async ({ page }) => {
   for (const path of ['/login', '/register', '/forgot-password', '/reset-password', '/activate-account', '/dashboard', '/admin', '/i/abc12345', '/this-does-not-exist']) {
     await page.goto(path)
