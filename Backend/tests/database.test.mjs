@@ -20,7 +20,7 @@ before(async () => {
     create role anon; create role authenticated; create role service_role bypassrls;
     create schema auth; create schema storage;
     grant usage on schema public,auth,storage to anon,authenticated,service_role;
-    create table auth.users(id uuid primary key, raw_app_meta_data jsonb default '{}', banned_until timestamptz, raw_user_meta_data jsonb default '{}');
+    create table auth.users(id uuid primary key, raw_app_meta_data jsonb default '{}', banned_until timestamptz, raw_user_meta_data jsonb default '{}', created_at timestamptz not null default now());
     create function auth.jwt() returns jsonb language sql stable as $$
       select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb
     $$;
@@ -30,9 +30,10 @@ before(async () => {
     alter table storage.objects enable row level security;
     grant all on storage.objects to anon,authenticated,service_role;
     create policy unrelated_storage_policy on storage.objects for all to anon,authenticated using(true) with check(true);
-    insert into auth.users values
-      ('${admin}','{"role":"admin"}',null),('${member}','{}',null),('${other}','{}',null),
-      ('${banned}','{"role":"admin"}','2099-01-01');
+    insert into auth.users(id,raw_app_meta_data,banned_until,raw_user_meta_data) values
+      ('${admin}','{"role":"admin"}',null,'{}'),('${member}','{}',null,'{"username":"Referrer","country":"Kenya"}'),
+      ('${other}','{}',null,'{"username":"Legacy invitee","country":"Uganda","invitation_reference":"Referrer"}'),
+      ('${banned}','{"role":"admin"}','2099-01-01','{}');
   `)
   const directory = new URL('../migrations/', import.meta.url)
   for (const name of (await readdir(directory)).filter(name => name.endsWith('.sql')).sort()) {
@@ -99,16 +100,62 @@ test('short username hashes match the browser algorithm and reject duplicate or 
   assert.equal((await db.query(`select * from public.resolve_invitation_code($1)`, [code])).rows.length, 0)
 })
 
+test('signup captures referral levels and counts only approved country-specific activation', async () => {
+  const direct = '55555555-5555-4555-8555-555555555555'
+  const rwanda = '66666666-6666-4666-8666-666666666666'
+  const third = '77777777-7777-4777-8777-777777777777'
+  const self = '88888888-8888-4888-8888-888888888888'
+  const pendingRwanda = '99999999-9999-4999-8999-999999999999'
+  const robotRequest = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
+  const rwandaRequest = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'
+  const pendingRequest = 'ffffffff-ffff-4fff-8fff-ffffffffffff'
+  const pendingRwandaRequest = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab'
+  assert.deepEqual((await db.query(`select member_id,inviter_id from public.member_referrals where member_id=$1`, [other])).rows, [{ member_id: other, inviter_id: member }])
+  await db.query(`update auth.users set raw_user_meta_data=$1::jsonb where id=$2`, [JSON.stringify({ username: 'Referrer', country: 'Kenya' }), member])
+  await db.query(`insert into public.robot_payment_instructions(country,version,methods,updated_by)
+    values ('Kenya',1,'[]',$1),('Rwanda',1,'[]',$1)`, [admin])
+  await db.query(`insert into auth.users(id,raw_user_meta_data) values
+    ($1,$2::jsonb),($3,$4::jsonb),($5,$6::jsonb),($7,$8::jsonb),($9,$10::jsonb)`, [
+    direct, JSON.stringify({ username: 'Direct', display_name: 'Direct Member', country: 'Kenya', invitation_reference: 'Referrer' }),
+    rwanda, JSON.stringify({ username: 'RwandaMember', display_name: 'Rwanda Member', country: 'Rwanda', invitation_reference: 'Direct' }),
+    third, JSON.stringify({ username: 'Third', display_name: 'Third Member', country: 'Burundi', invitation_reference: 'RwandaMember' }),
+    self, JSON.stringify({ username: 'Self', country: 'Kenya', invitation_reference: 'Self' }),
+    pendingRwanda, JSON.stringify({ username: 'RwandaPending', display_name: 'Rwanda Pending', country: 'Rwanda', invitation_reference: 'Referrer' }),
+  ])
+  await db.query(`insert into public.robot_activation_requests(id,user_id,country,plan_id,purpose,status,full_name,phone,instruction_version,payment_method,quote)
+    values($1,$2,'Kenya','robot-01','robot_activation','verified','Direct Member','+254700000000',1,'{}','{"currency":"KES","bonusMinor":"0"}'),
+      ($3,$4,'Rwanda','account-activation','account_activation','verified','Rwanda Member','+250700000000',1,'{}','{"currency":"RWF","bonusMinor":"0"}'),
+      ($5,$6,'Burundi','robot-01','robot_activation','pending_review','Third Member','+257700000000',1,'{}','{"currency":"BIF","bonusMinor":"0"}'),
+      ($7,$8,'Rwanda','account-activation','account_activation','pending_review','Rwanda Pending','+250700000001',1,'{}','{"currency":"RWF","bonusMinor":"0"}')`,
+    [robotRequest, direct, rwandaRequest, rwanda, pendingRequest, third, pendingRwandaRequest, pendingRwanda])
+  await db.query(`update public.rwanda_account_activations set activated_at=now(),approved_request_id=$1 where user_id=$2`, [rwandaRequest, rwanda])
+  await db.query(`update auth.users set raw_user_meta_data=jsonb_set(raw_user_meta_data,'{country}','"Kenya"') where id=$1`, [rwanda])
+  const selfRows = await db.query(`select * from public.member_referrals where member_id=$1`, [self])
+  assert.equal(selfRows.rows.length, 0)
+  await role('service_role')
+  const tree = await db.query(`select member_id,name,country,level,active from public.get_member_referrals($1)`, [member])
+  assert.deepEqual(tree.rows.map(row => ({ id: row.member_id, name: row.name, country: row.country, level: row.level, active: row.active })), [
+    { id: direct, name: 'Direct Member', country: 'Kenya', level: 1, active: true },
+    { id: pendingRwanda, name: 'Rwanda Pending', country: 'Rwanda', level: 1, active: false },
+    { id: other, name: 'Legacy invitee', country: 'Uganda', level: 1, active: false },
+    { id: rwanda, name: 'Rwanda Member', country: 'Rwanda', level: 2, active: true },
+    { id: third, name: 'Third Member', country: 'Burundi', level: 3, active: false },
+  ])
+})
+
 test('all migrations apply and every application table enables RLS', async () => {
   const { rows } = await db.query(`select relname,relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace
     where n.nspname='public' and c.relkind='r'`)
-  assert.equal(rows.length, 15)
+  assert.equal(rows.length, 16)
   assert.ok(rows.every(row => row.relrowsecurity), JSON.stringify(rows))
   const bucket = (await db.query(`select * from storage.buckets where id='robot-payment-proofs'`)).rows[0]
   assert.equal(bucket.public, false)
   assert.equal(Number(bucket.file_size_limit), 5242880)
+  assert.equal((await db.query(`select has_table_privilege('anon','public.member_referrals','select') allowed`)).rows[0].allowed, false)
+  assert.equal((await db.query(`select has_table_privilege('authenticated','public.member_referrals','select') allowed`)).rows[0].allowed, false)
+  assert.equal((await db.query(`select has_table_privilege('service_role','public.member_referrals','select') allowed`)).rows[0].allowed, true)
   await role('service_role')
-  assert.equal((await db.query('select public.backend_schema_revision() revision')).rows[0].revision, 8)
+  assert.equal((await db.query('select public.backend_schema_revision() revision')).rows[0].revision, 9)
 })
 
 test('browser roles cannot execute server-only RPCs or edit balance/support tables', async () => {

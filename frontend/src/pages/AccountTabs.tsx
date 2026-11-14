@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Check, CreditCard, History, LockKeyhole, ShieldCheck, Ticket, Users, Wallet } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, CreditCard, History, LockKeyhole, RefreshCw, ShieldCheck, Ticket, Users, Wallet } from 'lucide-react'
 import { Modal, Panel } from '../components'
 import { useMemberBalance } from '../useMemberBalance'
 import { walletMoney } from '../domain/balances'
 import { normalizeCountry } from '../domain/countries'
 import { useApp } from '../state'
 import { InviteLink } from '../InviteLink'
+import { platformApi } from '../lib/platform'
 import './ReferenceTabs.css'
 
 function AccountFunds() {
@@ -52,5 +53,27 @@ export function TeamPage() {
   const level = path.includes('level-2') ? 2 : path.includes('level-3') ? 3 : 1
   const status = path.endsWith('/inactive') ? 'inactive' : 'active'
   const [search, setSearch] = useState('')
-  return <Panel title="Team" className="reference-page"><div className="reference-body"><div className="reference-intro"><span className="eyebrow">GROW TOGETHER</span><h2>Your team</h2><p>View your referral levels and account activation status.</p></div><InviteLink /><div className="reference-tabs" aria-label="Team levels">{[1, 2, 3].map(item => <Link key={item} className={level === item ? 'selected' : ''} to={`/dashboard/referrals/level-${item}`}>{level === item && <Check size={14} />}Level {item}</Link>)}</div><div className="team-toolbar"><div className="reference-tabs" aria-label="Team activation status">{['active', 'inactive'].map(item => <Link key={item} className={status === item ? 'selected' : ''} to={`/dashboard/referrals/level-${level}/${item}`}>{item === 'active' ? 'Active' : 'Inactive'}</Link>)}</div><label><span className="sr-only">Search team members</span><input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search team members…" /></label></div><div className="reference-empty"><Users size={36} /><h3>Level {level} team</h3><p>Verified referral records are not available yet. Member names, activation status and team totals will appear here when referral tracking is enabled.</p>{search && <button className="text-link" onClick={() => setSearch('')}>Clear search</button>}<Link className="text-link" to="/dashboard/support">Get help with referrals<ArrowRight size={14} /></Link></div></div></Panel>
+  const { session } = useApp()
+  const [members, setMembers] = useState<ReferralMember[]>([])
+  const [loading, setLoading] = useState(!!session?.access_token)
+  const [error, setError] = useState('')
+  const [revision, setRevision] = useState(0)
+  useEffect(() => {
+    const token = session?.access_token
+    if (!token) { setMembers([]); setLoading(false); return }
+    let active = true
+    setLoading(true); setError('')
+    platformApi<ReferralMember[]>(token, '/api/referrals')
+      .then(rows => { if (active) setMembers(rows) })
+      .catch(reason => { if (active) setError(reason instanceof Error ? reason.message : 'Referral information is unavailable.') })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [session?.access_token, revision])
+  const visible = members.filter(member => member.level === level && member.active === (status === 'active') && `${member.name} ${member.country}`.toLowerCase().includes(search.trim().toLowerCase()))
+  const emptyMessage = !session
+    ? 'Practice workspaces do not have real referral records. Sign in to view members invited by your account.'
+    : 'Members who join using your invitation will appear here. Active status is based on approved robot activation, or Rwanda account activation approval.'
+  return <Panel title="Team" className="reference-page"><div className="reference-body"><div className="reference-intro"><span className="eyebrow">GROW TOGETHER</span><h2>Your team</h2><p>View your referral levels and account activation status.</p></div><InviteLink /><div className="reference-tabs" aria-label="Team levels">{[1, 2, 3].map(item => <Link key={item} className={level === item ? 'selected' : ''} to={`/dashboard/referrals/level-${item}`}>{level === item && <Check size={14} />}Level {item}</Link>)}</div><div className="team-toolbar"><div className="reference-tabs" aria-label="Team activation status">{['active', 'inactive'].map(item => <Link key={item} className={status === item ? 'selected' : ''} to={`/dashboard/referrals/level-${level}/${item}`}>{item === 'active' ? 'Active' : 'Inactive'}</Link>)}</div><label><span className="sr-only">Search team members</span><input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search team members…" /></label>{session && <button className="button secondary small" disabled={loading} onClick={() => setRevision(value => value + 1)}><RefreshCw size={14} />Refresh</button>}</div>{loading ? <div className="reference-empty"><p role="status">Loading team members…</p></div> : error ? <div className="reference-empty"><p className="form-error" role="alert">{error}</p></div> : visible.length ? <div className="team-table-scroll"><table className="team-table"><thead><tr><th>Member</th><th>Country</th><th>Level</th><th>Joined</th><th>Status</th></tr></thead><tbody>{visible.map(member => <tr key={member.id}><td>{member.name}</td><td>{member.country}</td><td>Level {member.level}</td><td>{new Date(member.joinedAt).toLocaleDateString()}</td><td><span className={`pill ${member.active ? 'team-active' : 'neutral-pill'}`}>{member.active ? 'Active' : 'Inactive'}</span></td></tr>)}</tbody></table></div> : <div className="reference-empty"><Users size={36} /><h3>Level {level} team</h3><p>{emptyMessage} Showing {status} members only.</p>{search && <button className="text-link" onClick={() => setSearch('')}>Clear search</button>}<Link className="text-link" to="/dashboard/support">Get help with referrals<ArrowRight size={14} /></Link></div>}</div></Panel>
 }
+
+type ReferralMember = { id: string; name: string; country: string; level: number; joinedAt: string; active: boolean }

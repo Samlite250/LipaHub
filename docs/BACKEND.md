@@ -56,13 +56,14 @@ The default API limit is 60 requests per minute per IP. Health/readiness probes 
 | `GET /api/ready` | Public | 200 with `ready: true`, or 503 with `ready: false`; no internal details |
 | `GET /api/admin/system/status` | Verified administrator | Named readiness checks and a timestamp, with no keys or internal error messages |
 
-Readiness probes the application tables, migration 007 authorization helpers, schema revision 8 and private payment-proof bucket configuration. Results are cached for five seconds and simultaneous probes share one check. These are connectivity/schema checks, not a substitute for the live two-account and provider tests in the setup guide.
+Readiness probes the application tables, migration 007 authorization helpers, schema revision 9, referral query and private payment-proof bucket configuration. Results are cached for five seconds and simultaneous probes share one check. These are connectivity/schema checks, not a substitute for the live two-account and provider tests in the setup guide.
 
 ## Current API
 
 | Area | Routes | Access |
 | --- | --- | --- |
 | Identity | `GET /api/me` | Active signed-in user |
+| Referrals | `GET /api/referrals` | Active signed-in user; own three-level team only |
 | Published content | `GET /api/member-content` | Active signed-in user; published records filtered for that member's country |
 | Member balances | `GET /api/member-balances?country=...&history=true` | Own wallet/history only; supplied user IDs cannot change ownership |
 | Support | `GET/POST /api/support`, `GET /api/support/:id`, `POST /api/support/:id/messages` | Owner, or active administrator for staff operations |
@@ -80,7 +81,7 @@ The bulk instruction endpoint returns all supported countries after one database
 
 ## Database rules and tests
 
-Migration 009 preserves registration usernames and adds a service-only invitation lookup. Migration 008 makes raw payment-instruction JSON server-only: members receive enabled methods from the API, while administrators can inspect/edit drafts. Migration 013 adds the manual-review withdrawal state machine. Apply migrations 001 through 013 once, in order, in the intended Supabase project. Migration 007 checks current database account status and administrator roles for browser-readable proof data, rather than relying on a role captured in an older JWT. It also rejects suspended actors in payment RPCs. Existing projects should apply only their missing migrations after backup/review.
+Migration 009 preserves registration usernames and adds a service-only invitation lookup. Migration 008 makes raw payment-instruction JSON server-only: members receive enabled methods from the API, while administrators can inspect/edit drafts. Migration 013 adds the manual-review withdrawal state machine. Migration 014 captures invitation references into a private referral tree, backfills existing references and reports active status from approved country-specific activation records. Apply migrations 001 through 014 once, in order, in the intended Supabase project. Migration 007 checks current database account status and administrator roles for browser-readable proof data, rather than relying on a role captured in an older JWT. It also rejects suspended actors in payment RPCs. Existing projects should apply only their missing migrations after backup/review.
 
 `npm run test:db` executes the complete migration chain in [PGlite](https://pglite.dev/docs/api), an embedded PostgreSQL engine. The fixture supplies minimal Auth/Storage schemas and roles, then verifies actual SQL grants, row-level policies, support ownership, stale versions, idempotent retries, country constraints and balance/clearing conservation. The test fixture does not implement Supabase Auth, PostgREST, signed URLs, Storage HTTP operations or production multi-connection concurrency. Repeat the [live RLS checks](https://supabase.com/docs/guides/database/postgres/testing-row-level-security) against your real project.
 

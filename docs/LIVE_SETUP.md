@@ -19,6 +19,9 @@ Create a Supabase project in your account. Keep the database password and server
 9. `Backend/migrations/009_invitation_usernames.sql`
 10. `Backend/migrations/010_short_invitation_codes.sql`
 11. `Backend/migrations/011_robot_payment_approval.sql`
+12. `Backend/migrations/012_rwanda_account_activation.sql`
+13. `Backend/migrations/013_withdrawal_state_machine.sql`
+14. `Backend/migrations/014_member_referrals.sql`
 
 The migrations are transactional. If a migration fails, resolve the error before running the next. Do not reapply earlier migrations to an existing project blindly: several create policies without an existence guard.
 

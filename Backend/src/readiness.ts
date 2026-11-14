@@ -9,7 +9,7 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
   async function inspect() {
     const checks = [{ name: 'authentication_configured', ready: !!auth }, { name: 'server_storage_configured', ready: !!db }]
     if (auth && db) {
-      const tables = ['system_settings', 'system_content', 'system_admin_audit', 'system_balance_accounts', 'system_balance_adjustments', 'support_tickets', 'support_messages', 'robot_payment_instructions', 'robot_activation_requests', 'robot_payment_proofs', 'robot_payment_audit']
+      const tables = ['system_settings', 'system_content', 'system_admin_audit', 'system_balance_accounts', 'system_balance_adjustments', 'support_tickets', 'support_messages', 'robot_payment_instructions', 'robot_activation_requests', 'robot_payment_proofs', 'robot_payment_audit', 'member_referrals']
       const tableChecks = tables.map(async table => {
         try { return { name: table, ready: !(await db.from(table).select('*', { head: true }).limit(1)).error } }
         catch { return { name: table, ready: false } }
@@ -18,11 +18,15 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
         try { return { name: rpc, ready: !(await db.rpc(rpc)).error } }
         catch { return { name: rpc, ready: false } }
       })
+      const referralCheck = (async () => {
+        try { return { name: 'member_referral_status_lookup', ready: !(await db.rpc('get_member_referrals', { p_actor: '00000000-0000-4000-8000-000000000000' })).error } }
+        catch { return { name: 'member_referral_status_lookup', ready: false } }
+      })()
       const revisionCheck = (async () => {
         try {
           const { data, error } = await db.rpc('backend_schema_revision')
-          return { name: 'schema_revision_8', ready: !error && Number(data) === 8 }
-        } catch { return { name: 'schema_revision_8', ready: false } }
+          return { name: 'schema_revision_9', ready: !error && Number(data) === 9 }
+        } catch { return { name: 'schema_revision_9', ready: false } }
       })()
       const bucketCheck = (async () => {
         try {
@@ -46,7 +50,7 @@ export function readinessCheck(auth: SupabaseClient | null, db: SupabaseClient |
         try { return {name: 'rwanda_account_activation', ready: !(await db.from('rwanda_account_activations').select('user_id,activated_at', {head: true}).limit(1)).error} }
         catch { return {name: 'rwanda_account_activation', ready: false} }
       })()
-      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck, codeCheck, reviewCheck, activationCheck]))
+      checks.push(...await Promise.all([...tableChecks, ...functionChecks, revisionCheck, bucketCheck, invitationCheck, codeCheck, reviewCheck, activationCheck, referralCheck]))
     }
     return { ready: checks.every(check => check.ready), checks, checkedAt: new Date().toISOString() }
   }

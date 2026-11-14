@@ -14,7 +14,7 @@ const auth = { auth: { getUser: async (token: string) => {
   if (token === 'offline-token') throw new Error('Upstream internal credentials must not be returned')
   return { data: { user: token === 'member-token' ? member : token === 'staff-token' ? staff : token === 'banned-token' ? { ...staff, banned_until: '2099-01-01' } : null }, error: null }
 } } } as unknown as SupabaseClient
-function storage(failedTable = '', publicBucket = false, revision = 8) {
+function storage(failedTable = '', publicBucket = false, revision = 9) {
   let instructionReads = 0
   const service = {
     from: (table: string) => ({ select: (_fields: string, options?: { head: boolean }) => ({ limit: async () => {
@@ -56,7 +56,7 @@ test('API applies security headers, fresh identity verification and consistent a
     expect(health.headers()['x-content-type-options']).toBe('nosniff')
     expect(health.headers()['x-request-id']).toMatch(/^[0-9a-f-]{36}$/)
     expect(health.headers()['x-powered-by']).toBeUndefined()
-    for (const path of ['/api/me', '/api/admin/users', '/api/robot-payments/instructions', '/api/member-content', '/api/member-balances?country=Rwanda', '/api/support', '/api/withdrawals', '/api/withdrawals/admin/requests']) {
+    for (const path of ['/api/me', '/api/admin/users', '/api/robot-payments/instructions', '/api/member-content', '/api/member-balances?country=Rwanda', '/api/support', '/api/withdrawals', '/api/withdrawals/admin/requests', '/api/referrals']) {
       expect((await request.get(`${base}${path}`)).status()).toBe(401)
       expect((await request.get(`${base}${path}`, { headers: { Authorization: 'Bearer banned-token' } })).status()).toBe(403)
       const offline = await request.get(`${base}${path}`, { headers: { Authorization: 'Bearer offline-token' } })
