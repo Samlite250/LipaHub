@@ -45,6 +45,7 @@ test('welcome page keeps the responsive landing layout and navigation usable', a
   await expect(page.locator('.install-banner')).toBeVisible()
   await expect(page.getByRole('heading', { name: /Learn, connect and explore something new/ })).toBeVisible()
   await expect(page.locator('.landing-feature')).toHaveCount(7)
+  await expect(page.locator('.public-nav-links a')).toHaveText(['Ways to Earn', 'How It Works', 'FAQ'])
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
   await page.evaluate(() => window.scrollTo(0, 1000))
   await expect.poll(() => page.locator('.landing-header').evaluate(element => Math.round(element.getBoundingClientRect().top))).toBe(page.viewportSize()!.width <= 600 ? 64 : 58)
@@ -65,8 +66,15 @@ test('welcome page keeps the responsive landing layout and navigation usable', a
   if ((page.viewportSize()?.width ?? 0) <= 700) {
     await page.getByRole('button', { name: 'Open navigation' }).click()
     await expect(page.locator('.landing-mobile-nav').getByRole('link', { name: 'Register Free' })).toBeVisible()
-    await page.getByRole('link', { name: 'How it works' }).click()
+    await page.getByRole('link', { name: 'How It Works' }).click()
+    await expect(page).toHaveURL(/#how$/)
     await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible()
+  } else {
+    for (const [label, hash, section] of [['Ways to Earn', '#earn', '#explore'], ['How It Works', '#how', '#how-it-works'], ['FAQ', '#faq', '#questions']]) {
+      await page.getByRole('link', { name: label, exact: true }).click()
+      await expect(page).toHaveURL(new RegExp(`${hash}$`))
+      await expect(page.locator(section)).toBeVisible()
+    }
   }
 })
 
