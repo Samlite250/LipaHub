@@ -22,6 +22,28 @@ test('wallet welcome matches LipaHub branding and CLICK HERE opens installation 
   await expect(page.getByRole('button', {name: 'KANDA HANO'})).toBeVisible()
 })
 
+test('dashboard header flag reflects the member country and does not change language', async ({ page }) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('lipahub-demo', JSON.stringify({
+      id: 'country-flag-test',
+      name: 'Cynthia',
+      country: 'Burundi',
+      robotIdsByCountry: {},
+      robotCatalogVersion: '',
+    }))
+  })
+  await page.goto('/dashboard')
+
+  const countryFlag = page.locator('.header-country')
+  await expect(countryFlag.getByRole('img', { name: 'Burundi' })).toBeVisible()
+  expect(await countryFlag.evaluate(element => element.tagName)).toBe('SPAN')
+  const language = page.getByRole('combobox', { name: 'Language' })
+  await expect(language).toHaveValue('en')
+  await language.selectOption('rw')
+  await expect(language).toHaveValue('rw')
+  await expect(countryFlag.getByRole('img', { name: 'Burundi' })).toBeVisible()
+})
+
 test('an early browser install prompt survives navigation and is used only once', async ({ page }) => {
   await page.goto('/')
   await page.evaluate(() => {

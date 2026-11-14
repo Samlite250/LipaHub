@@ -557,8 +557,8 @@
 .menu-button{width:54px;height:54px;background:#ffffff0a;color:#fff;border:1px solid #ffffff46;border-radius:16px;box-shadow:0 2px 12px #04132755}
 .header-tools{gap:5px}
 .header-tools>.header-country,.header-tools>.header-theme,.header-tools .account-menu-container>.header-settings{width:54px;height:54px;border:1px solid #ffffff2e;border-radius:16px;background:#ffffff12;color:#fff;box-shadow:0 2px 12px #29145330}
-.header-tools>.header-country{font-size:21px}
-.header-tools>.header-country .header-flag{width:29px;height:21px;border-radius:2px;box-shadow:0 0 7px #02c8ff55}
+.header-tools>.header-country{display:flex;align-items:center;justify-content:center;font-size:21px}
+.header-tools>.header-country .country-flag{width:29px;height:21px;border-radius:2px;box-shadow:0 0 7px #02c8ff55}
 .header-tools>.header-theme{color:#f0eafa}
 .header-tools>.header-theme svg{width:28px;height:28px;stroke-width:2}
 .header-tools .account-menu-container>.header-settings{color:#f4c44e}
@@ -568,7 +568,7 @@
 .dashboard-brand-icon{width:60px;height:48px;filter:drop-shadow(0 2px 3px #00183270)}
 @media(max-width:991px){.menu-button,.header-tools>.header-country,.header-tools>.header-theme,.header-tools .account-menu-container>.header-settings{width:54px;height:54px}.header-tools{gap:5px}}
 @media(min-width:480px) and (max-width:599px){.mobile-logo{left:38%}.dashboard-brand{font-size:clamp(22px,5.3vw,30px)}.dashboard-brand-icon{width:clamp(34px,8vw,46px);height:auto}}
-@media(max-width:479px){.dashboard-header{height:56px;padding:9px 10px 0;background:linear-gradient(to bottom,#11141b 0 7px,transparent 7px),linear-gradient(108deg,#0b1e2b 0%,#0d2b68 37%,#223b91 56%,#503da3 68%,#753bad 83%,#6c3abd 100%)}.menu-button,.header-tools>.header-country,.header-tools>.header-theme,.header-tools .account-menu-container>.header-settings{width:29px;height:29px;border-radius:9px}.menu-button>svg{width:16px;height:16px}.header-tools{gap:3px}.header-tools>.header-country .header-flag{width:18px;height:14px}.header-tools>.header-theme svg{width:18px;height:18px}.header-tools .account-menu-container>.header-settings svg{width:17px;height:17px}.mobile-logo{left:42%}.dashboard-brand{font-size:20px;gap:4px;letter-spacing:.2px}.dashboard-brand-icon{width:32px;height:28px}}
+@media(max-width:479px){.dashboard-header{height:56px;padding:9px 10px 0;background:linear-gradient(to bottom,#11141b 0 7px,transparent 7px),linear-gradient(108deg,#0b1e2b 0%,#0d2b68 37%,#223b91 56%,#503da3 68%,#753bad 83%,#6c3abd 100%)}.menu-button,.header-tools>.header-country,.header-tools>.header-theme,.header-tools .account-menu-container>.header-settings{width:29px;height:29px;border-radius:9px}.menu-button>svg{width:16px;height:16px}.header-tools{gap:3px}.header-tools>.header-country .country-flag{width:18px;height:14px}.header-tools>.header-theme svg{width:18px;height:18px}.header-tools .account-menu-container>.header-settings svg{width:17px;height:17px}.mobile-logo{left:42%}.dashboard-brand{font-size:20px;gap:4px;letter-spacing:.2px}.dashboard-brand-icon{width:32px;height:28px}}
 @media(max-width:359px){.dashboard-header{padding:7px 8px 0}.menu-button,.header-tools>.header-country,.header-tools>.header-theme,.header-tools .account-menu-container>.header-settings{width:27px;height:27px}.header-tools{gap:2px}.dashboard-brand{font-size:18px;gap:3px}.dashboard-brand-icon{width:28px;height:25px}}
 
 .registration{align-items:flex-start;justify-content:center;min-height:100svh;padding:78px 20px 48px;background:#f4f6fb}
