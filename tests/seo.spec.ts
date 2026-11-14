@@ -46,6 +46,10 @@ test('welcome page keeps the responsive landing layout and navigation usable', a
   await expect(page.getByRole('heading', { name: /Learn, connect and explore something new/ })).toBeVisible()
   await expect(page.locator('.landing-feature')).toHaveCount(7)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+  await page.evaluate(() => window.scrollTo(0, 1000))
+  await expect.poll(() => page.locator('.landing-header').evaluate(element => Math.round(element.getBoundingClientRect().top))).toBe(page.viewportSize()!.width <= 600 ? 64 : 57)
+  await expect(page.locator('.landing-header')).toBeVisible()
+  await page.evaluate(() => window.scrollTo(0, 0))
   if ((page.viewportSize()?.width ?? 0) <= 700) {
     await page.getByRole('button', { name: 'Open navigation' }).click()
     await expect(page.locator('.landing-mobile-nav').getByRole('link', { name: 'Register Free' })).toBeVisible()

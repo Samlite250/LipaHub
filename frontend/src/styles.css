@@ -22,7 +22,7 @@
 
 .member-footer{justify-content:center;font-size:13px}.member-footer>p{margin:0;text-align:center;line-height:1.8}.member-footer strong{font-weight:700}.member-footer .footer-heart{display:inline-block;vertical-align:-2px;fill:#f4513d;color:#f4513d;margin:0 2px}.member-footer .footer-designer{color:#20ddd5}
 
-.landing-redesign{--landing-ink:#11182b;--landing-navy:#101629;--landing-muted:#6b7282;background:#fff;color:var(--landing-ink);overflow:hidden}
+.landing-redesign{--landing-ink:#11182b;--landing-navy:#101629;--landing-muted:#6b7282;background:#fff;color:var(--landing-ink);overflow:clip}
 .landing-redesign .install-banner{min-height:54px;padding:8px max(24px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:15px;background:#e8fbf3;color:#174e3d;font-size:13px;font-weight:650}
 .landing-redesign .install-banner>span,.landing-redesign .install-banner>a{display:inline-flex;align-items:center;gap:9px}
 .landing-redesign .install-banner>a{padding:10px 20px;border-radius:9px;background:linear-gradient(110deg,#0aa578,#078d71);color:#fff;font-size:11px;font-weight:750;letter-spacing:.35px}
