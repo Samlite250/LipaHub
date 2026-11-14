@@ -5,7 +5,6 @@ import { Logo, Panel } from '../components'
 import { allNavigation } from '../navigation'
 import { useApp } from '../state'
 import { supabase } from '../lib/supabase'
-import { CountrySelect } from '../CountrySelect'
 import { normalizeCountry } from '../domain/countries'
 
 export function FeaturePage({ kind }: { kind: 'trading' | 'chat' }) {
@@ -39,7 +38,7 @@ function Chat() {
 export function ProfilePage() {
   const { demo, updateDemo, session } = useApp()
   const [name, setName] = useState(demo?.name || session?.user.user_metadata.display_name || '')
-  const [country, setCountry] = useState(normalizeCountry(demo?.country || session?.user.user_metadata.country) || 'Rwanda')
+  const country = normalizeCountry(demo?.country || session?.user.user_metadata.country) || 'Rwanda'
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -47,13 +46,13 @@ export function ProfilePage() {
     e.preventDefault(); setStatus(''); setError(''); setBusy(true)
     try {
       if (!name.trim()) throw new Error('Please enter a display name.')
-      if (demo) updateDemo({ name: name.trim(), country })
-      else if (supabase) { const { error } = await supabase.auth.updateUser({ data: { display_name: name.trim(), country } }); if (error) throw error }
+      if (demo) updateDemo({ name: name.trim() })
+      else if (supabase) { const { error } = await supabase.auth.updateUser({ data: { display_name: name.trim() } }); if (error) throw error }
       setStatus(demo ? 'Profile saved for this browser session.' : 'Profile saved.')
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to save.') }
     finally { setBusy(false) }
   }
-  return <Panel title="Your profile" className="profile-panel"><form className="profile-form" onSubmit={save}><span className="avatar profile-avatar">{(name || 'M').charAt(0)}</span><p className="muted">A little about you, in your own words.</p><label>Display name<input value={name} onChange={e => setName(e.target.value)} minLength={2} maxLength={40} required autoComplete="nickname" /></label><CountrySelect label="Country" value={country} onChange={setCountry} />{!demo && <label>Email<input value={session?.user.email || ''} readOnly /></label>}{error && <p className="form-error" role="alert">{error}</p>}{status && <p className="form-success" role="status">{status}</p>}<button className="button primary" disabled={busy}>{busy ? 'Saving…' : 'Save changes'}</button>{!demo && <Link className="text-link" to="/forgot-password">Request password reset <ArrowRight size={14} /></Link>}</form></Panel>
+  return <Panel title="Your profile" className="profile-panel"><form className="profile-form" onSubmit={save}><span className="avatar profile-avatar">{(name || 'M').charAt(0)}</span><p className="muted">A little about you, in your own words.</p><label>Display name<input value={name} onChange={e => setName(e.target.value)} minLength={2} maxLength={40} required autoComplete="nickname" /></label><label>Country<input value={country} readOnly aria-readonly="true" /></label><small>Country is set during registration and cannot be changed here.</small>{!demo && <label>Email<input value={session?.user.email || ''} readOnly /></label>}{error && <p className="form-error" role="alert">{error}</p>}{status && <p className="form-success" role="status">{status}</p>}<button className="button primary" disabled={busy}>{busy ? 'Saving…' : 'Save changes'}</button>{!demo && <Link className="text-link" to="/forgot-password">Request password reset <ArrowRight size={14} /></Link>}</form></Panel>
 }
 
 const descriptions: Record<string, string> = {

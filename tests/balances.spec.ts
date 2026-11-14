@@ -1,4 +1,3 @@
-import { selectCountry } from './helpers/country'
 import { expect, test, type Page } from '@playwright/test'
 import { balanceInput, minorAmount } from '../Backend/src/admin/balances'
 
@@ -19,6 +18,12 @@ async function adjust(page: Page, available: string, bonus: string, reason: stri
   await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue(available)
 }
 
+async function adminLink(page: Page, name: string) {
+  const toggle = page.getByRole('button', { name: 'Open admin navigation' })
+  if (await toggle.isVisible()) await toggle.click()
+  await page.getByRole('link', { name, exact: true }).click()
+}
+
 test('admin balance edits persist, update member dashboards and keep country wallets separate', async ({ page }) => {
   await openWallet(page)
   await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue('6800')
@@ -32,7 +37,7 @@ test('admin balance edits persist, update member dashboards and keep country wal
   await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue('1000000')
   await adjust(page, '1250000', '250000', 'Applying the Burundi demo account correction')
   await page.getByRole('button', { name: 'Close', exact: true }).click()
-  await page.getByRole('link', { name: 'Audit log', exact: true }).click()
+  await adminLink(page, 'Audit log')
   await expect(page.locator('.admin-audit-table tbody tr').filter({ hasText: 'balances.adjust' })).toHaveCount(2)
   await page.getByRole('link', { name: 'Back to dashboard', exact: true }).click()
   await expect(page.getByTestId('member-balance')).toHaveText('RF 12,500')
@@ -40,15 +45,16 @@ test('admin balance edits persist, update member dashboards and keep country wal
   await page.reload()
   await expect(page.getByTestId('member-balance')).toHaveText('RF 12,500')
   await page.goto('/dashboard/profile')
-  await selectCountry(page, 'Burundi')
+  await expect(page.getByLabel('Country', { exact: true })).toHaveValue('Rwanda')
+  await expect(page.getByLabel('Country', { exact: true })).toHaveAttribute('readonly')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await page.goto('/dashboard')
-  await expect(page.getByTestId('robot-funds')).toHaveText('1,250,000 Fbu')
-  await expect(page.getByTestId('robot-bonus')).toHaveText('250,000 Fbu')
-  await page.reload()
-  await expect(page.getByTestId('robot-funds')).toHaveText('1,250,000 Fbu')
+  await expect(page.getByTestId('member-balance')).toHaveText('RF 12,500')
   await openWallet(page)
-  await expect(page.getByLabel('Wallet country', { exact: true })).toHaveValue('Burundi')
+  await expect(page.getByLabel('Wallet country', { exact: true })).toHaveValue('Rwanda')
+  await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue('12500')
+  await page.getByLabel('Wallet country', { exact: true }).selectOption('Burundi')
+  await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue('1250000')
   await page.getByLabel('Wallet country', { exact: true }).selectOption('Rwanda')
   await expect(page.getByLabel('New available balance', { exact: true })).toHaveValue('12500')
   await adjust(page, '2000', '100', 'Correcting an over-credit on the demo account')
@@ -85,6 +91,8 @@ test('balance storage rejects stale edits and request reuse, and conserves adjus
 test('all eight admin tabs including support are shown and every tab has working controls', async ({ page }) => {
   await page.goto('/admin')
   await page.getByRole('button', { name: 'Open local workspace' }).click()
+  const toggle = page.getByRole('button', { name: 'Open admin navigation' })
+  if (await toggle.isVisible()) await toggle.click()
   const navigation = page.locator('.admin-sidebar nav')
   await expect(navigation.getByRole('link')).toHaveCount(8)
   await expect(navigation.getByRole('link', { name: 'Activity', exact: true })).toHaveCount(0)
@@ -93,14 +101,14 @@ test('all eight admin tabs including support are shown and every tab has working
     ['Members', 'Members'], ['Content', 'Content library'], ['Audit log', 'Audit log'],
     ['Settings', 'Settings'], ['Support', 'Support'],
   ]) {
-    await navigation.getByRole('link', { name, exact: true }).click()
+    await adminLink(page, name)
     await expect(page.locator('.admin-page-title').getByRole('heading', { name: heading, exact: true })).toBeVisible()
-    await expect(navigation.getByRole('link', { name, exact: true })).toHaveAttribute('aria-current', 'page')
+    await expect(navigation.locator('a[aria-current="page"]')).toHaveText(name)
   }
-  await navigation.getByRole('link', { name: 'Overview', exact: true }).click()
+  await adminLink(page, 'Overview')
   await page.getByRole('button', { name: 'Refresh data' }).click()
   await expect(page.locator('.admin-page-title').getByRole('heading', { name: 'Operations overview', exact: true })).toBeVisible()
-  await navigation.getByRole('link', { name: 'Payments', exact: true }).click()
+  await adminLink(page, 'Payments')
   await page.getByRole('tab', { name: 'Proof submissions', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Your queue is clear', exact: true })).toBeVisible()
   await page.getByRole('tab', { name: 'Payment instructions', exact: true }).click()

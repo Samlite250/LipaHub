@@ -673,3 +673,6 @@
 }
 
 .registration .country-select-field>input{padding-left:40px}
+.side-profile-link{display:flex;align-items:center;gap:11px;min-width:0;flex:1;color:inherit}
+.side-profile-link>div{min-width:0}
+.profile-country{display:inline-flex;align-items:center;justify-content:center;flex:none;pointer-events:none}

@@ -12,7 +12,7 @@ type DemoProfile = { id: string; name: string; country: string; robotIdsByCountr
 type ContextValue = {
   language: Language; setLanguage: (l: Language) => void; t: (key: TranslationKey) => string
   dark: boolean; setDark: (b: boolean) => void
-  demo: DemoProfile | null; startDemo: (country?: string) => void; updateDemo: (p: Pick<DemoProfile, 'name' | 'country'>) => void
+  demo: DemoProfile | null; startDemo: (country?: string) => void; updateDemo: (p: Pick<DemoProfile, 'name'> & Partial<Pick<DemoProfile, 'country'>>) => void
   activateDemoRobot: (id: string) => void; resetDemoRobots: () => void
   session: Session | null; loading: boolean; signOut: () => Promise<void>
 }
@@ -60,8 +60,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (demo) sessionStorage.setItem('lipahub-demo', JSON.stringify(demo))
     else sessionStorage.removeItem('lipahub-demo')
   }, [demo])
-  const updateDemo = (profile: Pick<DemoProfile, 'name' | 'country'>) => {
-    setDemo(previous => previous ? { ...previous, ...profile, country: normalizeCountry(profile.country) || 'Rwanda' } : null)
+  const updateDemo = (profile: Pick<DemoProfile, 'name'> & Partial<Pick<DemoProfile, 'country'>>) => {
+    setDemo(previous => previous ? { ...previous, name: profile.name, ...(profile.country ? { country: normalizeCountry(profile.country) || previous.country } : {}) } : null)
   }
   const activateDemoRobot = (id: string) => {
     setDemo(previous => {

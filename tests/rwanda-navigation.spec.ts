@@ -37,12 +37,10 @@ test('Rwanda navigation matches the supplied menu and keeps the existing submenu
 })
 
 test('country selection switches Rwanda menu without replacing other country menus', async ({ page }, info) => {
-  await page.goto('/login'); await page.getByRole('button', { name: 'Open practice workspace' }).click()
   for (const country of ['Burundi', 'Rwanda']) {
-    await page.goto('/dashboard/profile')
+    await page.goto('/register')
     await selectCountry(page, country)
-    await page.getByRole('button', { name: 'Save changes' }).click()
-    await expect(page.getByRole('status')).toContainText('Profile saved')
+    await page.getByRole('button', { name: 'Open practice workspace' }).click()
     await page.goto('/dashboard')
     if (info.project.name === 'mobile') await page.getByRole('button', { name: 'Toggle navigation' }).click()
     const menu = page.locator('.sidebar nav')

@@ -1,4 +1,3 @@
-import { selectCountry } from './helpers/country'
 import { expect, test, type Page } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
@@ -99,6 +98,11 @@ test('registration validates matching passwords and switches language', async ({
 })
 test('dashboard demo, hidden balances, theme, profile and sign out', async ({ page }, info) => {
   await demo(page)
+  const countryFlag = page.locator('.side-profile .profile-country')
+  await expect(countryFlag.getByRole('img', { name: 'Rwanda' })).toBeVisible()
+  await expect(countryFlag).toHaveCSS('pointer-events', 'none')
+  expect(await countryFlag.evaluate(element => element.closest('a'))).toBeNull()
+  await expect(page.locator('.side-profile-link')).toHaveAttribute('href', '/dashboard/profile')
   await expect(page.locator('.dashboard-shell')).not.toContainText(/\bdemo\b/i)
   await expect(page.getByText('Balances overview', { exact: true })).toBeVisible()
   await expect(page.getByText('RF 78,488')).toBeVisible()
@@ -128,7 +132,8 @@ test('dashboard demo, hidden balances, theme, profile and sign out', async ({ pa
   }
   await page.goto('/dashboard/profile')
   await page.getByLabel('Display name').fill('Taylor')
-  await selectCountry(page, 'Kenya')
+  await expect(page.getByLabel('Country', { exact: true })).toHaveValue('Rwanda')
+  await expect(page.getByLabel('Country', { exact: true })).toHaveAttribute('readonly')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByRole('status')).toContainText('Profile saved')
   await page.goto('/dashboard')

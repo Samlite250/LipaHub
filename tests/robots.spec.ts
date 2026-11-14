@@ -10,11 +10,10 @@ async function enterCountryDemo(page: Page, country: string) {
   await expect(page.locator('.hello-badge')).toBeVisible()
 }
 async function changeCountry(page: Page, country: string) {
-  await page.goto('/dashboard/profile')
+  await page.goto('/register')
   await selectCountry(page, country)
-  await page.getByRole('button', { name: 'Save changes' }).click()
-  await expect(page.getByRole('status')).toContainText('Profile saved')
-  await page.goto('/dashboard')
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
+  await expect(page).toHaveURL('/dashboard')
   await expect(page.locator('.hello-badge')).toBeVisible()
 }
 test('all non-Rwandan selections show 33 plans and Rwanda keeps its standard dashboard', async ({ page }) => {

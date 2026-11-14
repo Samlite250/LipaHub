@@ -36,7 +36,7 @@ test('registration synchronizes all supported countries and dialling codes', asy
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
 })
 
-test('a newly supported country persists as a named market through profile and dashboard', async ({ page }) => {
+test('a newly supported country stays fixed after registration and across profile saves', async ({ page }) => {
   await page.goto('/register')
   await page.locator('.iti__selected-country').click()
   await page.locator('.iti__country[data-iso2=cd]').click()
@@ -45,12 +45,17 @@ test('a newly supported country persists as a named market through profile and d
   await expect(page.locator('.robot-region')).toHaveText('DR Congo')
   await expect(page.locator('.robot-card')).toHaveCount(33)
   await page.goto('/dashboard/profile')
-  await expect(page.getByLabel('Country')).toHaveValue('DR Congo')
-  await selectCountry(page, 'Tanzania')
+  const country = page.getByLabel('Country', { exact: true })
+  await expect(country).toHaveValue('DR Congo')
+  await expect(country).toHaveAttribute('readonly')
+  await expect(page.locator('.country-select-popup')).toHaveCount(0)
+  await page.getByLabel('Display name').fill('DR Congo Member')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByRole('status')).toContainText('Profile saved')
   await page.reload()
-  await expect(page.getByLabel('Country')).toHaveValue('Tanzania')
+  await expect(country).toHaveValue('DR Congo')
+  await page.goto('/dashboard')
+  await expect(page.locator('.robot-region')).toHaveText('DR Congo')
 })
 
 
@@ -95,7 +100,7 @@ test('calling code search filters Burundi and selects it with the keyboard', asy
 })
 
 
-test('Country includes worldwide selections and preserves them in the profile', async ({ page }) => {
+test('Country includes worldwide selections and keeps the registered country read-only in the profile', async ({ page }) => {
   await page.goto('/register')
   const menu = page.getByLabel('Country')
   for (const country of ['France', 'United States', 'India', 'Australia', 'Brazil', 'Japan', 'Antarctica']) {
@@ -107,12 +112,15 @@ test('Country includes worldwide selections and preserves them in the profile', 
   await expect(page.locator('.robot-region')).toHaveText('France')
   await expect(page.locator('.robot-card')).toHaveCount(33)
   await page.goto('/dashboard/profile')
-  await expect(page.getByLabel('Country')).toHaveValue('France')
-  await selectCountry(page, 'Japan')
+  const country = page.getByLabel('Country', { exact: true })
+  await expect(country).toHaveValue('France')
+  await expect(country).toHaveAttribute('readonly')
+  await expect(page.locator('.country-select-popup')).toHaveCount(0)
+  await page.getByLabel('Display name').fill('France Member')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByRole('status')).toContainText('Profile saved')
   await page.reload()
-  await expect(page.getByLabel('Country')).toHaveValue('Japan')
+  await expect(country).toHaveValue('France')
 })
 
 
