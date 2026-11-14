@@ -8,7 +8,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
 }
 export function Languages() {
   const { language, setLanguage } = useApp()
-  return <div className="language-buttons" aria-label="Language"><button type="button" aria-pressed={language === 'rw'} onClick={() => setLanguage('rw')}>Kinyarwanda</button><button type="button" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>English</button></div>
+  return <div className="language-buttons" aria-label="Language"><button type="button" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>English</button><button type="button" aria-pressed={language === 'rw'} onClick={() => setLanguage('rw')}>Kinyarwanda</button><button type="button" aria-pressed={language === 'lg'} onClick={() => setLanguage('lg')}>Luganda</button><button type="button" aria-pressed={language === 'sw'} onClick={() => setLanguage('sw')}>Kiswahili</button></div>
 }
 export function IconChip({ icon: Icon, color = 'teal' }: { icon: LucideIcon; color?: string }) {
   return <span className={`icon-chip ${color}`}><Icon size={18} strokeWidth={1.8} /></span>

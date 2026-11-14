@@ -28,7 +28,10 @@ function readDemo(): DemoProfile | null {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>(() => localStorage.getItem('lipahub-language') === 'rw' ? 'rw' : 'en')
+  const [language, setLanguage] = useState<Language>(() => {
+    const stored = localStorage.getItem('lipahub-language')
+    return stored && stored in dictionary ? stored as Language : 'en'
+  })
   const [dark, setDark] = useState(() => localStorage.getItem('lipahub-theme') === 'dark')
   const [demo, setDemo] = useState<DemoProfile | null>(readDemo)
   const [session, setSession] = useState<Session | null>(null)
