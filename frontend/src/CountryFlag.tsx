@@ -1,10 +1,19 @@
 import { Globe2 } from 'lucide-react'
+import countryData from '../../shared/countries.json' with { type: 'json' }
+import 'intl-tel-input/styles'
 import { normalizeCountry } from './domain/countries'
 
 export function CountryFlag({ country: value }: { country: unknown }) {
   const country = normalizeCountry(value)
-  if (!country || !['Rwanda', 'Burundi', 'Uganda', 'Kenya', 'South Africa'].includes(country)) {
+  if (!country || country === 'International') {
     return <Globe2 width={22} height={18} role="img" aria-label={country || 'Country not selected'} />
+  }
+
+  if (!['Rwanda', 'Burundi', 'Uganda', 'Kenya', 'South Africa'].includes(country)) {
+    const iso2 = countryData.find(item => item.name === country)?.iso2
+    return iso2
+      ? <span className={`country-flag iti__flag iti__${iso2}`} role="img" aria-label={country} />
+      : <Globe2 width={22} height={18} role="img" aria-label={country} />
   }
 
   return <svg className="country-flag" viewBox="0 0 30 20" width="22" height="15" role="img" aria-label={country}>

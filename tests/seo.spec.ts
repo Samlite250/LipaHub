@@ -54,6 +54,28 @@ test('welcome page keeps the responsive landing layout and navigation usable', a
   }
 })
 
+test('country picker carries the selected flag identity through the splash theme', async ({ page }) => {
+  await page.goto('/?country=rw')
+  await expect(page.locator('.landing-brand .brand-location')).toContainText('RWANDA')
+  await expect(page.locator('.hero-flag-watermark [aria-label="Rwanda"]')).toBeVisible()
+  await page.getByRole('button', { name: 'Country and language: Rwanda, EN' }).click()
+  await expect(page.locator('.landing-country-grid button')).toHaveCount(22)
+  await page.locator('.landing-country-grid button').filter({ hasText: 'Kenya' }).click()
+  await expect(page).toHaveURL(/country=ke/)
+  await expect(page.locator('.landing-brand .brand-location')).toContainText('KENYA')
+  await expect(page.locator('.hero-copy .eyebrow')).toContainText('LIPAHUB KENYA')
+  await expect(page.locator('.hero-flag-watermark [aria-label="Kenya"]')).toBeVisible()
+  expect(await page.locator('.landing-redesign').evaluate(element => getComputedStyle(element).getPropertyValue('--landing-country-primary').trim())).toBe('#000')
+
+  await page.setViewportSize({ width: 320, height: 740 })
+  await page.getByRole('button', { name: 'Country and language: Kenya, EN' }).click()
+  const menu = await page.locator('.landing-country-menu').boundingBox()
+  expect(menu).not.toBeNull()
+  expect(menu!.x).toBeGreaterThanOrEqual(0)
+  expect(menu!.x + menu!.width).toBeLessThanOrEqual(320)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+})
+
 test('private and auth routes are excluded from search', async ({ page }) => {
   for (const path of ['/login', '/register', '/forgot-password', '/reset-password', '/activate-account', '/dashboard', '/admin', '/i/abc12345', '/this-does-not-exist']) {
     await page.goto(path)

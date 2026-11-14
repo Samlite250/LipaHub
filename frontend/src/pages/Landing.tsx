@@ -1,15 +1,96 @@
 import { demoEnabled } from '../lib/platform'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Bot, BookOpen, Check, ChevronDown, CircleHelp, Compass, Globe2, GraduationCap, Menu, MessageCircle, Moon, Smartphone, Sparkles, Sun, Users, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Languages, Logo, Panel } from '../components'
+import { CountryFlag } from '../CountryFlag'
+import countryData from '../../../shared/countries.json' with { type: 'json' }
+import { normalizeCountry } from '../domain/countries'
 import { useApp } from '../state'
+
+const countryCodes = ['ke', 'ug', 'tz', 'rw', 'ng', 'mw', 'zm', 'gh', 'cm', 'bw', 'bi', 'zw', 'mz', 'za', 'cd', 'ss', 'ci', 'sn', 'bf', 'tg', 'bj']
+const countryOptions = [
+  ...countryCodes.flatMap(iso2 => {
+    const country = countryData.find(item => item.iso2 === iso2)
+    return country ? [{ country: country.name, label: country.name, iso2 }] : []
+  }),
+  { country: 'International', label: 'All of Africa', iso2: '' },
+]
+const countryThemes: Record<string, { primary: string; secondary: string; accent: string; highlight: string; stripe: string }> = {
+  Rwanda: { primary: '#00a1de', secondary: '#20603d', accent: '#fad201', highlight: '#4ade80', stripe: 'linear-gradient(90deg,#00a1de 0 33.333%,#fad201 33.333% 66.666%,#20603d 66.666%)' },
+  Burundi: { primary: '#ce1126', secondary: '#1eb53a', accent: '#fff', highlight: '#70ef99', stripe: 'linear-gradient(90deg,#ce1126 0 33.333%,#fff 33.333% 66.666%,#1eb53a 66.666%)' },
+  Uganda: { primary: '#000', secondary: '#d90000', accent: '#fcdc04', highlight: '#ffdf3d', stripe: 'linear-gradient(90deg,#000 0 33.333%,#fcdc04 33.333% 66.666%,#d90000 66.666%)' },
+  Kenya: { primary: '#000', secondary: '#006600', accent: '#bb0000', highlight: '#ff6b73', stripe: 'linear-gradient(90deg,#000 0 33.333%,#bb0000 33.333% 66.666%,#006600 66.666%)' },
+  Tanzania: { primary: '#1eb53a', secondary: '#00a3dd', accent: '#fcd116', highlight: '#67ed81', stripe: 'linear-gradient(90deg,#1eb53a 0 33.333%,#fcd116 33.333% 66.666%,#00a3dd 66.666%)' },
+  Nigeria: { primary: '#008751', secondary: '#006b3f', accent: '#fff', highlight: '#64e6a3', stripe: 'linear-gradient(90deg,#008751 0 33.333%,#fff 33.333% 66.666%,#008751 66.666%)' },
+  Malawi: { primary: '#000', secondary: '#339e35', accent: '#ce1126', highlight: '#ff707b', stripe: 'linear-gradient(90deg,#000 0 33.333%,#ce1126 33.333% 66.666%,#339e35 66.666%)' },
+  Zambia: { primary: '#198a00', secondary: '#de2010', accent: '#ef7d00', highlight: '#ff9a3e', stripe: 'linear-gradient(90deg,#198a00 0 33.333%,#de2010 33.333% 66.666%,#ef7d00 66.666%)' },
+  Ghana: { primary: '#ce1126', secondary: '#006b3f', accent: '#fcd116', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#ce1126 0 33.333%,#fcd116 33.333% 66.666%,#006b3f 66.666%)' },
+  Cameroon: { primary: '#007a5e', secondary: '#fcd116', accent: '#ce1126', highlight: '#ff6b73', stripe: 'linear-gradient(90deg,#007a5e 0 33.333%,#ce1126 33.333% 66.666%,#fcd116 66.666%)' },
+  Botswana: { primary: '#75aadb', secondary: '#001489', accent: '#fff', highlight: '#9dd2ff', stripe: 'linear-gradient(90deg,#75aadb 0 33.333%,#fff 33.333% 66.666%,#001489 66.666%)' },
+  Zimbabwe: { primary: '#006400', secondary: '#de2010', accent: '#ffd200', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#006400 0 33.333%,#ffd200 33.333% 66.666%,#de2010 66.666%)' },
+  Mozambique: { primary: '#007168', secondary: '#d21034', accent: '#fce100', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#007168 0 33.333%,#fce100 33.333% 66.666%,#d21034 66.666%)' },
+  'South Africa': { primary: '#007749', secondary: '#001489', accent: '#e03c31', highlight: '#ff7470', stripe: 'linear-gradient(90deg,#e03c31 0 25%,#fff 25% 50%,#007749 50% 75%,#001489 75%)' },
+  'DR Congo': { primary: '#007fff', secondary: '#f7d618', accent: '#ce1021', highlight: '#ff737b', stripe: 'linear-gradient(90deg,#007fff 0 33.333%,#f7d618 33.333% 66.666%,#ce1021 66.666%)' },
+  'South Sudan': { primary: '#0f47af', secondary: '#da121a', accent: '#fcd116', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#0f47af 0 33.333%,#fcd116 33.333% 66.666%,#da121a 66.666%)' },
+  'Côte d’Ivoire': { primary: '#f77f00', secondary: '#009e60', accent: '#fff', highlight: '#ffae55', stripe: 'linear-gradient(90deg,#f77f00 0 33.333%,#fff 33.333% 66.666%,#009e60 66.666%)' },
+  Senegal: { primary: '#00853f', secondary: '#e31b23', accent: '#fdef42', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#00853f 0 33.333%,#fdef42 33.333% 66.666%,#e31b23 66.666%)' },
+  'Burkina Faso': { primary: '#ef2b2d', secondary: '#009e49', accent: '#fcd116', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#ef2b2d 0 33.333%,#fcd116 33.333% 66.666%,#009e49 66.666%)' },
+  Togo: { primary: '#006a4e', secondary: '#d21034', accent: '#ffce00', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#006a4e 0 33.333%,#ffce00 33.333% 66.666%,#d21034 66.666%)' },
+  Benin: { primary: '#008751', secondary: '#e8112d', accent: '#fcd116', highlight: '#ffdf55', stripe: 'linear-gradient(90deg,#008751 0 33.333%,#fcd116 33.333% 66.666%,#e8112d 66.666%)' },
+  International: { primary: '#1e3a8a', secondary: '#059669', accent: '#7c3aed', highlight: '#4ade80', stripe: 'linear-gradient(90deg,#00a8e0 0 33.333%,#ffd500 33.333% 66.666%,#00843d 66.666%)' },
+}
 
 export function Landing() {
   const { dark, setDark, language, setLanguage, startDemo, t } = useApp()
+  const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [countryMenuOpen, setCountryMenuOpen] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const countryPickerRef = useRef<HTMLDivElement>(null)
+  const countryFromUrl = new URLSearchParams(location.search).get('country')
+  const selectedCountry = normalizeCountry(countryFromUrl) || normalizeCountry(localStorage.getItem('lipahub-country')) || 'Rwanda'
+  const theme = countryThemes[selectedCountry] || countryThemes.International
+  const countryStyle: CSSProperties & {
+    '--landing-country-primary': string
+    '--landing-country-secondary': string
+    '--landing-country-accent': string
+    '--landing-country-highlight': string
+    '--landing-country-stripe': string
+  } = {
+    '--landing-country-primary': theme.primary,
+    '--landing-country-secondary': theme.secondary,
+    '--landing-country-accent': theme.accent,
+    '--landing-country-highlight': theme.highlight,
+    '--landing-country-stripe': theme.stripe,
+  }
+  useEffect(() => {
+    if (!countryMenuOpen) return
+    const closeOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !countryPickerRef.current?.contains(event.target)) setCountryMenuOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setCountryMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [countryMenuOpen])
+  useEffect(() => {
+    if (countryFromUrl) localStorage.setItem('lipahub-country', selectedCountry)
+  }, [countryFromUrl, selectedCountry])
+  const selectCountry = (country: string, iso2: string) => {
+    localStorage.setItem('lipahub-country', country)
+    const params = new URLSearchParams(location.search)
+    if (iso2) params.set('country', iso2)
+    else params.delete('country')
+    navigate({ pathname: location.pathname, search: params.toString() ? `?${params.toString()}` : '' }, { replace: true })
+    setCountryMenuOpen(false)
+  }
   const demo = () => { if (demoEnabled) { startDemo(); navigate('/dashboard') } else navigate('/register') }
   const openFeature = (path: string) => {
     if (demoEnabled) startDemo()
@@ -23,22 +104,34 @@ export function Landing() {
     ['Does LipaHub help with online work or the best-paying jobs in the world?', 'LipaHub provides learning resources, digital-skills guidance and a global online-work guide. It is not a job board and does not guarantee jobs or income.'],
     ['Can I deposit or withdraw?', 'Payments and withdrawals are not live yet. They will become available after providers, trusted verification and required reviews are complete.'],
   ]
-  return <div className="landing landing-redesign">
+  const selectedCountryLabel = selectedCountry === 'International' ? 'Africa' : selectedCountry
+  return <div className="landing landing-redesign" style={countryStyle}>
     <div className="install-banner"><span><Smartphone size={17} /> Install the LipaHub App</span><Link to="/install">DOWNLOAD LIPAHUB <ArrowRight size={15} /></Link></div>
     <header className="landing-header">
       <nav className="public-nav">
-        <div className="landing-brand"><Logo /><span className="brand-divider" /><span className="brand-location"><Globe2 size={15} /> GLOBAL</span></div>
+        <div className="landing-brand"><Logo /><span className="brand-divider" /><span className="brand-location"><CountryFlag country={selectedCountry} /> {selectedCountryLabel.toUpperCase()}</span></div>
         <div className="public-nav-links"><a href="#explore">Explore</a><a href="#how-it-works">How it works</a><a href="#global">Global access</a><a href="#questions">FAQ</a></div>
-        <div className="nav-actions"><Link className="login-link" to="/login">{t('signin')}</Link><Link className="button landing-nav-cta" to="/register">Register Free</Link><label className="landing-language"><Globe2 size={15} /><select aria-label="Language" value={language} onChange={event => setLanguage(event.target.value as typeof language)}><option value="en">EN</option><option value="rw">RW</option><option value="lg">LG</option><option value="sw">SW</option></select><ChevronDown size={12} /></label><button className="landing-menu-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button></div>
+        <div className="nav-actions"><Link className="login-link" to="/login">{t('signin')}</Link><Link className="button landing-nav-cta" to="/register">Register Free</Link>
+          <div className="landing-country-picker" ref={countryPickerRef}>
+            <button className="landing-country-trigger" aria-label={`Country and language: ${selectedCountryLabel}, ${language.toUpperCase()}`} aria-expanded={countryMenuOpen} aria-controls="landing-country-menu" onClick={() => setCountryMenuOpen(!countryMenuOpen)}><CountryFlag country={selectedCountry} /><span>{language.toUpperCase()}</span><ChevronDown size={12} /></button>
+            {countryMenuOpen && <div className="landing-country-menu" id="landing-country-menu">
+              <div className="landing-country-menu-title"><strong>Choose your country</strong><span>Country context</span></div>
+              <div className="landing-country-grid">{countryOptions.map(option => <button key={option.country} className={selectedCountry === option.country ? 'is-selected' : ''} aria-pressed={selectedCountry === option.country} onClick={() => selectCountry(option.country, option.iso2)}><CountryFlag country={option.country} /><span>{option.label}</span></button>)}</div>
+              <div className="landing-language-options" role="group" aria-label="Language">{(['en', 'rw', 'lg', 'sw'] as const).map(code => <button key={code} aria-pressed={language === code} onClick={() => { setLanguage(code); setCountryMenuOpen(false) }}>{code === 'en' ? 'English' : code === 'rw' ? 'Kinyarwanda' : code === 'lg' ? 'Luganda' : 'Kiswahili'}</button>)}</div>
+            </div>}
+          </div>
+          <button className="landing-menu-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>
+        </div>
       </nav>
       <div className="landing-stripe" aria-hidden="true" />
       {menuOpen && <div className="landing-mobile-nav"><a href="#explore" onClick={() => setMenuOpen(false)}>Ways to explore</a><a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a><a href="#global" onClick={() => setMenuOpen(false)}>Global access</a><a href="#questions" onClick={() => setMenuOpen(false)}>FAQ</a><Link to="/install" onClick={() => setMenuOpen(false)}>Get the app</Link><Link to="/login" onClick={() => setMenuOpen(false)}>Sign in</Link><button className="landing-theme-toggle" onClick={() => setDark(!dark)}>{dark ? <Sun size={16} /> : <Moon size={16} />} Toggle theme</button><Link className="mobile-nav-cta" to="/register" onClick={() => setMenuOpen(false)}>Register Free <ArrowRight size={15} /></Link></div>}
     </header>
     <main>
       <section className="landing-hero">
+        <div className="hero-flag-watermark" aria-hidden="true"><CountryFlag country={selectedCountry} /></div>
         <div className="container hero-grid">
           <div className="hero-copy">
-            <span className="eyebrow"><Globe2 size={16} /> LIPAHUB GLOBAL <span className="hello">Built in East Africa</span></span>
+            <span className="eyebrow"><CountryFlag country={selectedCountry} /> LIPAHUB {selectedCountryLabel.toUpperCase()} <span className="hello">Built in East Africa</span></span>
             <h1>Learn, connect and explore <span className="hl">something new.</span></h1>
             <p className="sub">Build digital skills, explore new ideas, connect with a worldwide community, and discover honest, practical online-work guidance you can use from anywhere.</p>
             <div className="cta-row"><Link className="button btn-green btn-lg" to="/register">Create Your Account</Link><button className="button btn-outline btn-lg" onClick={demo}>Explore LipaHub</button></div>
@@ -50,7 +143,7 @@ export function Landing() {
             </div>
           </div>
           <div className="wallet">
-            <div className="wallet-head"><b>Explore LipaHub</b><span><Globe2 size={14} /> Worldwide</span></div>
+            <div className="wallet-head"><b>Explore LipaHub</b><span><CountryFlag country={selectedCountry} /> {selectedCountryLabel}</span></div>
             <div className="wallet-row"><div className="ic"><Bot size={19} /></div><div className="lbl">Trading simulations<small>Practice strategies with virtual funds</small></div><div className="amt">Learn</div></div>
             <div className="wallet-row"><div className="ic"><BookOpen size={19} /></div><div className="lbl">Learning resources<small>Guides, articles and digital-skills resources</small></div><div className="amt">Explore</div></div>
             <div className="wallet-row"><div className="ic"><MessageCircle size={19} /></div><div className="lbl">Community<small>Connect with others and share ideas</small></div><div className="amt">Connect</div></div>
