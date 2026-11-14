@@ -182,6 +182,14 @@ test('admin supports Rwanda instructions and Binance TRC asset/network details',
   await expect(page.locator('.admin-payment-instructions')).toContainText('TEST TRC NETWORK')
   await expect(page.locator('.payment-plan-summary')).toContainText('19.96 USD')
 })
+test('Uganda and Kenya default to their mobile money providers', async ({ page }) => {
+  await admin(page)
+  const headings = page.locator('.admin-method-editor h3')
+  await page.getByLabel('Payment country').selectOption('Uganda')
+  await expect(headings).toHaveText(['MTN Uganda', 'Airtel'])
+  await page.getByLabel('Payment country').selectOption('Kenya')
+  await expect(headings).toHaveText(['Mpesa', 'Airtel'])
+})
 test('private proof and admin API routes reject unauthenticated and forged-role requests', async ({ request }) => {
   const api = 'http://127.0.0.1:3001/api/robot-payments'
   for (const path of ['/requests', '/instructions/Burundi', '/admin/requests', '/requests/not-mine/files/not-mine']) expect((await request.get(api + path)).status()).toBe(401)

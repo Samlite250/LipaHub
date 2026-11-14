@@ -18,7 +18,7 @@ export function paymentRequestTitle(row: Pick<PaymentRequest, 'purpose' | 'planI
 export type SubmitProof = { country: Country; planId: string; methodId: string; instructionVersion: number; fullName: string; phone: string; transactionReference: string; files: File[]; purpose?: 'robot_activation' | 'account_activation' }
 
 export function defaultInstructions(country: Country): PaymentInstructions {
-  const names = country === 'Burundi' ? ['Lumicash', 'Code'] : country === 'Rwanda' ? ['MTN', 'Airtel'] : ['Binance TRC']
+  const names = country === 'Burundi' ? ['Lumicash', 'Code'] : country === 'Rwanda' ? ['MTN', 'Airtel'] : country === 'Uganda' ? ['MTN Uganda', 'Airtel'] : country === 'Kenya' ? ['Mpesa', 'Airtel'] : ['Binance TRC']
   return { country, version: 0, updatedAt: null, intakeEnabled: false, methods: names.map((name, i) => ({ id: `${country.toLowerCase().replaceAll(' ', '-')}-${i + 1}`, name, recipient: '', accountName: '', asset: '', network: name === 'Binance TRC' ? 'TRC' : '', instructions: '', enabled: false })) }
 }
 export function validateInstructions(value: PaymentInstructions): string | null {

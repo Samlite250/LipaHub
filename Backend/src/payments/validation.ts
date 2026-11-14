@@ -30,7 +30,7 @@ export function quote(planId: unknown, region: string) {
   return { value: valueMinor / factor, bonus: bonusMinor / factor, valueMinor, bonusMinor, currency, rateDate: catalog.fx.date, catalogVersion: catalog.version }
 }
 export function defaultMethods(region: string) {
-  const names = region === 'Burundi' ? ['Lumicash', 'Code'] : region === 'Rwanda' ? ['MTN', 'Airtel'] : ['Binance TRC']
+  const names = region === 'Burundi' ? ['Lumicash', 'Code'] : region === 'Rwanda' ? ['MTN', 'Airtel'] : region === 'Uganda' ? ['MTN Uganda', 'Airtel'] : region === 'Kenya' ? ['Mpesa', 'Airtel'] : ['Binance TRC']
   return names.map((name, index) => ({ id: `${region.toLowerCase().replaceAll(' ', '-')}-${index + 1}`, name, recipient: '', accountName: '', asset: '', network: name === 'Binance TRC' ? 'TRC' : '', instructions: '', enabled: false }))
 }
 export function instructions(input: Record<string, unknown>, region: string) {
