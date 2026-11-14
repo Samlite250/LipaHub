@@ -53,8 +53,12 @@ export function robotMarket(country: unknown) {
 export function formatRobotMoney(value: number, country: unknown): string {
   const currency = robotMarket(country).currency
   if (!currency) return 'Not available'
-  const digits = currencyDigits(currency)
-  return `${value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${currency === 'BIF' ? 'Fbu' : currency}`
+  return `${formatRobotAmount(value, country)} ${currency === 'BIF' ? 'Fbu' : currency}`
+}
+export function formatRobotAmount(value: number, country: unknown): string {
+  const currency = robotMarket(country).currency
+  const digits = currency ? currencyDigits(currency) : 0
+  return value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 export function robotWallet(ids: readonly string[], country: unknown) {
   const active = ROBOT_CATALOG.filter(robot => ids.includes(robot.id) && getRobotTerms(robot.id, country))

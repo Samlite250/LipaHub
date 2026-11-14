@@ -69,4 +69,7 @@
 .compact-payment .proof-thumbnails>div{background:var(--surface)}
 .compact-payment .check-label{align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
 .compact-payment .check-label input{accent-color:#14b8a6;margin-top:2px}
-.compact-payment .payment-wide{box-shadow:0 8px 18px -10px #14b8a6cc;letter-spacing:.2px}
+.compact-payment .payment-wide{box-shadow:0 8px 18px -10px #14b8a6cc;letter-spacing:.2px}.compact-payment .pay-header{justify-content:center}
+.compact-payment .pay-wordmark{font-size:22px}
+.compact-payment .admin-payment-instructions .payment-plan-summary{margin:0 0 7px;padding:0 0 8px;border:0;border-bottom:1px dashed var(--line);border-radius:0;background:none;box-shadow:none}
+.compact-payment .admin-payment-instructions .payment-plan-summary .quick-copy{width:28px;height:28px}
