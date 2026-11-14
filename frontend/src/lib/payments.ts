@@ -34,7 +34,7 @@ export function reviewProof(access: PaymentAccess, id: string, status: 'under_re
 export async function proofImageUrl(access: PaymentAccess, request: PaymentRequest, fileId: string): Promise<string> {
   if ('demoId' in access) {
     const file = request.files.find(file => file.id === fileId)
-    if (!file?.blob) throw new Error('This preview image is unavailable.')
+    if (!file?.blob) throw new Error('This image is unavailable.')
     return URL.createObjectURL(file.blob)
   }
   return (await api<{ url: string }>(access, `/requests/${request.id}/files/${fileId}`)).url

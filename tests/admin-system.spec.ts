@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 async function admin(page: Page, section: string) {
   await page.goto(`/admin/${section}`)
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
-  await expect(page.locator('.admin-environment')).toContainText('Demo workspace')
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
+  await expect(page.locator('.admin-environment')).toContainText('Local workspace')
 }
 async function adminLink(page: Page, name: string) {
   const toggle = page.getByRole('button', { name: 'Open admin navigation' })

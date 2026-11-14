@@ -31,7 +31,7 @@ function GuidePage({ eyebrow, title, lead, children }: { eyebrow: string; title:
 }
 
 export function AboutPage() {
-  return <GuidePage eyebrow="ABOUT LIPAHUB" title="A global learning and community hub rooted in East Africa" lead="LipaHub brings learning resources, community, digital-skills guidance and transparent product previews to members worldwide.">
+  return <GuidePage eyebrow="ABOUT LIPAHUB" title="A global learning and community hub rooted in East Africa" lead="LipaHub brings learning resources, community, digital-skills guidance and practical online-work insights to members worldwide.">
     <h2>What LipaHub is</h2>
     <p>LipaHub is an online learning and community platform for people exploring digital opportunities. Built in East Africa and open globally, it gives members a private profile, published resources and announcements, support, and clearly labelled simulations.</p>
     <p>Our public guides explain online work, digital skills and the questions people should ask before trusting any earning opportunity. LipaHub is not a job board and does not promise employment or guaranteed income.</p>
@@ -57,13 +57,13 @@ export function AboutPage() {
 export function GlobalPage() {
   return <GuidePage eyebrow="LIPA HUB GLOBAL" title="A global learning and community hub, built in East Africa" lead="LipaHub works globally. Members can learn, connect and explore digital opportunities from any country, with clear local context where services differ.">
     <h2>Global by design</h2>
-    <p>LipaHub is accessible worldwide through the web app. Our East African roots shape the mission, but the learning dashboard, community preview, resources, support and public guides are designed for an international audience.</p>
+    <p>LipaHub is accessible worldwide through the web app. Our East African roots shape the mission, but the learning dashboard, community lounge, resources, support and public guides are designed for an international audience.</p>
     <p>LipaHub is also searched as LipaHub1 in some countries. The platform name, account experience and public guides are the same wherever a member joins.</p>
     <h2>What global members can do</h2>
     <ul className="guide-list">
       <li><CheckCircle2 size={16} /> Create a private account and manage a member profile.</li>
       <li><CheckCircle2 size={16} /> Read published learning resources and announcements.</li>
-      <li><CheckCircle2 size={16} /> Preview community features while rewards remain in development.</li>
+      <li><CheckCircle2 size={16} /> Explore community features while rewards are being prepared.</li>
       <li><CheckCircle2 size={16} /> Explore crypto trading simulations using virtual funds only.</li>
       <li><CheckCircle2 size={16} /> Contact support and use the public online-work guides.</li>
     </ul>
@@ -71,16 +71,16 @@ export function GlobalPage() {
     <p>Members join from Africa, Europe, North America, Asia, the Middle East, Latin America and Oceania. Country selection helps present relevant payment and activation information when those services are available. Payment and withdrawal services are not live yet, and availability will vary by country.</p>
     <div className="guide-grid">
       <section><h3>Africa</h3><p>Rwanda, Uganda, Kenya, Burundi, Nigeria, Ghana, South Africa and other African markets can use the web platform and public guides.</p></section>
-      <section><h3>Europe and the UK</h3><p>Members can access the learning dashboard, community preview and online-work guidance from any supported browser.</p></section>
+      <section><h3>Europe and the UK</h3><p>Members can access the learning dashboard, community lounge and online-work guidance from any supported browser.</p></section>
       <section><h3>The Americas</h3><p>Members in North, Central and South America can use the same global account and learning resources.</p></section>
       <section><h3>Asia-Pacific and the Middle East</h3><p>LipaHub is designed for international access, with local payment coverage added only when it is genuinely available.</p></section>
     </div>
     <h2>Online work and earning worldwide</h2>
     <p>Searches for <strong>earn online</strong>, <strong>Akazikeza</strong> and the <strong>best-paying jobs in the whole world</strong> often lead to unrealistic promises. There is no universal list of the best-paying jobs, and pay depends on skills, experience, language, location and demand. Our <Link className="text-link" to="/online-work">global online work guide</Link> explains how to evaluate an opportunity before sharing money or personal information.</p>
     <h2>LipaHub Business worldwide</h2>
-    <p>Organizations in East Africa and across the world can read the <Link className="text-link" to="/business">LipaHub Business overview</Link> to understand the planned direction for learning, content and community partnerships.</p>
+    <p>Organizations in East Africa and across the world can read the <Link className="text-link" to="/business">LipaHub Business overview</Link> to understand the intended direction for learning, content and community partnerships.</p>
     <h2>Important limits</h2>
-    <p>LipaHub does not guarantee jobs, income, investment returns or visa outcomes. Trading is an educational simulation. Payments and withdrawals are planned and remain unavailable until the required providers and reviews are complete.</p>
+    <p>LipaHub does not guarantee jobs, income, investment returns or visa outcomes. Trading is an educational simulation. Payments and withdrawals are not live yet and will remain unavailable until the required providers and reviews are complete.</p>
     <p><Globe2 size={16} /> Built in East Africa. Open worldwide.</p>
   </GuidePage>
 }
@@ -91,12 +91,12 @@ export function EastAfricaPage() {
     <p>People across East Africa search for learning, digital skills, online work and better opportunities. LipaHub brings those interests into one account while keeping the limits of each service clear.</p>
     <div className="guide-grid">
       <section><h3>LipaHub Rwanda</h3><p>Rwandan members can create an account, explore learning content and follow the account-activation steps required for new registrations. Kinyarwanda and English are supported in the interface.</p></section>
-      <section><h3>LipaHub Uganda</h3><p>Members in Uganda can use LipaHub to explore digital-skills resources, community previews and simulation-based education. Country-specific payment services are introduced only when configured.</p></section>
+      <section><h3>LipaHub Uganda</h3><p>Members in Uganda can use LipaHub to explore digital-skills resources, community features and simulation-based education. Country-specific payment services are introduced only when configured.</p></section>
       <section><h3>LipaHub Kenya</h3><p>Kenyan members can access the same learning dashboard and public guides. Always verify any online opportunity independently and never pay an upfront fee without written terms.</p></section>
       <section><h3>LipaHub Burundi</h3><p>LipaHub is designed to support Burundian members with the same account, learning and support experience, while respecting local payment availability.</p></section>
     </div>
     <h2>Part of a global platform</h2>
-    <p>LipaHub is built in East Africa and open worldwide. Members in East Africa use the same global learning dashboard, community preview and online-work guide as members in other regions. Read the <Link className="text-link" to="/global">LipaHub Global overview</Link> for international access details.</p>
+    <p>LipaHub is built in East Africa and open worldwide. Members in East Africa use the same global learning dashboard, community lounge and online-work guide as members in other regions. Read the <Link className="text-link" to="/global">LipaHub Global overview</Link> for international access details.</p>
     <h2>Online work, Akazikeza and digital skills</h2>
     <p>If you are searching for online work, Akazikeza, side opportunities or the best-paying jobs in East Africa or the world, start with skills and verification rather than promises. Our <Link className="text-link" to="/online-work">online work guide</Link> explains how to evaluate an opportunity and what LipaHub does and does not provide.</p>
     <h2>Start with LipaHub</h2>
@@ -125,16 +125,16 @@ export function OnlineWorkPage() {
     <h2>What about Akazikeza and “earn online” searches?</h2>
     <p>People use terms such as Akazikeza or “earn online” when looking for small opportunities or extra income. Treat every offer with the same checks: verify the source, understand the task and avoid paying to receive work. A legitimate opportunity should not depend on recruiting other people or making an unexplained payment.</p>
     <h2>Where LipaHub fits</h2>
-    <p>LipaHub provides learning resources, community previews and simulation-based education for members worldwide. It does not guarantee a job, income or investment return. Use the platform to build knowledge and evaluate opportunities carefully, not as a substitute for independent verification.</p>
+    <p>LipaHub provides learning resources, community features and simulation-based education for members worldwide. It does not guarantee a job, income or investment return. Use the platform to build knowledge and evaluate opportunities carefully, not as a substitute for independent verification.</p>
     <div className="guide-note"><ShieldCheck size={18} /><p>If an offer promises guaranteed daily income with no clear employer or product, stop and verify it before sharing money or personal information.</p></div>
   </GuidePage>
 }
 
 export function BusinessPage() {
-  return <GuidePage eyebrow="LIPA HUB BUSINESS" title="Global learning, content and community partnerships" lead="LipaHub Business is the planned path for organizations that want to contribute learning content, community programmes or member support across East Africa and worldwide.">
+  return <GuidePage eyebrow="LIPA HUB BUSINESS" title="Global learning, content and community partnerships" lead="LipaHub Business is the intended path for organizations that want to contribute learning content, community programmes or member support across East Africa and worldwide.">
     <h2>What we are building</h2>
     <p>LipaHub Business is intended for training providers, community organizations, employers and support teams that share an interest in practical digital-skills education. The direction includes learning-content collaboration, member education and community programmes across borders.</p>
-    <p>Business partnerships are not yet open. This page explains the planned direction so organizations can start a conversation without assuming that a service is already available.</p>
+    <p>Business partnerships are not yet open. This page explains the intended direction so organizations can start a conversation without assuming that a service is already available.</p>
     <h2>Who it is for</h2>
     <div className="guide-grid">
       <section><h3>Learning providers</h3><p>Organizations with courses, articles or practical guides that could support members building digital skills anywhere in the world.</p></section>

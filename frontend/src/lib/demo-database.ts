@@ -14,7 +14,7 @@ export async function openDemoDatabase(): Promise<IDBDatabase> {
       }
     }
     opening.onsuccess = () => resolve(opening.result)
-    opening.onerror = () => reject(new Error('Browser preview storage is unavailable.'))
+    opening.onerror = () => reject(new Error('Browser storage is unavailable.'))
   })
   try {
     if (await idbResult(db.transaction('migrations').objectStore('migrations').get('legacy-payments'))) return db

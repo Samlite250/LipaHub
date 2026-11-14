@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises'
 
 async function admin(page: Page) {
   await page.goto('/admin/payments')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await expect(page.getByRole('button', { name: 'Save payment instructions' })).toBeVisible()
 }
 async function configureBurundi(page: Page, both = false) {
@@ -17,12 +17,12 @@ async function configureBurundi(page: Page, both = false) {
     await section.getByLabel(`Publish ${name}`).check()
   }
   await page.getByRole('button', { name: 'Save payment instructions' }).click()
-  await expect(page.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
+  await expect(page.getByRole('status')).toHaveText('Instructions saved in this browser.')
 }
 async function member(page: Page, country = 'Burundi') {
   await page.goto('/register')
   await selectCountry(page, country)
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page.locator('.robot-card')).toHaveCount(33)
 }
 async function image(page: Page) {
@@ -36,7 +36,6 @@ async function image(page: Page) {
 async function proofFields(page: Page) {
   await page.getByLabel('Full names').fill('Preview Member')
   await page.getByLabel('Phone number', { exact: true }).fill('+25779000000')
-  await page.getByLabel('Transaction reference (optional)').fill('PREVIEW-NO-PAYMENT')
   await page.locator('input[type=file]').setInputFiles(await image(page))
   await page.getByRole('checkbox').check()
   await expect(page.getByRole('button', { name: 'Submit payment proof' })).toBeEnabled()
@@ -149,7 +148,7 @@ test('proof validation and changed instruction versions prevent invalid submissi
   await admin(second)
   await second.getByLabel('Instructions for Lumicash').fill('UPDATED TEST INSTRUCTIONS. No money should be sent.')
   await second.getByRole('button', { name: 'Save payment instructions' }).click()
-  await expect(second.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
+  await expect(second.getByRole('status')).toHaveText('Instructions saved in this browser.')
   await second.close()
   await page.getByRole('button', { name: 'Submit payment proof' }).click()
   await expect(page.getByRole('alert')).toContainText('instructions changed')
@@ -167,7 +166,7 @@ test('admin supports Rwanda instructions and Binance TRC asset/network details',
   await mtn.getByLabel('Instructions for MTN').fill('RWANDA TEST INSTRUCTIONS. Do not send a payment.')
   await mtn.getByLabel('Publish MTN').check()
   await page.getByRole('button', { name: 'Save payment instructions' }).click()
-  await expect(page.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
+  await expect(page.getByRole('status')).toHaveText('Instructions saved in this browser.')
   await page.getByLabel('Payment country').selectOption('International')
   await page.getByLabel('Recipient phone / code / wallet address').fill('DEMO-ADDRESS-DO-NOT-SEND')
   await page.getByLabel('Crypto asset').fill('TESTASSET')
@@ -175,7 +174,7 @@ test('admin supports Rwanda instructions and Binance TRC asset/network details',
   await page.getByLabel('Instructions for Binance TRC').fill('CRYPTO TEST INSTRUCTIONS. Do not transfer assets.')
   await page.getByLabel('Publish Binance TRC').check()
   await page.getByRole('button', { name: 'Save payment instructions' }).click()
-  await expect(page.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
+  await expect(page.getByRole('status')).toHaveText('Instructions saved in this browser.')
   await member(page, 'International')
   await page.getByTestId('robot-01').getByRole('button').click()
   await expect(page.locator('.admin-payment-instructions')).toContainText('TESTASSET')

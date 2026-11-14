@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises'
 
 async function open(page: Page, route: string) {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await page.goto(`/dashboard/${route}`)
 }
 test('deposit shows Rwanda providers, expands details and returns to the dashboard', async ({ page }) => {

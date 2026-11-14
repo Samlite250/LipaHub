@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises'
 
 test('wallet welcome matches LipaHub branding and CLICK HERE opens installation help', async ({ page }, info) => {
   await page.goto('/login')
-  await page.getByRole('button', {name: 'Explore the demo'}).click()
+  await page.getByRole('button', {name: 'Open practice workspace'}).click()
   await expect(page.locator('.wallet-welcome')).toContainText('Welcome to LipaHub')
   await expect(page.locator('.wallet-welcome')).toContainText('Courses, videos, games, trivia & referrals')
   await expect(page.locator('.hello-badge')).toContainText('Hello, Alex')

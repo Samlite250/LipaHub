@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 
 test('Rwanda navigation matches the supplied menu and keeps the existing submenu behavior', async ({ page }, info) => {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   if (info.project.name === 'mobile') await page.getByRole('button', { name: 'Toggle navigation' }).click()
   const menu = page.locator('.sidebar nav')
   await expect(menu.locator('.nav-caption')).toHaveText(['Main', 'Accounts', 'Products', 'Settings'])
@@ -37,7 +37,7 @@ test('Rwanda navigation matches the supplied menu and keeps the existing submenu
 })
 
 test('country selection switches Rwanda menu without replacing other country menus', async ({ page }, info) => {
-  await page.goto('/login'); await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.goto('/login'); await page.getByRole('button', { name: 'Open practice workspace' }).click()
   for (const country of ['Burundi', 'Rwanda']) {
     await page.goto('/dashboard/profile')
     await selectCountry(page, country)

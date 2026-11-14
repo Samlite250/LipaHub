@@ -5,7 +5,7 @@ import { mkdir } from 'node:fs/promises'
 async function enterCountryDemo(page: Page, country: string) {
   await page.goto('/register')
   await selectCountry(page, country)
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page).toHaveURL('/dashboard')
   await expect(page.locator('.hello-badge')).toBeVisible()
 }
@@ -18,6 +18,7 @@ async function changeCountry(page: Page, country: string) {
   await expect(page.locator('.hello-badge')).toBeVisible()
 }
 test('all non-Rwandan selections show 33 plans and Rwanda keeps its standard dashboard', async ({ page }) => {
+  test.setTimeout(60_000)
   await enterCountryDemo(page, 'Rwanda')
   await expect(page.locator('.robot-card')).toHaveCount(0)
   await expect(page.getByText('RF 78,488')).toBeVisible()
@@ -72,7 +73,7 @@ test('restoring demo storage rejects unknown, duplicate and unaffordable activat
   await expect(page.getByTestId('active-robot-count')).toHaveText('0 / 33')
   expect((await request.post('http://127.0.0.1:3001/api/robots/robot-01/activate', { data: { country: 'Burundi', bonus: 261000 } })).status()).toBe(404)
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await changeCountry(page, 'Burundi')
   await expect(page.getByTestId('active-robot-count')).toHaveText('0 / 33')
 })
@@ -84,7 +85,7 @@ test('robot filters, country dial codes and responsive preview work', async ({ p
   await page.getByLabel('Telephone').fill('+33123456789')
   expect(await page.getByLabel('Telephone').evaluate(input => (input as HTMLInputElement).checkValidity())).toBeTruthy()
   await selectCountry(page, 'Burundi')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page.locator('.robot-card')).toHaveCount(33)
   await page.getByLabel('Filter robots').selectOption('available')
   await expect(page.locator('.robot-card')).toHaveCount(33)

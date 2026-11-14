@@ -9,7 +9,7 @@ async function adminLink(page: Page, name: string) {
 
 test('admin counts and filters saved submissions and opens a specific request from overview', async ({ page }) => {
   await page.goto('/admin')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await expect(page.getByRole('heading', { name: 'No payment markets published' })).toBeVisible()
   await expect(page.locator('.admin-market-panel')).toContainText(`0 of ${countries.length}`)
   await page.evaluate(async () => {
@@ -59,11 +59,11 @@ test('admin counts and filters saved submissions and opens a specific request fr
 
 test('withdrawals administration is reachable and stays live-only in the demo', async ({ page }) => {
   await page.goto('/admin')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await adminLink(page, 'Withdrawals')
   await expect(page.locator('.admin-page-title').getByRole('heading', { name: 'Withdrawal review', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Live administrator access required' })).toBeVisible()
-  await expect(page.locator('.admin-live-only')).toContainText('not simulated in the demo workspace')
+  await expect(page.locator('.admin-live-only')).toContainText('not available in the local workspace')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy()
 })
 
@@ -71,7 +71,7 @@ test('admin overview connects country settings, review filters and audit on desk
   await page.goto('/admin')
   await expect(page.getByRole('heading', { name: 'Admin workspace', exact: true })).toBeVisible()
   await expect(page.locator('.admin-metrics')).toHaveCount(0)
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await expect(page.locator('.admin-metric').filter({ hasText: 'Payment proofs to review' }).locator('strong')).toHaveText('0')
   await expect(page.getByRole('heading', { name: 'No payment markets published' })).toBeVisible()
   await expect(page.locator('.admin-market-panel')).toContainText(`0 of ${countries.length}`)
@@ -82,7 +82,7 @@ test('admin overview connects country settings, review filters and audit on desk
   await method.getByLabel('Instructions for Lumicash').fill('Test instructions only. Do not send a payment.')
   await method.getByLabel('Publish Lumicash').check()
   await page.getByRole('button', { name: 'Save payment instructions' }).click()
-  await expect(page.getByRole('status')).toHaveText('Demo instructions saved in this browser.')
+  await expect(page.getByRole('status')).toHaveText('Instructions saved in this browser.')
   await adminLink(page, 'Overview')
   await expect(page.locator('.admin-metric').filter({ hasText: 'Published payment markets' }).locator('strong')).toHaveText('1')
   await expect(page.locator('.admin-market-grid > button')).toHaveCount(1)
@@ -105,7 +105,7 @@ test('admin overview connects country settings, review filters and audit on desk
 test('mobile admin navigation opens from the hamburger and closes after use', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/admin')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   const toggle = page.getByRole('button', { name: 'Open admin navigation' })
   const sidebar = page.locator('.admin-sidebar')
   await expect(toggle).toBeVisible()

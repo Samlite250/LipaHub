@@ -4,7 +4,7 @@ import { balanceInput, minorAmount } from '../Backend/src/admin/balances'
 
 async function openWallet(page: Page) {
   await page.goto('/admin/users')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await page.getByRole('button', { name: /Manage balances/ }).first().click()
   await expect(page.getByLabel('New available balance', { exact: true })).toBeVisible()
 }
@@ -58,7 +58,7 @@ test('admin balance edits persist, update member dashboards and keep country wal
 
 test('balance storage rejects stale edits and request reuse, and conserves adjustment entries', async ({ page }) => {
   await page.goto('/admin/users')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   await expect(page.locator('.admin-user-table tbody tr')).toHaveCount(1)
   const result = await page.evaluate(async () => {
     const path = '/src/lib/balances.ts'
@@ -84,7 +84,7 @@ test('balance storage rejects stale edits and request reuse, and conserves adjus
 
 test('all eight admin tabs including support are shown and every tab has working controls', async ({ page }) => {
   await page.goto('/admin')
-  await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.getByRole('button', { name: 'Open local workspace' }).click()
   const navigation = page.locator('.admin-sidebar nav')
   await expect(navigation.getByRole('link')).toHaveCount(8)
   await expect(navigation.getByRole('link', { name: 'Activity', exact: true })).toHaveCount(0)

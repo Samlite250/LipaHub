@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('member balance history shows saved corrections after a reload', async ({ page }) => {
-  await page.goto('/login'); await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.goto('/login'); await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await page.goto('/dashboard/transactions')
   await expect(page.getByRole('heading', { name: 'Balance history' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'No balance changes yet' })).toBeVisible()
@@ -17,16 +17,16 @@ test('member balance history shows saved corrections after a reload', async ({ p
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Balance history' })).toBeVisible()
   await expect(page.getByRole('cell', { name: 'RF 250', exact: true })).toBeVisible()
-  await expect(page.getByText('Not available yet', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('In development', { exact: true })).toHaveCount(0)
 })
 
 test('support in demo requires a real account and admin inbox is routed', async ({ page }) => {
-  await page.goto('/login'); await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.goto('/login'); await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await page.goto('/dashboard/support')
   await expect(page.getByRole('heading', { name: 'Member support' })).toBeVisible()
   await expect(page.getByText('Sign in with a real account', { exact: false })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Submit request' })).toHaveCount(0)
-  await page.goto('/admin/support'); await page.getByRole('button', { name: 'Open admin demo' }).click()
+  await page.goto('/admin/support'); await page.getByRole('button', { name: 'Open local workspace' }).click()
   await expect(page.getByRole('heading', { name: 'Support inbox', exact: true, level: 2 })).toBeVisible()
   await expect(page.getByText('Sign in with an administrator account to respond to real member requests.')).toBeVisible()
 })

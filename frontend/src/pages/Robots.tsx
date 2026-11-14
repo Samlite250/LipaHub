@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { ArrowRight, Bot, Check, CheckCircle2, Gift, Globe2, Lightbulb, RotateCcw, Search, ShieldCheck, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowRight, Bot, Check, CheckCircle2, Gift, Globe2, Lightbulb, RotateCcw, Search, TrendingUp, Wallet } from 'lucide-react'
 import { RobotPlanIcon } from '../RobotPlanIcon'
 import { hasRobotDashboard, normalizeCountry } from '../domain/countries'
 import { formatRobotMoney, getRobotTerms, ROBOT_CATALOG, ROBOT_FX_REFERENCE, robotMarket, robotWallet, type Robot } from '../domain/robots'
@@ -12,6 +12,7 @@ import './Robots.css'
 import { useMemberBalance } from '../useMemberBalance'
 import { walletMoney } from '../domain/balances'
 import { WalletWelcome } from '../WalletWelcome'
+import { InviteLink } from '../InviteLink'
 
 export function RobotsPage() {
   const { demo, session } = useApp()
@@ -64,7 +65,7 @@ export function RobotDashboard() {
       <section className="stat-card red"><h2>{t('totalActivatedValue')}</h2><span className="stat-icon"><TrendingUp size={24} strokeWidth={1.5} /></span><strong data-testid="robot-activated-value">{market.currency ? money(demo ? wallet.spent : approved.reduce((sum, row) => sum + row.quote.value, 0)) : t('unavailable')}</strong><small>{t('approvedActivationValue')}</small></section>
       <section className="stat-card yellow"><h2>{t('availableFunds')}</h2><span className="stat-icon"><Wallet size={24} strokeWidth={1.5} /></span><strong data-testid="robot-funds">{account.wallet ? walletMoney(account.wallet.availableMinor, account.wallet.currency) : account.error ? t('unavailable') : t('loadingText')}</strong><small>{t('accountBalance')}</small></section>
     </div>
-    <div className="notice robot-simulation-notice"><ShieldCheck size={20} /><p>{t('robotSimulationNotice')}</p></div>
+    <InviteLink />
     {account.error && <p className="form-error" role="alert">{account.error} <button className="text-link" onClick={account.refresh}>{t('retryBalance')}</button></p>}
     {paymentError && <p className="form-error" role="alert">{paymentError}</p>}
     {resetNotice && <p className="form-success" role="status">{t('practiceResetPrefix')} {country}{t('practiceResetSuffix')}</p>}

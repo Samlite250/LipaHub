@@ -79,7 +79,7 @@ export function AdminWithdrawals({ access, revision, onChanged }: { access: Paym
     <div className="admin-section-banner"><span className="icon-chip teal"><Banknote size={22} /></span><div><h2>Withdrawal review</h2><p>Approve, reject and settle member withdrawal requests. Intake can stay disabled while existing requests are reviewed.</p></div><button className="button secondary small" disabled={!live || loading} onClick={() => { setNotice(''); setError(''); setTick(value => value + 1) }}><RefreshCw size={15} className={loading ? 'admin-spin' : ''} />Refresh</button></div>
     {notice && <p className="form-success" role="status">{notice}</p>}
     {error && <p className="form-error" role="alert">{error}</p>}
-    {!live ? <div className="panel admin-live-only"><ShieldCheck size={30} /><h3>Live administrator access required</h3><p>Withdrawals move real account funds and are not simulated in the demo workspace. Sign in with an administrator account to review live requests.</p></div> : <>
+    {!live ? <div className="panel admin-live-only"><ShieldCheck size={30} /><h3>Live administrator access required</h3><p>Withdrawals move real account funds and are not available in the local workspace. Sign in with an administrator account to review live requests.</p></div> : <>
       <div className="admin-queue-summary">{[
         ['attention', 'Needs attention', counts.attention],
         ['approved', 'Approved, awaiting payout', counts.approved],

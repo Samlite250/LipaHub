@@ -5,7 +5,7 @@ import { dirname } from 'node:path'
 
 async function demo(page: Page) {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page).toHaveURL('/dashboard')
   await expect(page.locator('.hello-badge')).toBeVisible()
 }
@@ -35,12 +35,12 @@ test('unconfigured authentication never pretends to log in or send email', async
   await page.getByRole('button', { name: 'Show password' }).click()
   await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'text')
   await page.getByRole('button', { name: 'Sign In', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('Live accounts are not connected')
+  await expect(page.getByRole('alert')).toContainText('Account sign-in is temporarily unavailable')
   await page.getByRole('link', { name: 'Forgot password?' }).click()
   await expect(page.getByRole('alert')).toHaveCount(0)
   await page.getByLabel('Email', { exact: true }).fill('preview@example.com')
   await page.getByRole('button', { name: 'Send reset link' }).click()
-  await expect(page.getByRole('alert')).toContainText('Live accounts are not connected')
+  await expect(page.getByRole('alert')).toContainText('Account sign-in is temporarily unavailable')
 })
 test('registration validates matching passwords and switches language', async ({ page }) => {
   await page.goto('/register')
@@ -54,7 +54,7 @@ test('registration validates matching passwords and switches language', async ({
   await expect(page.getByRole('alert')).toHaveText('Passwords must match.')
   await page.getByLabel('Confirm password').fill('test1234')
   await page.getByRole('button', { name: 'Sign Up', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('Live accounts are not connected')
+  await expect(page.getByRole('alert')).toContainText('Account sign-in is temporarily unavailable')
   await page.getByRole('button', { name: 'Kinyarwanda' }).click()
   await expect(page.getByRole('heading', { name: 'Tangira Nonaha' })).toBeVisible()
   await page.reload()
@@ -63,7 +63,7 @@ test('registration validates matching passwords and switches language', async ({
 test('dashboard demo, hidden balances, theme, profile and sign out', async ({ page }, info) => {
   await demo(page)
   await expect(page.locator('.dashboard-shell')).not.toContainText(/\bdemo\b/i)
-  await expect(page.getByText('Virtual balances', { exact: true })).toBeVisible()
+  await expect(page.getByText('Balances overview', { exact: true })).toBeVisible()
   await expect(page.getByText('RF 78,488')).toBeVisible()
   const userDetails = page.locator('.user-details-panel')
   await expect(userDetails.getByRole('heading', { name: 'User Details' })).toBeVisible()
@@ -194,7 +194,7 @@ test('chat displays text safely and clears it when leaving', async ({ page }) =>
   await demo(page)
   await page.goto('/dashboard/chat')
   await page.getByLabel('Your message').fill('<img src=x onerror=alert(1)> Hello!')
-  await page.getByRole('button', { name: 'Send preview message' }).click()
+  await page.getByRole('button', { name: 'Send message' }).click()
   await expect(page.locator('.chat-message')).toContainText('<img src=x onerror=alert(1)> Hello!')
   await expect(page.locator('.chat-message img')).toHaveCount(0)
   await page.goto('/dashboard')
@@ -205,7 +205,7 @@ test('future payment and admin pages expose no financial controls', async ({ pag
   await demo(page)
   for (const route of ['pay-for-client', 'ranks', 'claim-bonus', 'surveys', 'ads', 'social', 'shop']) {
     await page.goto(`/dashboard/${route}`)
-    await expect(page.getByText('Not available yet', { exact: true })).toBeVisible()
+    await expect(page.getByText('In development', { exact: true })).toBeVisible()
     await expect(page.locator('main form')).toHaveCount(0)
   }
   for (const route of ['support', 'courses', 'articles', 'ebooks']) {
@@ -215,7 +215,7 @@ test('future payment and admin pages expose no financial controls', async ({ pag
   }
   await page.goto('/admin')
   await expect(page.getByRole('heading', { name: 'Admin workspace' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Open admin demo' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Open local workspace' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Save payment instructions' })).toHaveCount(0)
 })
 test('API requires real authentication and leaves financial services disabled', async ({ request }) => {

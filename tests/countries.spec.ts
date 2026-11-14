@@ -41,7 +41,7 @@ test('a newly supported country persists as a named market through profile and d
   await page.locator('.iti__selected-country').click()
   await page.locator('.iti__country[data-iso2=cd]').click()
   await selectCountry(page, 'DR Congo')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page.locator('.robot-region')).toHaveText('DR Congo')
   await expect(page.locator('.robot-card')).toHaveCount(33)
   await page.goto('/dashboard/profile')
@@ -103,7 +103,7 @@ test('Country includes worldwide selections and preserves them in the profile', 
     await expect(menu).toHaveValue(country)
   }
   await selectCountry(page, 'France')
-  await page.getByRole('button', { name: 'Explore the demo' }).click()
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
   await expect(page.locator('.robot-region')).toHaveText('France')
   await expect(page.locator('.robot-card')).toHaveCount(33)
   await page.goto('/dashboard/profile')

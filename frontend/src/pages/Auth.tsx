@@ -47,7 +47,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
     e.preventDefault(); setError(''); setMessage('')
     const fields = new FormData(e.currentTarget)
     if (isRegister && fields.get('password') !== fields.get('confirm')) { setError('Passwords must match.'); return }
-    if (!supabase) { setError('Live accounts are not connected yet. Use “Explore the demo” to preview LipaHub.'); return }
+    if (!supabase) { setError(demoEnabled ? 'Account sign-in is temporarily unavailable. Open the practice workspace to continue.' : 'Account sign-in is temporarily unavailable. Please try again shortly or contact support.'); return }
     setBusy(true)
     try {
       const email = String(fields.get('email')).trim()
@@ -110,7 +110,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
       </section>
       {demoEnabled && <button className="demo-link" onClick={() => { startDemo(isRegister ? country : undefined); navigate(destination) }}>{t('demoEnter')} <ArrowRight size={14} /></button>}
       {!isRegister && <Languages />}
-      <p className="auth-footnote"><ShieldCheck size={13} /> {demoEnabled ? 'Development preview · Demo accounts use sample data' : 'Private accounts · Secure sign-in'}</p>
+      <p className="auth-footnote"><ShieldCheck size={13} /> {demoEnabled ? 'Practice workspace · Local practice data' : 'Private accounts · Secure sign-in'}</p>
     </div>
   </main>
 }

@@ -46,7 +46,7 @@ const pages: Record<string, SeoEntry> = {
     title: 'LipaHub Business | Global Learning & Community Partnerships',
     description: 'Learn about LipaHub Business, future partnership opportunities, learning content and community collaboration across East Africa and worldwide.',
     path: '/business',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub Business', url: `${siteUrl}/business`, description: 'Planned LipaHub learning, content and community partnerships across East Africa and worldwide.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: 'LipaHub Business', url: `${siteUrl}/business`, description: 'LipaHub learning, content and community partnerships across East Africa and worldwide.', isPartOf: { '@id': `${siteUrl}/#website` }, about: { '@id': `${siteUrl}/#organization` } },
   },
   '/install': {
     title: 'Install the LipaHub App | Learn and Connect on Mobile',
@@ -55,12 +55,12 @@ const pages: Record<string, SeoEntry> = {
   },
   '/terms': {
     title: 'LipaHub Terms of Use',
-    description: 'Read the LipaHub terms of use for the development preview, educational simulations and member accounts.',
+    description: 'Read the LipaHub terms of use for educational simulations, community features and member accounts.',
     path: '/terms',
   },
   '/privacy': {
     title: 'LipaHub Privacy Notice',
-    description: 'Read how LipaHub handles account, demo, payment-proof and browser-storage data in the development preview.',
+    description: 'Read how LipaHub handles account, payment-proof, community and browser-storage data.',
     path: '/privacy',
   },
   '/login': {

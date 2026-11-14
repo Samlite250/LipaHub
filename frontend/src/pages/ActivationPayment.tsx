@@ -67,8 +67,7 @@ export function ActivationPayment({ robot, country, access, request, close, subm
     if (!instructions || !ready) { setError(t('instructionsUnavailable')); return }
     setBusy(true)
     try {
-      const fields = new FormData(event.currentTarget)
-      submitted(await submitProof(access, { country, planId: robot.id, methodId, instructionVersion: instructions.version, fullName, phone, transactionReference: String(fields.get('reference') || ''), files }))
+      submitted(await submitProof(access, { country, planId: robot.id, methodId, instructionVersion: instructions.version, fullName, phone, transactionReference: '', files }))
     } catch (err) { setError(err instanceof Error ? err.message : 'Submission failed. Check your request history before retrying.') }
     finally { setBusy(false) }
   }
@@ -101,19 +100,17 @@ export function ActivationPayment({ robot, country, access, request, close, subm
           </> : <div className="payment-unconfigured"><LockKeyhole size={24} /><h3>{t('notPublishedTitle')}</h3><p>{t('notPublishedBody')}</p>{isDemo && <Link className="text-link" to="/admin/payments" onClick={close}>{t('openAdminWorkspace')}</Link>}</div>}
         </section>
         {ready && <form className="proof-form" onSubmit={submit}>
-          <section className="payment-form-section"><h3><span>2</span> {t('yourPaymentDetails')}</h3><div className="proof-contact-fields">
+          <section className="payment-form-section"><h3><span>2</span> {t('submitPaymentProof')}</h3><div className="proof-contact-fields">
             <label>{t('fullNames')}<input name="fullName" value={fullName} onChange={event => setFullName(event.target.value)} minLength={2} maxLength={120} autoComplete="name" disabled={busy} required /></label>
             <label>{t('phoneNumber')}<input name="phone" aria-label="Phone number" aria-describedby={phoneHelp} value={phone} onChange={event => setPhone(event.target.value)} type="tel" placeholder="+25779000000" pattern="[+][1-9][0-9]{6,14}" autoComplete="tel" disabled={busy} required /><small id={phoneHelp}>{t('includeCountryCode')}</small></label>
-          </div><label>{t('transactionReferenceOptional')}<input name="reference" maxLength={100} disabled={busy} /></label></section>
-          <section className="payment-form-section"><h3><span>3</span> {t('uploadYourScreenshot')}</h3>
-            <label className="proof-upload"><ImagePlus size={22} /><span>{t('paymentScreenshots')}</span><small>{t('screenshotsHelp')}</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void selectFiles(Array.from(event.target.files || []))} /></label>
-            <div className="proof-thumbnails">{files.map((file, i) => <div key={`${file.name}-${i}`}><img src={urls[i]} alt={`${t('selectedScreenshot')} ${i + 1}`} /><span>{file.name}</span><button type="button" className="icon-button" disabled={busy} aria-label={`${t('removeScreenshot')} ${i + 1}`} onClick={() => setFiles(previous => previous.filter((_, index) => index !== i))}><X size={15} /></button></div>)}</div>
+          </div>
+          <label className="proof-upload"><ImagePlus size={22} /><span>{t('paymentScreenshots')}</span><small>{t('screenshotsHelp')}</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void selectFiles(Array.from(event.target.files || []))} /></label>
+          <div className="proof-thumbnails">{files.map((file, i) => <div key={`${file.name}-${i}`}><img src={urls[i]} alt={`${t('selectedScreenshot')} ${i + 1}`} /><span>{file.name}</span><button type="button" className="icon-button" disabled={busy} aria-label={`${t('removeScreenshot')} ${i + 1}`} onClick={() => setFiles(previous => previous.filter((_, index) => index !== i))}><X size={15} /></button></div>)}</div>
           </section>
           <label className="check-label"><input type="checkbox" disabled={busy} required /><span>{t('confirmDetails')}</span></label>
           <button className="button primary payment-wide" disabled={busy || !files.length}>{busy ? t('submitting') : t('submitPaymentProof')}</button>
         </form>}
       </>}
     </>}
-    <p className="payment-security"><CheckCircle2 size={14} />{t('screenshotsPrivate')}</p>
   </div></Modal>
 }
