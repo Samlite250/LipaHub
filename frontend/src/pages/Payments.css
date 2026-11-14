@@ -39,4 +39,34 @@
 @media(max-width:600px){.compact-payment .proof-contact-fields{grid-template-columns:1fr}.compact-payment .admin-payment-instructions dt{min-width:60px}}.compact-payment .pay-head>div{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .compact-payment .pay-head>div>strong{font-size:18px;font-weight:700;line-height:1.2}
 .compact-payment .pay-head>div>small{color:var(--muted);font-size:9px;line-height:1.4}
-.compact-payment .compact-upload{position:relative}
+.compact-payment .compact-upload{position:relative}.compact-payment .pay-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 0 10px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.compact-payment .pay-wordmark{font-size:21px;font-weight:800;letter-spacing:-.7px;line-height:1;color:var(--text)}
+.compact-payment .pay-wordmark>span{color:var(--teal)}
+.compact-payment .pay-secure{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid #14b8a633;border-radius:999px;background:#14b8a612;color:var(--teal);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.compact-payment .payment-plan-summary{background:linear-gradient(135deg,#14b8a614,var(--soft) 60%);border-color:#14b8a633;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.compact-payment .pay-head>span{text-transform:uppercase;letter-spacing:.6px;font-size:9px;font-weight:700}
+.compact-payment .pay-head>div>strong{font-size:22px;letter-spacing:-.5px}
+.compact-payment .quick-copy{box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .15s,border-color .15s,color .15s,background .15s}
+.compact-payment .quick-copy:hover{border-color:#14b8a6;color:var(--teal);transform:translateY(-1px)}
+.compact-payment .quick-copy:focus-visible{outline:2px solid #14b8a6;outline-offset:1px}
+.compact-payment .quick-copy.done{border-color:#16a34a66;background:#16a34a12;color:#16a34a}
+.compact-payment .payment-methods>button{position:relative;justify-content:center;border-radius:8px;background:var(--surface);font-weight:600;transition:border-color .15s,background .15s,box-shadow .15s}
+.compact-payment .payment-methods>button.selected{border-color:#14b8a6;background:#14b8a60f;box-shadow:0 0 0 1px #14b8a6 inset,0 1px 2px rgba(0,0,0,.04)}
+.compact-payment .payment-methods>button:hover:not(:disabled){border-color:#14b8a680}
+.compact-payment .admin-payment-instructions{border-color:var(--line);background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.compact-payment .pay-details-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;margin-bottom:7px;border-bottom:1px dashed var(--line)}
+.compact-payment .pay-details-head>span{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.compact-payment .pay-details-head>small{font-size:10px;font-weight:700;color:var(--teal)}
+.compact-payment .admin-payment-instructions dt{text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.compact-payment .admin-payment-instructions dd{font-variant-numeric:tabular-nums}
+.compact-payment .payment-recipient{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;font-weight:600;letter-spacing:.2px}
+.compact-payment .compact-upload{border:1.5px dashed #14b8a666;background:#14b8a608;transition:border-color .15s,background .15s}
+.compact-payment .compact-upload:hover{border-color:#14b8a6;background:#14b8a612}
+.compact-payment .compact-upload>span{font-weight:700;color:var(--teal)}
+.compact-payment .proof-contact-fields>input{border:1px solid var(--line);border-radius:8px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.compact-payment .proof-contact-fields>input:focus{outline:none;border-color:#14b8a6;box-shadow:0 0 0 3px #14b8a622}
+.compact-payment .proof-contact-fields>input::placeholder{color:var(--muted)}
+.compact-payment .proof-thumbnails>div{background:var(--surface)}
+.compact-payment .check-label{align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
+.compact-payment .check-label input{accent-color:#14b8a6;margin-top:2px}
+.compact-payment .payment-wide{box-shadow:0 8px 18px -10px #14b8a6cc;letter-spacing:.2px}
