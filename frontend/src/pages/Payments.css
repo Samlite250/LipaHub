@@ -72,4 +72,11 @@
 .compact-payment .payment-wide{box-shadow:0 8px 18px -10px #14b8a6cc;letter-spacing:.2px}.compact-payment .pay-header{justify-content:center}
 .compact-payment .pay-wordmark{font-size:22px}
 .compact-payment .admin-payment-instructions .payment-plan-summary{margin:0 0 7px;padding:0 0 8px;border:0;border-bottom:1px dashed var(--line);border-radius:0;background:none;box-shadow:none}
-.compact-payment .admin-payment-instructions .payment-plan-summary .quick-copy{width:28px;height:28px}
+.compact-payment .admin-payment-instructions .payment-plan-summary .quick-copy{width:28px;height:28px}.instruction-field{grid-column:1/-1}
+.instruction-field-label{display:block;font-size:12px;font-weight:600;margin-bottom:7px;color:var(--text)}
+.instruction-format{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px}
+.instruction-format>button{display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--text);font-size:13px;line-height:1}
+.instruction-format>button:hover{border-color:#14b8a6;background:var(--soft);color:var(--teal)}
+.instruction-format>button:focus-visible{outline:2px solid #14b8a6;outline-offset:1px}
+.instruction-format>small{font-size:10px;color:var(--muted);margin-left:2px}
+.instruction-field textarea{width:100%;min-height:120px;resize:vertical}

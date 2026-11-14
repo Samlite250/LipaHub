@@ -1,34 +1,18 @@
 .invite-link-card { overflow: visible; }
-.invite-link-body { padding: 20px; }
-.invite-link-sections { border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.invite-link-section+.invite-link-section { border-top: 1px solid var(--line); }
-.invite-link-toggle { display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; background: var(--bg); padding: 13px 16px; color: var(--text); font: inherit; font-size: 13px; font-weight: 600; text-align: left; }
-.invite-link-section+.invite-link-section>.invite-link-toggle { background: var(--surface); }
-.invite-link-toggle>svg { flex-shrink: 0; color: var(--muted); transition: transform 220ms ease; }
-.invite-link-toggle[aria-expanded=true]>svg { transform: rotate(180deg); }
-.invite-link-collapse { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 220ms ease, visibility 220ms; }
-.invite-link-collapse[data-open=true] { grid-template-rows: 1fr; visibility: visible; }
-.invite-link-fields { min-height: 0; overflow: hidden; }
-.invite-link-fields>input { display: block; width: 100%; min-width: 0; border: 0; border-radius: 5px; padding: 10px 13px; background: var(--soft); color: var(--text); font: inherit; font-size: 12px; }
-.invite-link-fields>.button { padding: 9px 15px; min-height: 37px; font-size: 12px; font-weight: 700; margin: 4px 0 0; border-radius: 5px; }
-.invite-share-caption { margin: 20px 0 14px; font-size: 13px; }
-.invite-link-username { margin: 0 0 14px; font-size: 13px; overflow-wrap: anywhere; }
-.invite-link-username strong { color: var(--teal); }
-.invite-share-links { display: flex; flex-wrap: wrap; align-items: center; gap: 1px; }
-.invite-share-links>a { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 7px; }
-.invite-share-links>a:hover { background: var(--bg); }
-.invite-whatsapp { color: #25d366; }.invite-twitter { color: #00aced; }.invite-facebook { color: #3b5998; }.invite-email { color: #bb001b; }
-.invite-link-note,.invite-link-status { font-size: 10px; line-height: 1.8; color: var(--muted); margin-top: 12px; }
-.invite-link-status:empty { display: none; }
+.invite-link-body { padding: 0; }
+.invite-link-fields { display: flex; flex-direction: column; gap: 8px; }
+.invite-link-fields > input { display: block; width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px; background: var(--bg); color: var(--text); font: inherit; font-size: 12px; }
+.invite-link-fields > input:focus { border-color: var(--teal); outline: none; }
+.invite-link-fields > .button { width: 100%; min-height: 36px; padding: 8px 14px; font-size: 12px; font-weight: 700; border-radius: 7px; }
+.invite-link-note, .invite-link-status { font-size: 10px; line-height: 1.7; color: var(--muted); margin: 0; }
 .invite-link-status { color: var(--teal); }
-.invite-link-options { position: relative; }
-.invite-link-options>summary { display: grid; place-items: center; width: 28px; height: 28px; color: var(--muted); background: var(--bg); border-radius: 5px; cursor: pointer; list-style: none; }
-.invite-link-options>summary::-webkit-details-marker { display: none; }
-.invite-link-options>div { position: absolute; right: 0; top: 34px; width: 150px; padding: 5px; background: var(--surface); border: 1px solid var(--line); border-radius: 7px; box-shadow: var(--shadow); z-index: 10; }
-.invite-link-options button { display: block; width: 100%; padding: 10px; text-align: left; font-size: 12px; border-radius: 5px; }
-.invite-link-options button:hover { background: var(--soft); color: var(--teal); }
-.invite-link-toggle:focus-visible,.invite-share-links>a:focus-visible,.invite-link-options>summary:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
-@media(max-width:479px) { .invite-link-body { padding: 17px; }.invite-link-toggle,.invite-share-caption { font-size: 12px; } }
-@media(prefers-reduced-motion:reduce) { .invite-link-collapse,.invite-link-toggle>svg { transition: none; } }
-
-.invite-share-links svg { display: block; flex-shrink: 0; }
+.invite-link-status:empty { display: none; }
+.invite-link-card .panel-heading { min-height: 0; padding: 12px 14px; }
+.invite-link-card .panel-heading h2 { font-size: 11px; }
+.invite-link-card .panel-heading h2:before { top: 0; height: 14px; }
+.wallet-hero .invite-link-card { margin-top: 16px; border-color: #ffffff4d; }
+.robot-hero .invite-link-card { margin-top: 18px; border-color: #ffffff4d; }
+@media (min-width: 560px) {
+  .invite-link-fields { flex-direction: row; align-items: center; }
+  .invite-link-fields > .button { width: auto; flex-shrink: 0; }
+}

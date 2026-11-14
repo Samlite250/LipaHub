@@ -5,6 +5,7 @@ import { Languages, Logo } from '../components'
 import { useApp } from '../state'
 import { useAccountActivation } from '../lib/account-activation'
 import { submitProof } from '../lib/payments'
+import { renderInstructions } from '../lib/instructions'
 import { validateProofImages, type PaymentMethod, type PaymentRequest } from '../domain/payments'
 import './AccountActivation.css'
 
@@ -81,7 +82,7 @@ export function AccountActivation() {
         {ready ? <>
           <p className="activation-amount">{tr('Activation payment', 'Amafaranga yo gufungura konti')}: <strong>RF {Number(method.amountMinor).toLocaleString('en-US')}</strong></p>
           <section className="activation-instructions"><p>{tr('Send payment to:', 'Ohereza ubwishyu kuri:')}</p><div className="activation-recipient"><strong>{method.recipient}</strong><button type="button" onClick={() => void copyRecipient()}>{copied ? 'Copied' : 'Copy'}</button></div>
-            {method.accountName && <p>{method.accountName}</p>}<p className="activation-procedure">{method.instructions}</p>
+            {method.accountName && <p>{method.accountName}</p>}<p className="activation-procedure">{renderInstructions(method.instructions)}</p>
           </section>
           <form className="activation-proof-form" onSubmit={submit}>
             <p>{tr('Enter your official names as registered on your mobile money account:', 'Shyiramo amazina yawe yanditse kuri konti ya mobile money:')}</p>

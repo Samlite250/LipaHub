@@ -6,6 +6,7 @@ import type { Country } from '../domain/countries'
 import { formatRobotAmount, formatRobotMoney, getRobotTerms, type Robot } from '../domain/robots'
 import { validateProofImages, type PaymentAccess, type PaymentInstructions, type PaymentRequest } from '../domain/payments'
 import { loadInstructions, submitProof } from '../lib/payments'
+import { renderInstructions } from '../lib/instructions'
 import { useApp } from '../state'
 import './Payments.css'
 
@@ -93,7 +94,7 @@ export function ActivationPayment({ robot, country, access, request, close, subm
             {method.recipient && <div><dt>{method.name === 'Binance TRC' ? t('walletAddress') : t('paymentRecipient')}</dt><dd className="payment-recipient">{method.recipient}</dd><button type="button" className={copied === 'recipient' ? 'quick-copy done' : 'quick-copy'} aria-label={copyLabel('recipient', method.name === 'Binance TRC' ? t('copyAddress') : t('copyNumber'))} title={copyLabel('recipient', method.name === 'Binance TRC' ? t('copyAddress') : t('copyNumber'))} onClick={() => void copy('recipient', method.recipient)}>{copied === 'recipient' ? <CheckCircle2 size={14} /> : <Copy size={14} />}</button></div>}
             {method.accountName && <div><dt>{t('recipientName')}</dt><dd>{method.accountName}</dd></div>}
             {method.asset && <div><dt>{t('assetLabel')}</dt><dd>{method.asset}</dd></div>}{method.network && <div><dt>{t('networkLabel')}</dt><dd>{method.network}</dd></div>}
-          </dl>{method.instructions && <p>{method.instructions}</p>}</div>
+          </dl>{method.instructions && <p>{renderInstructions(method.instructions)}</p>}</div>
           <label className="proof-upload compact-upload"><ImagePlus size={18} /><span>{files.length ? `${files.length} ${t('screenshotsLabel')}` : t('uploadYourScreenshot')}</span><small>{t('screenshotsHelp')}</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void selectFiles(Array.from(event.target.files || []))} /></label>
           {files.length > 0 && <div className="proof-thumbnails">{files.map((file, i) => <div key={`${file.name}-${i}`}><img src={urls[i]} alt={`${t('selectedScreenshot')} ${i + 1}`} /><span>{file.name}</span><button type="button" className="icon-button" disabled={busy} aria-label={`${t('removeScreenshot')} ${i + 1}`} onClick={() => setFiles(previous => previous.filter((_, index) => index !== i))}><X size={15} /></button></div>)}</div>}
           <div className="proof-contact-fields">

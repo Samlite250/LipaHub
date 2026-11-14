@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowDownLeft, ArrowRight, Banknote, BookOpen, ChevronRight, CreditCard, FileCheck2, Globe2, Image, LayoutDashboard, LifeBuoy, LogOut, Menu, Megaphone, RefreshCw, ScrollText, Search, Settings2, ShieldCheck, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Logo, Modal } from '../components'
@@ -21,6 +21,29 @@ import { formatRobotMoney } from '../domain/robots'
 import { paymentRequestTitle } from '../domain/payments'
 
 function paymentAmount(value: number, country: string) { return country === 'Rwanda' ? `RF ${value.toLocaleString('en-US')}` : formatRobotMoney(value, country) }
+function InstructionsField({ name, value, onChange, required }: { name: string; value: string; onChange: (value: string) => void; required: boolean }) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  function wrap(marker: string) {
+    const field = ref.current
+    if (!field) return
+    const start = field.selectionStart
+    const end = field.selectionEnd
+    const selected = value.slice(start, end)
+    onChange(`${value.slice(0, start)}${marker}${selected || 'text'}${marker}${value.slice(end)}`)
+    const from = start + marker.length
+    window.requestAnimationFrame(() => { field.focus(); field.setSelectionRange(from, from + (selected || 'text').length) })
+  }
+  return <div className="instruction-field">
+    <span className="instruction-field-label">Instructions for {name}</span>
+    <div className="instruction-format" role="toolbar" aria-label={`Formatting for ${name}`}>
+      <button type="button" aria-label="Bold" title="Bold" onClick={() => wrap('**')}><strong>B</strong></button>
+      <button type="button" aria-label="Italic" title="Italic" onClick={() => wrap('*')}><em>I</em></button>
+      <button type="button" aria-label="Underline" title="Underline" onClick={() => wrap('__')}><u>U</u></button>
+      <small>Select text, then apply a style.</small>
+    </div>
+    <textarea ref={ref} aria-label={`Instructions for ${name}`} value={value} onChange={event => onChange(event.target.value)} maxLength={4000} required={required} placeholder="Enter the exact payment steps, recipient details and any reference the member must include." />
+  </div>
+}
 
 type AdminTab = 'overview' | 'instructions' | 'proofs' | 'withdrawals' | 'content' | SystemSection
 type NavId = 'overview' | 'payments' | 'withdrawals' | 'support' | 'users' | 'content' | 'audit' | 'settings'
@@ -231,7 +254,7 @@ export function AdminPayments() {
               <label>Recipient phone / code / wallet address<input value={method.recipient} onChange={event => editMethod(method.id, { recipient: event.target.value })} maxLength={200} /></label>
               <label>Recipient name (if applicable)<input value={method.accountName} onChange={event => editMethod(method.id, { accountName: event.target.value })} maxLength={120} /></label>
               {country === 'Rwanda' && <label>Activation amount (RWF) for {method.name}<input type="number" min="1" max="999999999999" step="1" value={method.amountMinor ?? ''} onChange={event => editMethod(method.id, {amountMinor: event.target.value ? Number(event.target.value) : null})} required={method.enabled} /></label>}{method.name === 'Binance TRC' && <><label>Crypto asset<input value={method.asset} onChange={event => editMethod(method.id, { asset: event.target.value })} maxLength={40} required={method.enabled} /></label><label>Payment network<input value={method.network} onChange={event => editMethod(method.id, { network: event.target.value })} maxLength={80} required={method.enabled} /></label></>}
-              <label>Instructions for {method.name}<textarea value={method.instructions} onChange={event => editMethod(method.id, { instructions: event.target.value })} maxLength={4000} required={method.enabled} placeholder="Enter the exact payment steps, recipient details and any reference the member must include." /></label>
+              <InstructionsField name={method.name} value={method.instructions} onChange={value => editMethod(method.id, { instructions: value })} required={method.enabled} />
             </div></section>)}
             <div className="admin-save-bar"><p>Version {config.version}<span>{preview ? 'Published options appear in the local member workspace.' : config.intakeEnabled ? 'Proof intake enabled.' : 'Proof intake disabled on the server.'}</span></p><button className="button primary" disabled={busy || loading}>{busy ? 'Saving…' : 'Save payment instructions'}</button></div>
           </form>}</section>}
