@@ -42,12 +42,13 @@ test('global positioning and target keywords are visible', async ({ page }) => {
 test('welcome page keeps the responsive landing layout and navigation usable', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('Take LipaHub with you')).toBeVisible()
+  await expect(page.locator('.install-banner')).toBeVisible()
   await expect(page.getByRole('heading', { name: /Learn, connect and explore something new/ })).toBeVisible()
-  await expect(page.locator('.landing-feature')).toHaveCount(4)
+  await expect(page.locator('.landing-feature')).toHaveCount(7)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
   if ((page.viewportSize()?.width ?? 0) <= 700) {
     await page.getByRole('button', { name: 'Open navigation' }).click()
-    await expect(page.getByRole('link', { name: 'Create account' })).toBeVisible()
+    await expect(page.locator('.landing-mobile-nav').getByRole('link', { name: 'Register Free' })).toBeVisible()
     await page.getByRole('link', { name: 'How it works' }).click()
     await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible()
   }
