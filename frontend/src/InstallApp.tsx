@@ -25,7 +25,7 @@ export function InstallAppButton({ label = 'Install LipaHub', className = 'butto
   return <>
     <button type="button" className={className} onClick={() => void install()} disabled={busy}>{label}</button>
     {open && <Modal title={installed ? 'LipaHub is installed' : 'Install the LipaHub app'} close={() => setOpen(false)}>
-      <div className="install-app-heading"><img src="/icons/app-192.png" width="56" height="56" alt="LipaHub app icon" /><p>The same LipaHub website, account and content, opened from your home screen.</p></div>
+      <div className="install-app-heading"><img src="/icons/app-192.png?v=2" width="56" height="56" alt="LipaHub app icon" /><p>The same LipaHub website, account and content, opened from your home screen.</p></div>
       {message && <p role="status" className="install-app-message">{message}</p>}
       {installed ? <p>Open LipaHub from your home screen or app list. You can also keep using this website.</p> : <>
         <ol className="install-app-steps">

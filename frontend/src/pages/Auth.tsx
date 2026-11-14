@@ -75,7 +75,8 @@ export function AuthPage({ mode }: { mode: Mode }) {
   }
   return <main className={`auth-page ${isRegister ? 'registration' : ''}`} key={mode}>
     <Link className="back-home" to="/"><ArrowLeft size={15} /> LipaHub home</Link>
-    <div className="auth-wrap"><Logo />
+    <div className="auth-wrap">
+      {isRegister ? <section className="registration-promo"><Logo /><h2>Learn, connect and discover something new.</h2><p>Learning and community, in one place.</p></section> : <Logo />}
       <section className="auth-card">
         {isRegister && <Languages />}
         <h1>{isRegister ? t('create') : isForgot ? t('reset') : t('signin')}</h1>
@@ -100,6 +101,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
           </>}
           {isRegister && <>
             <CountrySelect label={t('country')} value={country} onChange={setCountry} required />
+            {invitation.inviter && <label>Invited by<input value={invitation.inviter.name} readOnly /></label>}
             <label className="check-label"><input type="checkbox" name="terms" required /><span>{t('agree')} <Link to="/terms">{t('terms')}</Link> {t('and')} <Link to="/privacy">{t('privacy')}</Link>.</span></label>
           </>}
           {error && <p className="form-error" role="alert">{error}</p>}

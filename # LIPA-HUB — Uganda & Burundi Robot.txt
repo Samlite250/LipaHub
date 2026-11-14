@@ -1,0 +1,231 @@
+# LIPA-HUB — Uganda & Burundi Robot Plans Update
+
+## MAIN TASK
+
+Update the EXISTING Uganda and Burundi robot plans in LIPA-HUB.
+
+This is strictly a targeted configuration/data update.
+
+**IMPORTANT: Change ONLY robot purchase prices and their corresponding Direct Deposit Bonus values. Do not change designs, UI, functionality, or workflows.**
+
+---
+
+# 1. STRICT DEVELOPMENT RULES
+
+Before making changes:
+
+1. Inspect the existing codebase.
+2. Identify the existing Uganda and Burundi robot configurations.
+3. Identify how country-specific robot plans are stored and retrieved.
+4. Understand the existing purchase-price and bonus mapping.
+5. Update only the existing country-specific values.
+
+### DO NOT MODIFY:
+
+- Website design or UI.
+- Page layouts or components.
+- Colors, fonts, buttons, cards, or icons.
+- Robot purchasing workflows.
+- User dashboards.
+- Registration or login.
+- Deposit or withdrawal systems.
+- Payment gateways.
+- Referral systems.
+- Commission systems.
+- Other bonus structures.
+- Other countries' robot plans.
+- Database structures or API contracts unless absolutely necessary.
+
+Do not create duplicate plans.
+
+Do not refactor or rebuild existing functionality.
+
+**Make the smallest possible changes.**
+
+---
+
+# 2. UGANDA ROBOT PLANS 🇺🇬
+
+Country: Uganda  
+Currency: UGX  
+Number of plans: 33
+
+IMPORTANT:
+The first Uganda robot plan must now be 70,000 UGX instead of the previous 60,000 UGX.
+
+Its corresponding Direct Deposit Bonus remains 261,000 UGX.
+
+All other Uganda values remain exactly as listed below.
+
+| No. | Purchase Amount (UGX) | Direct Deposit Bonus (UGX) |
+|---:|---:|---:|
+| 1 | 70,000 | 261,000 |
+| 2 | 90,000 | 478,000 |
+| 3 | 120,000 | 520,000 |
+| 4 | 150,000 | 640,000 |
+| 5 | 180,000 | 700,000 |
+| 6 | 210,000 | 820,000 |
+| 7 | 240,000 | 960,000 |
+| 8 | 270,000 | 1,160,000 |
+| 9 | 300,000 | 1,380,000 |
+| 10 | 330,000 | 1,490,000 |
+| 11 | 360,000 | 1,620,000 |
+| 12 | 390,000 | 1,840,000 |
+| 13 | 420,000 | 2,260,000 |
+| 14 | 450,000 | 2,660,000 |
+| 15 | 480,000 | 3,060,000 |
+| 16 | 510,000 | 3,160,000 |
+| 17 | 540,000 | 3,360,000 |
+| 18 | 570,000 | 3,660,000 |
+| 19 | 600,000 | 4,000,000 |
+| 20 | 630,000 | 4,360,000 |
+| 21 | 660,000 | 4,660,000 |
+| 22 | 690,000 | 4,960,000 |
+| 23 | 710,000 | 5,360,000 |
+| 24 | 740,000 | 5,680,000 |
+| 25 | 770,000 | 6,060,000 |
+| 26 | 800,000 | 6,480,000 |
+| 27 | 830,000 | 6,900,000 |
+| 28 | 860,000 | 7,020,000 |
+| 29 | 890,000 | 7,390,000 |
+| 30 | 910,000 | 7,740,000 |
+| 31 | 940,000 | 8,060,000 |
+| 32 | 970,000 | 8,200,000 |
+| 33 | 1,000,000 | 8,600,000 |
+
+---
+
+# 3. BURUNDI ROBOT PLANS 🇧🇮
+
+Country: Burundi  
+Currency: FBu  
+Number of plans: 33
+
+Update the existing Burundi robot plans with these exact purchase amounts and corresponding Direct Deposit Bonus values.
+
+| No. | Purchase Amount (FBu) | Direct Deposit Bonus (FBu) |
+|---:|---:|---:|
+| 1 | 60,000 | 261,000 |
+| 2 | 90,000 | 478,000 |
+| 3 | 120,000 | 520,000 |
+| 4 | 150,000 | 640,000 |
+| 5 | 180,000 | 700,000 |
+| 6 | 210,000 | 820,000 |
+| 7 | 240,000 | 960,000 |
+| 8 | 270,000 | 1,160,000 |
+| 9 | 300,000 | 1,380,000 |
+| 10 | 330,000 | 1,490,000 |
+| 11 | 360,000 | 1,620,000 |
+| 12 | 390,000 | 1,840,000 |
+| 13 | 420,000 | 2,260,000 |
+| 14 | 450,000 | 2,660,000 |
+| 15 | 480,000 | 3,060,000 |
+| 16 | 510,000 | 3,160,000 |
+| 17 | 540,000 | 3,360,000 |
+| 18 | 570,000 | 3,660,000 |
+| 19 | 600,000 | 4,000,000 |
+| 20 | 630,000 | 4,360,000 |
+| 21 | 660,000 | 4,660,000 |
+| 22 | 690,000 | 4,960,000 |
+| 23 | 710,000 | 5,360,000 |
+| 24 | 740,000 | 5,680,000 |
+| 25 | 770,000 | 6,060,000 |
+| 26 | 800,000 | 6,480,000 |
+| 27 | 830,000 | 6,900,000 |
+| 28 | 860,000 | 7,020,000 |
+| 29 | 890,000 | 7,390,000 |
+| 30 | 910,000 | 7,740,000 |
+| 31 | 940,000 | 8,060,000 |
+| 32 | 970,000 | 8,200,000 |
+| 33 | 1,000,000 | 8,600,000 |
+
+---
+
+# 4. COUNTRY SEPARATION REQUIREMENTS
+
+This is extremely important.
+
+Uganda and Burundi must have independent country-specific robot configurations.
+
+- Uganda prices must use UGX.
+- Burundi prices must use FBu.
+- Uganda's first plan must be 70,000 UGX.
+- Burundi's first plan must remain 60,000 FBu.
+- Each country's robot plans must load according to the existing country-selection mechanism.
+- Changing Uganda values must not overwrite Burundi values.
+- Changing Burundi values must not overwrite Uganda values.
+- Do not affect other countries.
+
+If the application uses shared configuration, preserve its existing architecture and update only the appropriate country-specific entries.
+
+---
+
+# 5. DIRECT DEPOSIT BONUS REQUIREMENTS
+
+Preserve the existing Direct Deposit Bonus mechanism.
+
+Only update the corresponding values.
+
+Ensure:
+
+1. Every purchase amount maps to its exact corresponding bonus.
+2. The correct bonus is displayed for the selected robot.
+3. Existing bonus calculation logic continues functioning.
+4. The existing purchase process remains unchanged.
+5. No other bonus or commission system is affected.
+
+Do not introduce new bonus calculation methods or workflows.
+
+---
+
+# 6. VERIFICATION CHECKLIST
+
+After completing the changes, verify:
+
+### Uganda
+- [ ] All 33 robot plans are updated.
+- [ ] First plan is 70,000 UGX.
+- [ ] First plan bonus is 261,000 UGX.
+- [ ] Remaining 32 purchase/bonus pairs match this document.
+- [ ] Currency is UGX.
+
+### Burundi
+- [ ] All 33 robot plans are updated.
+- [ ] First plan is 60,000 FBu.
+- [ ] First plan bonus is 261,000 FBu.
+- [ ] Remaining 32 purchase/bonus pairs match this document.
+- [ ] Currency is FBu.
+
+### Overall
+- [ ] Uganda and Burundi configurations remain separate.
+- [ ] No duplicate robot plans were created.
+- [ ] Other countries remain unchanged.
+- [ ] Existing purchasing functionality still works.
+- [ ] Existing Direct Deposit Bonus functionality still works.
+- [ ] No UI or design changes were made.
+- [ ] No unrelated workflows were modified.
+
+---
+
+# 7. FINAL INSTRUCTION TO OPENCODE
+
+This task is NOT a redesign, rebuild, optimization, or refactoring project.
+
+It is strictly a targeted update of existing Uganda and Burundi robot plan purchase amounts and Direct Deposit Bonus values.
+
+Do not change anything else.
+
+Inspect first, make the smallest necessary changes, and verify both country configurations independently.
+
+When finished, provide a report containing:
+
+1. Files or database records updated.
+2. Number of Uganda plans updated.
+3. Number of Burundi plans updated.
+4. Confirmation of all 66 purchase/bonus mappings.
+5. Confirmation that Uganda's first plan is 70,000 UGX.
+6. Confirmation that Burundi's first plan is 60,000 FBu.
+7. Confirmation that other countries remain unchanged.
+8. Confirmation that no designs or workflows were changed.
+
+**FINAL RULE: ONLY UPDATE THE EXISTING UGANDA AND BURUNDI ROBOT PLAN VALUES. DO NOT TOUCH ANYTHING ELSE.**

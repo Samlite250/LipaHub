@@ -10,8 +10,6 @@
 .invite-link-card .panel-heading { min-height: 0; padding: 12px 14px; }
 .invite-link-card .panel-heading h2 { font-size: 11px; }
 .invite-link-card .panel-heading h2:before { top: 0; height: 14px; }
-.wallet-hero .invite-link-card { margin-top: 16px; border-color: #ffffff4d; }
-.robot-hero .invite-link-card { margin-top: 18px; border-color: #ffffff4d; }
 @media (min-width: 560px) {
   .invite-link-fields { flex-direction: row; align-items: center; }
   .invite-link-fields > .button { width: auto; flex-shrink: 0; }

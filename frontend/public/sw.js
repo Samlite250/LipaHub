@@ -1,6 +1,6 @@
-const OFFLINE_CACHE = 'lipahub-public-offline-v1'
+const OFFLINE_CACHE = 'lipahub-public-offline-v2'
 const OFFLINE_PAGE = '/offline.html'
-const PUBLIC_FILES = [OFFLINE_PAGE, '/favicon.svg', '/icons/app-192.png', '/icons/app-512.png', '/icons/app-maskable-512.png', '/icons/apple-touch-icon.png']
+const PUBLIC_FILES = [OFFLINE_PAGE, '/favicon.svg?v=2', '/icons/app-192.png?v=2', '/icons/app-512.png?v=2', '/icons/app-maskable-512.png?v=2', '/icons/apple-touch-icon.png?v=2']
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(OFFLINE_CACHE).then(cache => cache.addAll(PUBLIC_FILES)).then(() => self.skipWaiting()))
 })

@@ -12,6 +12,7 @@ test('invited registration shows the inviter above the fields and preserves the 
   await page.getByRole('link', {name: 'Sign Up', exact: true}).click()
   const banner = page.locator('.registration-invitation')
   await expect(banner).toHaveText('Invited by: Cynthia')
+  await expect(page.getByLabel('Invited by')).toHaveValue('Cynthia')
   expect((await banner.boundingBox())!.y).toBeLessThan((await page.locator('input[name=username]').boundingBox())!.y)
   await page.getByRole('button', {name: 'Kinyarwanda', exact: true}).click()
   await expect(banner).toHaveText('Ufashijwe na: Cynthia')

@@ -105,6 +105,8 @@ test('dashboard demo, hidden balances, theme, profile and sign out', async ({ pa
 test('invite link copies and offers a manual fallback', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (value: string) => { localStorage.setItem('lipahub-test-clipboard', value) } } }))
   await demo(page)
+  await expect(page.locator('.wallet-hero .invite-link-card')).toHaveCount(0)
+  await page.goto('/dashboard/referrals')
   const card = page.locator('.invite-link-card')
   const primary = card.getByRole('textbox', { name: 'Invite link URL', exact: true })
   const primaryUrl = await primary.inputValue()

@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { useApp } from './state'
 
 export function Logo({ compact = false }: { compact?: boolean }) {
-  return <Link to="/" className={`logo ${compact ? 'compact' : ''}`} aria-label="LipaHub home"><img src="/favicon.svg" alt="" width="36" height="36" /><span>LipaHub</span></Link>
+  return <Link to="/" className={`logo ${compact ? 'compact' : ''}`} aria-label="LipaHub home"><img src="/brand-mark.svg" alt="" width="36" height="36" /><span>LipaHub</span></Link>
 }
 export function Languages() {
   const { language, setLanguage } = useApp()
