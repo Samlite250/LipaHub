@@ -47,9 +47,21 @@ test('welcome page keeps the responsive landing layout and navigation usable', a
   await expect(page.locator('.landing-feature')).toHaveCount(7)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
   await page.evaluate(() => window.scrollTo(0, 1000))
-  await expect.poll(() => page.locator('.landing-header').evaluate(element => Math.round(element.getBoundingClientRect().top))).toBe(page.viewportSize()!.width <= 600 ? 64 : 57)
+  await expect.poll(() => page.locator('.landing-header').evaluate(element => Math.round(element.getBoundingClientRect().top))).toBe(page.viewportSize()!.width <= 600 ? 64 : 58)
   await expect(page.locator('.landing-header')).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 0))
+  if ((page.viewportSize()?.width ?? 0) > 900) {
+    const hero = await page.locator('.landing-hero').boundingBox()
+    const card = await page.locator('.wallet').boundingBox()
+    expect(hero?.height).toBeGreaterThanOrEqual(560)
+    expect(hero?.height).toBeLessThanOrEqual(590)
+    expect(card?.x).toBeGreaterThanOrEqual(700)
+    expect(card?.x).toBeLessThanOrEqual(730)
+    expect(card?.width).toBeGreaterThanOrEqual(400)
+    expect(card?.width).toBeLessThanOrEqual(430)
+    expect(card?.height).toBeGreaterThanOrEqual(340)
+    expect(card?.height).toBeLessThanOrEqual(370)
+  }
   if ((page.viewportSize()?.width ?? 0) <= 700) {
     await page.getByRole('button', { name: 'Open navigation' }).click()
     await expect(page.locator('.landing-mobile-nav').getByRole('link', { name: 'Register Free' })).toBeVisible()
