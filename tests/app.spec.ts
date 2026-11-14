@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import { selectCountry } from './helpers/country'
 
 async function demo(page: Page) {
   await page.goto('/login')
@@ -149,7 +150,7 @@ test('invite link copies and offers a manual fallback', async ({ page }) => {
   await demo(page)
   await expect(page.locator('.dashboard-service-invite-grid .invite-link-card')).toBeVisible()
   await expect(page.locator('.wallet-hero .invite-link-card')).toHaveCount(0)
-  await page.goto('/dashboard/referrals')
+  await page.goto('/dashboard/invite-earn')
   const card = page.locator('.invite-link-card')
   const primary = card.getByRole('textbox', { name: 'Invite link URL', exact: true })
   const primaryUrl = await primary.inputValue()
@@ -160,15 +161,41 @@ test('invite link copies and offers a manual fallback', async ({ page }) => {
   await expect(card.getByRole('status')).toHaveText('Link copied.')
   expect(await page.evaluate(() => localStorage.getItem('lipahub-test-clipboard'))).toBe(primaryUrl)
   await expect(card.locator('.invite-link-username')).toHaveCount(0)
-  await expect(card.locator('.invite-share-links')).toHaveCount(0)
-  await expect(card.getByRole('button', { name: 'Alternative link', exact: true })).toHaveCount(0)
+  await expect(card.locator('.invite-share-links a')).toHaveCount(4)
+  const alternativeToggle = card.getByRole('button', { name: 'Alternative link', exact: true })
+  await alternativeToggle.click()
+  await expect(alternativeToggle).toHaveAttribute('aria-expanded', 'true')
+  const alternative = card.getByRole('textbox', { name: 'Alternative invite link URL', exact: true })
+  await expect(alternative).toHaveValue(/\/i\/[A-Za-z0-9_-]{8}$/)
+  const alternativeUrl = await alternative.inputValue()
+  await page.goto(alternativeUrl)
+  await expect(page).toHaveURL(/\/register\?ref=Alex$/)
+  await page.goto('/dashboard/invite-earn')
+  const inviteCard = page.locator('.invite-link-card')
+  await inviteCard.getByRole('button', { name: 'Alternative link', exact: true }).click()
+  await inviteCard.getByRole('button', { name: 'Copy link', exact: true }).click()
+  expect(await page.evaluate(() => localStorage.getItem('lipahub-test-clipboard'))).toBe(alternativeUrl)
+  await inviteCard.getByRole('button', { name: 'Invite link', exact: true }).click()
   await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async () => { throw new Error('Clipboard unavailable') } } }))
-  await card.getByRole('button', { name: 'Copy link', exact: true }).click()
-  await expect(card.getByRole('status')).toContainText('copy it manually')
+  await inviteCard.getByRole('button', { name: 'Copy link', exact: true }).click()
+  await expect(inviteCard.getByRole('status')).toContainText('copy it manually')
   await expect(primary).toBeFocused()
   expect(await primary.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([0, (await primary.inputValue()).length])
   await page.setViewportSize({ width: 320, height: 800 })
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+})
+
+test('non-Rwanda navigation includes Invite & Earn under Accounts', async ({ page }, info) => {
+  await page.goto('/register')
+  await selectCountry(page, 'Burundi')
+  await page.getByRole('button', { name: 'Open practice workspace' }).click()
+  await expect(page).toHaveURL('/dashboard')
+  if (info.project.name === 'mobile') await page.getByRole('button', { name: 'Toggle navigation' }).click()
+  const inviteLink = page.getByRole('link', { name: 'Invite & Earn', exact: true })
+  await expect(inviteLink).toBeVisible()
+  await inviteLink.click()
+  await expect(page).toHaveURL('/dashboard/invite-earn')
+  await expect(page.locator('.invite-link-card')).toBeVisible()
 })
 
 test('simulation has both gains and losses, is deterministic and resets', async ({ page }) => {

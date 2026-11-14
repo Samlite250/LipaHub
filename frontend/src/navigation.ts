@@ -18,6 +18,7 @@ export const navigation: NavigationGroup[] = [
     { path: 'ranks', key: 'ranks' as TranslationKey, icon: Trophy, color: 'green' },
     { path: 'withdraw', key: 'withdraw' as TranslationKey, icon: Landmark, color: 'violet' },
     { path: 'claim-bonus', key: 'claimBonus', icon: Gift, color: 'teal' },
+    { path: 'invite-earn', label: 'Invite & Earn', icon: Share2, color: 'green' },
     { path: 'referrals', key: 'team', icon: Users, color: 'amber' },
     { path: 'transactions', key: 'transactionHistory', icon: History, color: 'amber' },
     { path: 'reversals', key: 'reversals', icon: RotateCcw, color: 'red' },

@@ -11,6 +11,7 @@ import { MemberContentPage } from './MemberContent'
 import { SupportPage } from './pages/Support'
 import { TransactionsPage } from './pages/Transactions'
 import { DepositPage, VoucherPage, WithdrawPage, TeamPage } from './pages/AccountTabs'
+import { InviteEarnPage } from './InviteLink'
 import { ConversationPage } from './pages/Conversations'
 import { invitationReference } from './lib/invitations'
 import { ShortInvitation } from './ShortInvitation'
@@ -62,6 +63,7 @@ export function App() {
       <Route path="voucher/history" element={<VoucherPage />} />
       <Route path="withdraw" element={<WithdrawPage />} />
       <Route path="withdraw/:source" element={<WithdrawPage />} />
+      <Route path="invite-earn" element={<InviteEarnPage />} />
       <Route path="referrals" element={<TeamPage />} />
       <Route path="referrals/:level" element={<TeamPage />} />
       <Route path="referrals/:level/:status" element={<TeamPage />} />
