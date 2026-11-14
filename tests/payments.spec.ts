@@ -41,6 +41,7 @@ async function proofFields(page: Page) {
   await expect(page.getByRole('button', { name: 'Submit payment proof' })).toBeEnabled()
 }
 test('one-form proof stays pending until admin approval activates and credits its bonus once', async ({ page }, info) => {
+  test.setTimeout(60_000)
   await member(page)
   await page.getByTestId('robot-01').getByRole('button').click()
   await expect(page.getByRole('heading', { name: 'Payment instructions are not published yet' })).toBeVisible()

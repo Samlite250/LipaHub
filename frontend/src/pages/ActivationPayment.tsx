@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle2, ClipboardList, Clock3, Copy, ImagePlus, LockKeyhole, X } from 'lucide-react'
 import { Modal } from '../components'
@@ -31,7 +31,6 @@ export function ActivationPayment({ robot, country, access, request, close, subm
   const [copyError, setCopyError] = useState('')
   const [fullName, setFullName] = useState(demo?.name || session?.user.user_metadata.display_name || '')
   const [phone, setPhone] = useState(session?.user.user_metadata.phone || '')
-  const phoneHelp = useId()
   const isDemo = 'demoId' in access
   const terms = getRobotTerms(robot.id, country)!
   const amount = formatRobotMoney(request?.quote.value ?? terms.value, country)
@@ -73,8 +72,8 @@ export function ActivationPayment({ robot, country, access, request, close, subm
   }
   const pending = request && request.status !== 'rejected'
   const approved = request?.status === 'verified'
-  return <Modal title={`${robot.name} ${t('activationSuffix')}`} close={close}><div className="activation-payment">
-    <div className="payment-plan-summary"><span>{country} · {robot.name}</span><strong>{amount}</strong><small>{t('activationPaymentLabel')} · {t('oneTimeBonus')} {formatRobotMoney(request?.quote.bonus ?? terms.bonus, country)} {t('afterAdminApproval')}</small></div>
+  return <Modal title={`${robot.name} ${t('activationSuffix')}`} close={close}><div className="activation-payment compact-payment">
+    <div className="payment-plan-summary"><div className="pay-head"><span>{country} · {t('activationPaymentLabel')}</span><div><strong>{amount}</strong><small>+{formatRobotMoney(request?.quote.bonus ?? terms.bonus, country)} {t('oneTimeBonus')}</small></div></div><button type="button" className="quick-copy" aria-label={copyLabel('amount', t('copyAmount'))} title={copyLabel('amount', t('copyAmount'))} onClick={() => void copy('amount', amount)}>{copied === 'amount' ? <CheckCircle2 size={15} /> : <Copy size={15} />}</button></div>
     {isDemo && <p className="payment-preview-note">{t('practiceModeNotice')}</p>}
     {pending ? <div className="proof-pending">{approved ? <CheckCircle2 size={30} /> : <Clock3 size={30} />}<h3>{approved ? t('paymentApprovedTitle') : request.status === 'under_review' ? t('proofUnderReviewTitle') : t('proofSubmittedTitle')}</h3>
       <p>{approved ? `${t('bonusCreditedPrefix')} ${formatRobotMoney(request.quote.bonus, country)} ${t('bonusCreditedSuffix')}` : t('adminWillCheck')}</p>
@@ -85,31 +84,22 @@ export function ActivationPayment({ robot, country, access, request, close, subm
       {error && <p className="form-error" role="alert">{error}</p>}
       {!loading && instructions && <>
         {request?.status === 'rejected' && <p className="payment-review-note">{t('previousRejectedPrefix')} {request.reviewNote}{t('previousRejectedSuffix')}</p>}
-        <section className="payment-form-section"><h3><span>1</span> {t('paymentInstructions')}</h3>
-          <div className="payment-methods">{instructions.methods.map(item => <button type="button" className={methodId === item.id ? 'selected' : ''} aria-pressed={methodId === item.id} disabled={!item.enabled || !instructions.intakeEnabled || busy} key={item.id} onClick={() => setMethodId(item.id)}><ClipboardList size={17} /><span>{item.name}<small>{item.enabled && instructions.intakeEnabled ? t('viewAdminInstructions') : t('notConfigured')}</small></span></button>)}</div>
-          {ready && method ? <>
-            <div className="payment-pay-summary">
-              <div className="pay-copy-card"><span>{t('amountToPay')}</span><strong>{amount}</strong><button type="button" className="copy-button" onClick={() => void copy('amount', amount)}>{copied === 'amount' ? <CheckCircle2 size={14} /> : <Copy size={14} />}{copyLabel('amount', t('copyAmount'))}</button></div>
-              {method.recipient && <div className="pay-copy-card"><span>{t('paymentNumber')}</span><strong className="pay-number">{method.recipient}</strong><button type="button" className="copy-button" onClick={() => void copy('recipient', method.recipient)}>{copied === 'recipient' ? <CheckCircle2 size={14} /> : <Copy size={14} />}{copyLabel('recipient', method.name === 'Binance TRC' ? t('copyAddress') : t('copyNumber'))}</button></div>}
-            </div>
-            <div className="admin-payment-instructions"><h3>{method.name}</h3><dl>
-              {method.recipient && <div><dt>{method.name === 'Binance TRC' ? t('walletAddress') : t('paymentRecipient')}</dt><dd className="payment-recipient">{method.recipient}</dd></div>}
-              {method.accountName && <div><dt>{t('recipientName')}</dt><dd>{method.accountName}</dd></div>}
-              {method.asset && <div><dt>{t('assetLabel')}</dt><dd>{method.asset}</dd></div>}{method.network && <div><dt>{t('networkLabel')}</dt><dd>{method.network}</dd></div>}
-            </dl><p>{method.instructions}</p><small>{t('instructionsVersion')} {instructions.version}</small></div>
-          </> : <div className="payment-unconfigured"><LockKeyhole size={24} /><h3>{t('notPublishedTitle')}</h3><p>{t('notPublishedBody')}</p>{isDemo && <Link className="text-link" to="/admin/payments" onClick={close}>{t('openAdminWorkspace')}</Link>}</div>}
-        </section>
-        {ready && <form className="proof-form" onSubmit={submit}>
-          <section className="payment-form-section"><h3><span>2</span> {t('submitPaymentProof')}</h3><div className="proof-contact-fields">
-            <label>{t('fullNames')}<input name="fullName" value={fullName} onChange={event => setFullName(event.target.value)} minLength={2} maxLength={120} autoComplete="name" disabled={busy} required /></label>
-            <label>{t('phoneNumber')}<input name="phone" aria-label="Phone number" aria-describedby={phoneHelp} value={phone} onChange={event => setPhone(event.target.value)} type="tel" placeholder="+25779000000" pattern="[+][1-9][0-9]{6,14}" autoComplete="tel" disabled={busy} required /><small id={phoneHelp}>{t('includeCountryCode')}</small></label>
+        <div className="payment-methods">{instructions.methods.map(item => <button type="button" className={methodId === item.id ? 'selected' : ''} aria-pressed={methodId === item.id} disabled={!item.enabled || !instructions.intakeEnabled || busy} key={item.id} onClick={() => setMethodId(item.id)}><ClipboardList size={15} /><span>{item.name}<small>{item.enabled && instructions.intakeEnabled ? t('viewAdminInstructions') : t('notConfigured')}</small></span></button>)}</div>
+        {ready && method ? <form className="proof-form" onSubmit={submit}>
+          <div className="admin-payment-instructions"><dl>
+            {method.recipient && <div><dt>{method.name === 'Binance TRC' ? t('walletAddress') : t('paymentRecipient')}</dt><dd className="payment-recipient">{method.recipient}</dd><button type="button" className="quick-copy" aria-label={copyLabel('recipient', method.name === 'Binance TRC' ? t('copyAddress') : t('copyNumber'))} title={copyLabel('recipient', method.name === 'Binance TRC' ? t('copyAddress') : t('copyNumber'))} onClick={() => void copy('recipient', method.recipient)}>{copied === 'recipient' ? <CheckCircle2 size={14} /> : <Copy size={14} />}</button></div>}
+            {method.accountName && <div><dt>{t('recipientName')}</dt><dd>{method.accountName}</dd></div>}
+            {method.asset && <div><dt>{t('assetLabel')}</dt><dd>{method.asset}</dd></div>}{method.network && <div><dt>{t('networkLabel')}</dt><dd>{method.network}</dd></div>}
+          </dl>{method.instructions && <p>{method.instructions}</p>}<small>{t('instructionsVersion')} {instructions.version}</small></div>
+          <label className="proof-upload compact-upload"><ImagePlus size={18} /><span>{files.length ? `${files.length} ${t('screenshotsLabel')}` : t('uploadYourScreenshot')}</span><small>{t('screenshotsHelp')}</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void selectFiles(Array.from(event.target.files || []))} /></label>
+          {files.length > 0 && <div className="proof-thumbnails">{files.map((file, i) => <div key={`${file.name}-${i}`}><img src={urls[i]} alt={`${t('selectedScreenshot')} ${i + 1}`} /><span>{file.name}</span><button type="button" className="icon-button" disabled={busy} aria-label={`${t('removeScreenshot')} ${i + 1}`} onClick={() => setFiles(previous => previous.filter((_, index) => index !== i))}><X size={15} /></button></div>)}</div>}
+          <div className="proof-contact-fields">
+            <input name="fullName" aria-label={t('fullNames')} placeholder={t('fullNames')} value={fullName} onChange={event => setFullName(event.target.value)} minLength={2} maxLength={120} autoComplete="name" disabled={busy} required />
+            <input name="phone" aria-label="Phone number" placeholder={`+257 79 000 0000 · ${t('includeCountryCode')}`} value={phone} onChange={event => setPhone(event.target.value)} type="tel" pattern="[+][1-9][0-9]{6,14}" autoComplete="tel" disabled={busy} required />
           </div>
-          <label className="proof-upload"><ImagePlus size={22} /><span>{t('paymentScreenshots')}</span><small>{t('screenshotsHelp')}</small><input type="file" accept="image/png,image/jpeg" multiple disabled={busy} onChange={event => void selectFiles(Array.from(event.target.files || []))} /></label>
-          <div className="proof-thumbnails">{files.map((file, i) => <div key={`${file.name}-${i}`}><img src={urls[i]} alt={`${t('selectedScreenshot')} ${i + 1}`} /><span>{file.name}</span><button type="button" className="icon-button" disabled={busy} aria-label={`${t('removeScreenshot')} ${i + 1}`} onClick={() => setFiles(previous => previous.filter((_, index) => index !== i))}><X size={15} /></button></div>)}</div>
-          </section>
           <label className="check-label"><input type="checkbox" disabled={busy} required /><span>{t('confirmDetails')}</span></label>
           <button className="button primary payment-wide" disabled={busy || !files.length}>{busy ? t('submitting') : t('submitPaymentProof')}</button>
-        </form>}
+        </form> : <div className="payment-unconfigured"><LockKeyhole size={24} /><h3>{t('notPublishedTitle')}</h3><p>{t('notPublishedBody')}</p>{isDemo && <Link className="text-link" to="/admin/payments" onClick={close}>{t('openAdminWorkspace')}</Link>}</div>}
       </>}
     </>}
   </div></Modal>
