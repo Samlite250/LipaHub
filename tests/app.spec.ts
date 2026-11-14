@@ -42,6 +42,43 @@ test('unconfigured authentication never pretends to log in or send email', async
   await page.getByRole('button', { name: 'Send reset link' }).click()
   await expect(page.getByRole('alert')).toContainText('Account sign-in is temporarily unavailable')
 })
+test('login and registration match the split desktop and compact mobile auth layouts', async ({ page }) => {
+  const width = page.viewportSize()?.width ?? 0
+  await page.goto('/login')
+  await expect(page.locator('.login .auth-promo')).toBeVisible()
+  await expect(page.locator('.login .auth-card h1')).toBeVisible()
+  await expect(page.locator('.login .language-buttons')).toHaveCount(0)
+  await expect(page.getByRole('checkbox', { name: 'Remember me' })).toBeVisible()
+  const loginPromo = await page.locator('.login .auth-promo').boundingBox()
+  const loginCard = await page.locator('.login .auth-card').boundingBox()
+  expect(loginPromo).not.toBeNull()
+  expect(loginCard).not.toBeNull()
+  if (width > 700) {
+    expect(loginPromo!.x).toBeLessThan(20)
+    expect(loginPromo!.width).toBeGreaterThan(450)
+    expect(loginCard!.x).toBeGreaterThan(loginPromo!.x + loginPromo!.width)
+  } else {
+    expect(loginCard!.y).toBeLessThan(loginPromo!.y + loginPromo!.height)
+    expect(loginCard!.width).toBeGreaterThanOrEqual(width - 40)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+  }
+
+  await page.goto('/register')
+  await expect(page.locator('.registration .auth-promo')).toBeVisible()
+  await expect(page.locator('.registration .auth-language-buttons button')).toHaveText(['Kinyarwanda', 'English'])
+  const registrationPromo = await page.locator('.registration .auth-promo').boundingBox()
+  const registrationCard = await page.locator('.registration .auth-card').boundingBox()
+  expect(registrationPromo).not.toBeNull()
+  expect(registrationCard).not.toBeNull()
+  if (width > 700) {
+    expect(registrationPromo!.width).toBeGreaterThan(450)
+    expect(registrationCard!.x).toBeGreaterThan(registrationPromo!.x + registrationPromo!.width)
+    expect(registrationCard!.width).toBeLessThanOrEqual(340)
+  } else {
+    expect(registrationCard!.y).toBeLessThan(registrationPromo!.y + registrationPromo!.height)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
+  }
+})
 test('registration validates matching passwords and switches language', async ({ page }) => {
   await page.goto('/register')
   await page.getByLabel('Username', { exact: false }).fill('Sample Member')

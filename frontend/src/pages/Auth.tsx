@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Eye, EyeOff, Gamepad2, ShieldCheck, Users } from 'lucide-react'
 import { Languages, Logo } from '../components'
 import { useApp } from '../state'
 import { supabase } from '../lib/supabase'
@@ -16,7 +16,7 @@ import { clearInvitation } from '../lib/invitations'
 
 type Mode = 'login' | 'register' | 'forgot'
 export function AuthPage({ mode }: { mode: Mode }) {
-  const { t, startDemo, language, session } = useApp()
+  const { t, startDemo, language, setLanguage, session } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
   const [visible, setVisible] = useState(false)
@@ -73,12 +73,25 @@ export function AuthPage({ mode }: { mode: Mode }) {
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to connect. Please try again.') }
     finally { setBusy(false) }
   }
-  return <main className={`auth-page ${isRegister ? 'registration' : ''}`} key={mode}>
+  return <main className={`auth-page ${isRegister ? 'registration' : mode === 'login' ? 'login' : ''}`} key={mode}>
     <Link className="back-home" to="/"><ArrowLeft size={15} /> LipaHub home</Link>
     <div className="auth-wrap">
-      {isRegister ? <section className="registration-promo"><Logo /><h2>Learn, connect and discover something new.</h2><p>Learning and community, in one place.</p></section> : <Logo />}
+      {isRegister || mode === 'login' ? <section className="auth-promo">
+        <Logo />
+        <h2>Learn, connect and discover something new.</h2>
+        <strong>Build digital skills and explore at your own pace.</strong>
+        <p>Explore learning resources, games, community and practical online-work guidance from anywhere.</p>
+        <ul aria-label="Explore LipaHub">
+          <li><BookOpen size={16} /> Learning resources and digital skills</li>
+          <li><Gamepad2 size={16} /> Games and interactive activities</li>
+          <li><Users size={16} /> A global learning community</li>
+        </ul>
+      </section> : <Logo />}
       <section className="auth-card">
-        {isRegister && <Languages />}
+        {isRegister && <div className="auth-language-buttons" role="group" aria-label="Language">
+          <button type="button" aria-pressed={language === 'rw'} onClick={() => setLanguage('rw')}>Kinyarwanda</button>
+          <button type="button" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>English</button>
+        </div>}
         <h1>{isRegister ? t('create') : isForgot ? t('reset') : t('signin')}</h1>
         <p className="auth-subtitle">{isRegister ? t('createSub') : isForgot ? t('resetSub') : t('welcome')}</p>
         {isRegister && <InvitationBanner invitation={invitation} />}
@@ -98,6 +111,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
               <span className="password-field"><input aria-label={t('password')} name="password" type={visible ? 'text' : 'password'} placeholder={t('password')} minLength={isRegister ? 8 : undefined} autoComplete={isRegister ? 'new-password' : 'current-password'} required /><button type="button" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={15} /> : <Eye size={15} />}</button></span>
             </label>
             {isRegister && <label>{t('confirm')} <em>*</em><input name="confirm" type={visible ? 'text' : 'password'} placeholder={t('confirm')} minLength={8} autoComplete="new-password" required /></label>}
+            {mode === 'login' && <label className="check-label"><input type="checkbox" name="remember" /><span>{t('remember')}</span></label>}
           </>}
           {isRegister && <>
             <CountrySelect label={t('country')} value={country} onChange={setCountry} required />
@@ -111,7 +125,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         <p className="auth-bottom">{isForgot ? <Link to="/login">{t('back')}</Link> : <>{isRegister ? t('hasAccount') : t('noAccount')} <Link to={isRegister ? '/login' : '/register'}>{isRegister ? t('signin') : t('signup')}</Link></>}</p>
       </section>
       {demoEnabled && <button className="demo-link" onClick={() => { startDemo(isRegister ? country : undefined); navigate(destination) }}>{t('demoEnter')} <ArrowRight size={14} /></button>}
-      {!isRegister && <Languages />}
+      {isForgot && <Languages />}
       <p className="auth-footnote"><ShieldCheck size={13} /> {demoEnabled ? 'Practice workspace · Local practice data' : 'Private accounts · Secure sign-in'}</p>
     </div>
   </main>
