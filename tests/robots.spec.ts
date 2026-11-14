@@ -35,7 +35,7 @@ test('all non-Rwandan selections show 33 plans and Rwanda keeps its standard das
     }
     await expect(page.locator('.robot-region')).toHaveText(country)
     const expected: Record<string, [string, string]> = {
-      Burundi: ['60,000 Fbu', '+261,000 Fbu'], Uganda: ['81,522 UGX', '+354,621 UGX'],
+      Burundi: ['60,000 Fbu', '+261,000 Fbu'], Uganda: ['70,000 UGX', '+261,000 UGX'],
       Kenya: ['2,590.92 KES', '+11,270.50 KES'], 'South Africa': ['328.57 ZAR', '+1,429.29 ZAR'],
       International: ['19.96 USD', '+86.84 USD'],
     }
@@ -50,8 +50,8 @@ test('all 33 Burundi plan values retain the supplied endpoints and generated mid
   await enterCountryDemo(page, 'Burundi')
   await expect(page.getByTestId('robot-01').locator('.robot-price dd')).toHaveText('60,000 Fbu')
   await expect(page.getByTestId('robot-01').locator('.robot-bonus-box dd')).toHaveText('+261,000 Fbu')
-  await expect(page.getByTestId('robot-17').locator('.robot-price dd')).toHaveText('530,000 Fbu')
-  await expect(page.getByTestId('robot-33').locator('.robot-bonus-box dd')).toHaveText('+8,000,000 Fbu')
+  await expect(page.getByTestId('robot-17').locator('.robot-price dd')).toHaveText('540,000 Fbu')
+  await expect(page.getByTestId('robot-33').locator('.robot-bonus-box dd')).toHaveText('+8,600,000 Fbu')
   const values = (await page.locator('.robot-price dd').allTextContents()).map(value => Number(value.replace(/[^0-9]/g, '')))
   expect(values.every((value, index) => index === 0 || value > values[index - 1])).toBeTruthy()
 })

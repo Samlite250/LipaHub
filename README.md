@@ -57,7 +57,7 @@ The dashboard's header settings icon opens an account dropdown with **Profile**,
 
 Select Burundi, Uganda, Kenya, South Africa or International in Registration before **Explore the demo**, or change the demo's country in Profile. Everyone outside Rwanda sees **33 robotic plans** on the dashboard and at `/dashboard/robots`. Rwanda keeps its original dashboard.
 
-Burundi plans span **60,000–1,000,000 Fbu**, with one-time demo bonuses spanning **261,000–8,000,000 Fbu**. All 33 tiers interpolate between the owner-supplied endpoints. Uganda uses UGX, Kenya KES, South Africa ZAR and International USD, converted using the checked-in reference rates dated 9 November 2026. See [all plan values and conversion rules](docs/ROBOT_PLANS.md).
+Uganda and Burundi each have **33 explicit plan tiers**: Uganda spans **70,000–1,000,000 UGX** and Burundi **60,000–1,000,000 Fbu**, with one-time demo bonuses spanning **261,000–8,600,000** in each local currency. The two countries are independent. Kenya KES, South Africa ZAR and International USD still interpolate the checked-in BIF endpoints, converted using the reference rates dated 9 November 2026. See [all plan values and conversion rules](docs/ROBOT_PLANS.md).
 
 Demo activation deducts virtual funding and records the bonus once in a separate demo ledger. It survives reloads, rejects repeated activation and keeps each country's wallet separate. Search, available/active filters and demo reset are included. No funds, real trades or withdrawable rewards are created; live activation and the listed one-time bonus require an audited administrator approval of a submitted payment proof.
 

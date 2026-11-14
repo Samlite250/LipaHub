@@ -1,6 +1,6 @@
 # Robotic plans and country rules
 
-The owner requested 33 plans for everyone outside Rwanda, with Burundi values from 60,000 Fbu to 1,000,000 Fbu and instant activation bonuses from 261,000 Fbu to 8,000,000 Fbu. The owner authorized filling the range and converting the resulting amounts into local currencies. These figures are product inputs, not verified financial returns.
+The owner supplied 33 explicit plans each for Uganda and Burundi. Uganda runs from 70,000 UGX to 1,000,000 UGX and Burundi from 60,000 Fbu to 1,000,000 Fbu, both with instant activation bonuses from 261,000 to 8,600,000 in their local currency. The other markets still interpolate the BIF endpoints and convert the result into local currencies. These figures are product inputs, not verified financial returns.
 
 ## Country display
 
@@ -18,43 +18,43 @@ Registration and Profile offer Burundi, Uganda, Kenya, Rwanda, South Africa and 
 
 ## Plan generation
 
-Plan i uses fraction `(i - 1) / 32`. Robot value and bonus each interpolate linearly between their supplied endpoints. Base Burundi amounts round to whole francs. The two endpoints remain exact; intermediate plans are generated rather than represented as individually supplied by the owner.
+Uganda and Burundi each use the explicit owner-supplied tables stored in [robot-catalog.json](../shared/robot-catalog.json). The two countries are independent: Uganda starts at 70,000 UGX, Burundi at 60,000 Fbu. For all other markets, plan i uses fraction `(i - 1) / 32` and interpolates linearly between the BIF endpoints (60,000 to 1,000,000 value, 261,000 to 8,000,000 bonus) before converting once to the local currency.
 
-| Plan | Robot value (Fbu) | Instant bonus (Fbu, demo) |
-| --- | ---: | ---: |
-| Robot 01 | 60,000 | 261,000 |
-| Robot 02 | 89,375 | 502,844 |
-| Robot 03 | 118,750 | 744,688 |
-| Robot 04 | 148,125 | 986,531 |
-| Robot 05 | 177,500 | 1,228,375 |
-| Robot 06 | 206,875 | 1,470,219 |
-| Robot 07 | 236,250 | 1,712,063 |
-| Robot 08 | 265,625 | 1,953,906 |
-| Robot 09 | 295,000 | 2,195,750 |
-| Robot 10 | 324,375 | 2,437,594 |
-| Robot 11 | 353,750 | 2,679,438 |
-| Robot 12 | 383,125 | 2,921,281 |
-| Robot 13 | 412,500 | 3,163,125 |
-| Robot 14 | 441,875 | 3,404,969 |
-| Robot 15 | 471,250 | 3,646,813 |
-| Robot 16 | 500,625 | 3,888,656 |
-| Robot 17 | 530,000 | 4,130,500 |
-| Robot 18 | 559,375 | 4,372,344 |
-| Robot 19 | 588,750 | 4,614,188 |
-| Robot 20 | 618,125 | 4,856,031 |
-| Robot 21 | 647,500 | 5,097,875 |
-| Robot 22 | 676,875 | 5,339,719 |
-| Robot 23 | 706,250 | 5,581,563 |
-| Robot 24 | 735,625 | 5,823,406 |
-| Robot 25 | 765,000 | 6,065,250 |
-| Robot 26 | 794,375 | 6,307,094 |
-| Robot 27 | 823,750 | 6,548,938 |
-| Robot 28 | 853,125 | 6,790,781 |
-| Robot 29 | 882,500 | 7,032,625 |
-| Robot 30 | 911,875 | 7,274,469 |
-| Robot 31 | 941,250 | 7,516,313 |
-| Robot 32 | 970,625 | 7,758,156 |
-| Robot 33 | 1,000,000 | 8,000,000 |
+| Plan | Uganda value (UGX) | Burundi value (Fbu) | Instant bonus (Uganda UGX / Burundi Fbu) |
+| --- | ---: | ---: | ---: |
+| Robot 01 | 70,000 | 60,000 | 261,000 |
+| Robot 02 | 90,000 | 90,000 | 478,000 |
+| Robot 03 | 120,000 | 120,000 | 520,000 |
+| Robot 04 | 150,000 | 150,000 | 640,000 |
+| Robot 05 | 180,000 | 180,000 | 700,000 |
+| Robot 06 | 210,000 | 210,000 | 820,000 |
+| Robot 07 | 240,000 | 240,000 | 960,000 |
+| Robot 08 | 270,000 | 270,000 | 1,160,000 |
+| Robot 09 | 300,000 | 300,000 | 1,380,000 |
+| Robot 10 | 330,000 | 330,000 | 1,490,000 |
+| Robot 11 | 360,000 | 360,000 | 1,620,000 |
+| Robot 12 | 390,000 | 390,000 | 1,840,000 |
+| Robot 13 | 420,000 | 420,000 | 2,260,000 |
+| Robot 14 | 450,000 | 450,000 | 2,660,000 |
+| Robot 15 | 480,000 | 480,000 | 3,060,000 |
+| Robot 16 | 510,000 | 510,000 | 3,160,000 |
+| Robot 17 | 540,000 | 540,000 | 3,360,000 |
+| Robot 18 | 570,000 | 570,000 | 3,660,000 |
+| Robot 19 | 600,000 | 600,000 | 4,000,000 |
+| Robot 20 | 630,000 | 630,000 | 4,360,000 |
+| Robot 21 | 660,000 | 660,000 | 4,660,000 |
+| Robot 22 | 690,000 | 690,000 | 4,960,000 |
+| Robot 23 | 710,000 | 710,000 | 5,360,000 |
+| Robot 24 | 740,000 | 740,000 | 5,680,000 |
+| Robot 25 | 770,000 | 770,000 | 6,060,000 |
+| Robot 26 | 800,000 | 800,000 | 6,480,000 |
+| Robot 27 | 830,000 | 830,000 | 6,900,000 |
+| Robot 28 | 860,000 | 860,000 | 7,020,000 |
+| Robot 29 | 890,000 | 890,000 | 7,390,000 |
+| Robot 30 | 910,000 | 910,000 | 7,740,000 |
+| Robot 31 | 940,000 | 940,000 | 8,060,000 |
+| Robot 32 | 970,000 | 970,000 | 8,200,000 |
+| Robot 33 | 1,000,000 | 1,000,000 | 8,600,000 |
 
 ## Currency conversion
 

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 
-type Catalog = { version: string; count: number; minimumValue: number; maximumValue: number; minimumBonus: number; maximumBonus: number; currencies: Record<string, string>; fx: { date: string; rates: Record<string, number> } }
+type Catalog = { version: string; count: number; minimumValue: number; maximumValue: number; minimumBonus: number; maximumBonus: number; plans?: Record<string, { value: number; bonus: number }[]>; currencies: Record<string, string>; fx: { date: string; rates: Record<string, number> } }
 const sourceCatalog = new URL('../../../shared/robot-catalog.json', import.meta.url)
 const catalog: Catalog = JSON.parse(readFileSync(existsSync(sourceCatalog) ? sourceCatalog : new URL('../config/robot-catalog.json', import.meta.url), 'utf8'))
 const sourceLimits = new URL('../../../shared/proof-limits.json', import.meta.url)
@@ -16,8 +16,15 @@ export function country(value: unknown): string { if (typeof value !== 'string' 
 export function quote(planId: unknown, region: string) {
   if (typeof planId !== 'string' || !/^robot-(0[1-9]|[12][0-9]|3[0-3])$/.test(planId) || !Object.hasOwn(catalog.currencies, region)) throw new InputError('Plan is unavailable for this country.')
   const currency = catalog.currencies[region]
-  const fraction = (Number(planId.slice(-2)) - 1) / (catalog.count - 1)
+  const number = Number(planId.slice(-2))
   const factor = ['BIF', 'UGX'].includes(currency) ? 1 : 100
+  const plan = catalog.plans?.[region]?.[number - 1]
+  if (plan) {
+    const valueMinor = Math.round(plan.value * factor)
+    const bonusMinor = Math.round(plan.bonus * factor)
+    return { value: valueMinor / factor, bonus: bonusMinor / factor, valueMinor, bonusMinor, currency, rateDate: catalog.fx.date, catalogVersion: catalog.version }
+  }
+  const fraction = (number - 1) / (catalog.count - 1)
   const valueMinor = Math.round(Math.round(catalog.minimumValue + fraction * (catalog.maximumValue - catalog.minimumValue)) * catalog.fx.rates[currency] * factor)
   const bonusMinor = Math.round(Math.round(catalog.minimumBonus + fraction * (catalog.maximumBonus - catalog.minimumBonus)) * catalog.fx.rates[currency] * factor)
   return { value: valueMinor / factor, bonus: bonusMinor / factor, valueMinor, bonusMinor, currency, rateDate: catalog.fx.date, catalogVersion: catalog.version }

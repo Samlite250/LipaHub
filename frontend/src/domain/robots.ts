@@ -21,18 +21,24 @@ const MARKET_CURRENCIES: Partial<Record<Country, Currency>> = {
 }
 export function currencyDigits(currency: Currency): number { return currency === 'BIF' || currency === 'UGX' ? 0 : 2 }
 
-// Owner authorized filling 33 plans across these Burundi endpoints.
-// Both value and bonus progress linearly; BIF amounts round to whole francs.
-// Foreign amounts convert from the BIF result, then round once to minor units.
+// Uganda and Burundi carry explicit owner-supplied plan tables. Other markets
+// interpolate the BIF endpoints and convert once to minor units.
+const COUNTRY_PLANS = catalog.plans as Partial<Record<Country, readonly { value: number; bonus: number }[]>>
 export function getRobotTerms(id: string, country: unknown): RobotTerms | null {
   const robot = ROBOT_CATALOG.find(robot => robot.id === id)
   const region = normalizeCountry(country)
   const currency = region && region !== 'Rwanda' ? MARKET_CURRENCIES[region] || 'USD' : null
   if (!robot || !currency) return null
+  const factor = 10 ** currencyDigits(currency)
+  const plan = region ? COUNTRY_PLANS[region]?.[robot.number - 1] : undefined
+  if (plan) {
+    const valueMinor = Math.round(plan.value * factor)
+    const bonusMinor = Math.round(plan.bonus * factor)
+    return { currency, valueMinor, bonusMinor, value: valueMinor / factor, bonus: bonusMinor / factor }
+  }
   const fraction = (robot.number - 1) / 32
   const baseValue = Math.round(catalog.minimumValue + fraction * (catalog.maximumValue - catalog.minimumValue))
   const baseBonus = Math.round(catalog.minimumBonus + fraction * (catalog.maximumBonus - catalog.minimumBonus))
-  const factor = 10 ** currencyDigits(currency)
   const valueMinor = Math.round(baseValue * fx.rates[currency] * factor)
   const bonusMinor = Math.round(baseBonus * fx.rates[currency] * factor)
   return { currency, valueMinor, bonusMinor, value: valueMinor / factor, bonus: bonusMinor / factor }
