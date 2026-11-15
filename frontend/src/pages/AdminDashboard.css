@@ -94,13 +94,13 @@
 .admin-shell .admin-proof-details{margin:14px 0;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
 .admin-shell .admin-proof-review{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
 .admin-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}
-.admin-metrics .admin-metric{position:relative;overflow:hidden;padding:18px 19px 16px;border:1px solid var(--line);border-radius:var(--admin-radius);background:var(--surface);transition:border-color .15s,transform .15s,box-shadow .15s}
-.admin-metrics .admin-metric::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--soft)}
-.admin-metrics .admin-metric:nth-child(1)::before{background:linear-gradient(#2dd4bf,#0d9488)}
-.admin-metrics .admin-metric:nth-child(2)::before{background:linear-gradient(#fbbf24,#ea580c)}
-.admin-metrics .admin-metric:nth-child(3)::before{background:linear-gradient(#818cf8,#4f46e5)}
-.admin-metrics .admin-metric:nth-child(4)::before{background:linear-gradient(#60a5fa,#2563eb)}
-.admin-metrics .admin-metric:hover{border-color:#0d94883d;transform:translateY(-2px);box-shadow:0 18px 30px -26px #10443f66}
+.admin-metrics .admin-metric{--metric-tone:13 148 136;position:relative;overflow:hidden;padding:18px 19px 16px;border:1px solid color-mix(in srgb,rgb(var(--metric-tone)) 20%,var(--line));border-radius:var(--admin-radius);background:radial-gradient(180px 110px at 100% 0%,rgb(var(--metric-tone) / 11%),transparent 75%),linear-gradient(145deg,color-mix(in srgb,rgb(var(--metric-tone)) 7%,var(--surface)),var(--surface) 78%);transition:border-color .15s,transform .15s,box-shadow .15s}
+.admin-metrics .admin-metric::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(rgb(var(--metric-tone) / 55%),rgb(var(--metric-tone)))}
+.admin-metrics .admin-metric.tone-teal{--metric-tone:13 148 136}
+.admin-metrics .admin-metric.tone-amber{--metric-tone:234 88 12}
+.admin-metrics .admin-metric.tone-indigo{--metric-tone:79 70 229}
+.admin-metrics .admin-metric.tone-blue{--metric-tone:37 99 235}
+.admin-metrics .admin-metric:hover{border-color:color-mix(in srgb,rgb(var(--metric-tone)) 42%,var(--line));transform:translateY(-2px);box-shadow:0 18px 30px -26px #10443f66}
 .admin-metric>div{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .admin-metric>div>span:first-child{font-size:10.5px;color:var(--muted);font-weight:650;line-height:1.45}
 .admin-metric-icon{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;border-radius:10px;background:color-mix(in srgb,var(--teal) 12%,var(--surface));color:var(--teal);box-shadow:none}
@@ -109,6 +109,7 @@
 .admin-metric-icon.blue{background:color-mix(in srgb,var(--admin-tone-blue) 12%,var(--surface));color:var(--admin-tone-blue)}
 .admin-metric>strong{display:block;font-size:33px;font-weight:750;letter-spacing:-1.3px;margin:12px 0 4px;line-height:1}
 .admin-metric>small{font-size:10px;color:var(--muted);line-height:1.5}
+[data-theme=dark] .admin-metrics .admin-metric{border-color:color-mix(in srgb,rgb(var(--metric-tone)) 32%,var(--line));background:radial-gradient(180px 110px at 100% 0%,rgb(var(--metric-tone) / 16%),transparent 75%),linear-gradient(145deg,color-mix(in srgb,rgb(var(--metric-tone)) 12%,var(--surface)),var(--surface) 82%)}
 
 .admin-overview-grid,.admin-secondary-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:18px;margin-bottom:18px}
 .admin-secondary-grid{margin-bottom:22px}
