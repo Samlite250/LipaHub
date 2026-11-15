@@ -9,7 +9,7 @@
   --admin-tone-amber:#d97706;
   --admin-tone-indigo:#6366f1;
   --admin-tone-blue:#2563eb;
-  --admin-hero:linear-gradient(120deg,var(--surface),var(--soft));
+  --admin-hero:radial-gradient(520px 260px at 96% -20%,#fde0474c,transparent 55%),radial-gradient(440px 250px at -6% 115%,#45efe061,transparent 60%),linear-gradient(115deg,#2563eb,#7c3aed 52%,#ec4899);
   min-height:100svh;
   background:var(--bg);
 }
@@ -72,14 +72,14 @@
 .admin-page-title h1{font-size:28px;font-weight:700;letter-spacing:-.9px;margin:8px 0 6px;line-height:1.18}
 .admin-page-title p{font-size:12px;color:var(--muted);line-height:1.7;max-width:640px}
 .admin-page-title>.button{font-size:11px;flex-shrink:0;background:var(--surface);border-radius:9px;font-weight:650;margin-bottom:2px;box-shadow:var(--shadow)}
-.admin-page-hero{position:relative;overflow:hidden;align-items:center;padding:28px 30px;border:1px solid var(--line);border-radius:18px;background:var(--admin-hero);color:var(--text);box-shadow:inset 4px 0 var(--teal),var(--shadow)}
-.admin-page-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(420px 180px at 100% -30%,color-mix(in srgb,var(--teal) 12%,transparent),transparent 70%);pointer-events:none}
+.admin-page-hero{position:relative;overflow:hidden;align-items:center;padding:28px 30px;border:1px solid #ffffff36;border-radius:18px;background:var(--admin-hero);color:#fff;box-shadow:0 12px 30px -20px #2563eb80}
+.admin-page-hero::after{content:'';position:absolute;right:-55px;top:-55px;width:190px;height:190px;border:26px solid #ffffff1a;border-radius:50%;pointer-events:none}
 .admin-page-hero>div{position:relative;z-index:1}
-.admin-page-hero .admin-eyebrow{color:var(--teal)}
-.admin-page-hero h1{color:var(--text);text-shadow:none}
-.admin-page-hero p{color:var(--muted)}
-.admin-page-hero>.button{position:relative;z-index:1;color:var(--text);border-color:var(--line);background:var(--surface)}
-.admin-page-hero>.button:hover{background:var(--soft)}
+.admin-page-hero .admin-eyebrow{color:#ffffffdf}
+.admin-page-hero h1{color:#fff;text-shadow:none}
+.admin-page-hero p{color:#ffffffe0}
+.admin-page-hero>.button{position:relative;z-index:1;color:#24313a;border-color:#ffffff80;background:#fff;box-shadow:0 8px 20px -14px #162c5166}
+.admin-page-hero>.button:hover{background:#f1f5ff}
 .admin-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:30px;padding:20px 0 26px;font-size:10px;color:var(--muted)}
 
 .admin-environment{display:flex;align-items:center;gap:10px;border:1px solid #f59e0b2e;background:#f59e0b0d;padding:10px 14px;border-radius:10px;color:#9a6a12;margin-bottom:18px}
