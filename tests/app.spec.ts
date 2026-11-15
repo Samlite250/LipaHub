@@ -145,11 +145,28 @@ test('dashboard demo, hidden balances, theme, profile and sign out', async ({ pa
   await page.goto('/dashboard')
   await expect(page).toHaveURL('/login')
 })
-test('invite link copies and offers a manual fallback', async ({ page }) => {
+test('invite link copies and offers a manual fallback', async ({ page }, info) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (value: string) => { localStorage.setItem('lipahub-test-clipboard', value) } } }))
   await demo(page)
   await expect(page.locator('.dashboard-service-invite-grid .invite-link-card')).toBeVisible()
   await expect(page.locator('.wallet-hero .invite-link-card')).toHaveCount(0)
+  const serviceCard = page.locator('.dashboard-service-invite-grid .service-balance-card')
+  const inviteCardOnHome = page.locator('.dashboard-service-invite-grid .invite-link-card')
+  const serviceBox = await serviceCard.boundingBox()
+  const inviteBox = await inviteCardOnHome.boundingBox()
+  const timetableBox = await page.locator('.dashboard-timetable-panel').boundingBox()
+  expect(serviceBox).not.toBeNull()
+  expect(inviteBox).not.toBeNull()
+  expect(timetableBox).not.toBeNull()
+  expect(timetableBox!.y).toBeGreaterThan(Math.max(serviceBox!.y + serviceBox!.height, inviteBox!.y + inviteBox!.height))
+  if (info.project.name === 'desktop') {
+    expect(serviceBox!.x).toBeLessThan(inviteBox!.x)
+    expect(serviceBox!.width).toBeLessThan(inviteBox!.width)
+    expect(Math.abs(serviceBox!.y - inviteBox!.y)).toBeLessThan(2)
+  } else {
+    expect(Math.abs(serviceBox!.x - inviteBox!.x)).toBeLessThan(2)
+    expect(serviceBox!.y).toBeLessThan(inviteBox!.y)
+  }
   await page.goto('/dashboard/invite-earn')
   const card = page.locator('.invite-link-card')
   const primary = card.getByRole('textbox', { name: 'Invite link URL', exact: true })
