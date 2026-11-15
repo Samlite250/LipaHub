@@ -159,6 +159,13 @@ test('invite link copies and offers a manual fallback', async ({ page }, info) =
   expect(inviteBox).not.toBeNull()
   expect(timetableBox).not.toBeNull()
   expect(timetableBox!.y).toBeGreaterThan(Math.max(serviceBox!.y + serviceBox!.height, inviteBox!.y + inviteBox!.height))
+  const lightCardBackgrounds = await page.evaluate(() => ['.service-balance-card', '.invite-link-card'].map(selector => getComputedStyle(document.querySelector(selector)!).backgroundImage))
+  expect(lightCardBackgrounds.every(background => background.includes('linear-gradient'))).toBeTruthy()
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click()
+  const darkCardBackgrounds = await page.evaluate(() => ['.service-balance-card', '.invite-link-card'].map(selector => getComputedStyle(document.querySelector(selector)!).backgroundImage))
+  expect(darkCardBackgrounds.every(background => background.includes('linear-gradient'))).toBeTruthy()
+  expect(darkCardBackgrounds).not.toEqual(lightCardBackgrounds)
+  await page.getByRole('button', { name: 'Switch to light mode' }).click()
   if (info.project.name === 'desktop') {
     expect(serviceBox!.x).toBeLessThan(inviteBox!.x)
     expect(serviceBox!.width).toBeLessThan(inviteBox!.width)

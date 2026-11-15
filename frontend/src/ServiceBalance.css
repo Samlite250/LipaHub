@@ -1,12 +1,28 @@
+.service-balance-card.panel {
+  border-color: #cfece3;
+  background:
+    radial-gradient(ellipse at 2% 0%, rgb(20 184 166 / 12%), transparent 58%),
+    linear-gradient(145deg, #fff 0%, #f0faf6 100%);
+}
 .service-balance-card .panel-heading { min-height: 46px; padding: 12px 14px; }
 .service-balance-card .panel-heading h2 { font-size: 11px; text-transform: uppercase; }
 .service-balance-card .panel-heading h2:before { top: 0; height: 14px; }
 .service-balance-rows { margin: 0; padding: 2px 8px 8px; }
 .service-balance-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 45px; padding: 6px 8px; }
+.service-balance-row + .service-balance-row { border-top: 1px solid rgb(13 148 136 / 7%); }
+.service-balance-row:hover { background: rgb(20 184 166 / 5%); }
 .service-balance-row>dt { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 11px; font-weight: 500; line-height: 1.35; }
 .service-balance-icon { display: inline-flex; justify-content: center; align-items: center; width: 27px; height: 27px; border-radius: 4px; flex-shrink: 0; }
 .service-balance-icon>img { display: block; }
 .service-tile-green { background: #1bc59c; }.service-tile-teal { background: #14b8a6; }.service-tile-blue { background: #43b9f6; }.service-tile-yellow { background: #ffb739; }.service-tile-red { background: #f74c39; }.service-tile-pink { background: #e98bbb; }
 .service-balance-row>dd { margin: 0; text-align: right; white-space: nowrap; font-size: 11px; font-weight: 400; line-height: 1.4; flex-shrink: 0; }
 .service-balance-row>.service-amount-green { color: #0dcd94; }.service-balance-row>.service-amount-red { color: #ff473e; }
+:root[data-theme="dark"] .service-balance-card.panel {
+  border-color: #24665e;
+  background:
+    radial-gradient(ellipse at 2% 0%, rgb(20 184 166 / 16%), transparent 58%),
+    linear-gradient(145deg, #192e34 0%, #172b31 100%);
+}
+:root[data-theme="dark"] .service-balance-row + .service-balance-row { border-color: rgb(80 190 170 / 12%); }
+:root[data-theme="dark"] .service-balance-row:hover { background: rgb(20 184 166 / 9%); }
 @media(max-width:479px) { .service-balance-row { padding-left: 8px; padding-right: 8px; gap: 8px; }.service-balance-row>dt { font-size: 11px; gap: 8px; }.service-balance-row>dd { font-size: 10px; } }

@@ -1,18 +1,25 @@
-.invite-link-card { overflow: visible; }
+.invite-link-card.panel {
+  overflow: visible;
+  border-color: #d3e6f4;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(59 130 246 / 10%), transparent 54%),
+    linear-gradient(145deg, #fff 0%, #f0f7fc 100%);
+}
 .invite-link-card .panel-heading { min-height: 46px; padding: 12px 14px; }
 .invite-link-card .panel-heading h2 { font-size: 11px; text-transform: uppercase; }
 .invite-link-card .panel-heading h2:before { top: 0; height: 14px; }
 .invite-link-body { padding: 14px; }
-.invite-link-accordion { border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.invite-link-toggle { display: flex; width: 100%; min-height: 37px; padding: 0 12px; align-items: center; justify-content: space-between; border: 0; background: var(--surface); color: var(--text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+.invite-link-accordion { border: 1px solid #dce8ed; border-radius: 7px; overflow: hidden; background: rgb(255 255 255 / 76%); }
+.invite-link-toggle { display: flex; width: 100%; min-height: 37px; padding: 0 12px; align-items: center; justify-content: space-between; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
 .invite-link-toggle + .invite-link-toggle, .invite-link-content + .invite-link-toggle { border-top: 1px solid var(--line); }
-.invite-link-toggle[aria-expanded="true"] { background: #f3f5f6; color: var(--text); }
+.invite-link-toggle[aria-expanded="true"] { background: #eaf3f8; color: #244b60; }
 .invite-link-toggle svg { color: var(--muted); transition: transform .18s ease; }
 .invite-link-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
-.invite-link-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px; padding: 0 10px 8px; background: var(--surface); }
+.invite-link-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px; padding: 0 10px 8px; background: rgb(255 255 255 / 65%); }
 .invite-link-content > input { display: block; grid-column: 1 / -1; width: 100%; min-width: 0; border: 0; border-radius: 5px; padding: 7px 10px; background: #e4f6f4; color: var(--text); font: inherit; font-size: 10px; }
 .invite-link-content > input:focus { outline: 2px solid #14b8a6; outline-offset: -2px; }
 .invite-link-content > .button { grid-column: 1 / -1; justify-self: start; min-height: 30px; padding: 6px 11px; border-color: #14b8a6; border-radius: 5px; background: #14b8a6; font-size: 10px; font-weight: 700; }
+.invite-link-content > .button:hover { border-color: #0f9f92; background: #0f9f92; }
 .invite-link-content > .button:disabled { opacity: .55; cursor: not-allowed; }
 .invite-link-menu-wrap { position: relative; }
 .invite-link-menu-trigger { display: grid; width: 26px; height: 26px; place-items: center; border: 0; border-radius: 5px; background: var(--bg); color: var(--muted); cursor: pointer; }
@@ -32,6 +39,18 @@
 .invite-share-links a.twitter { color: #08a9e7; }
 .invite-share-links a.facebook { color: #3b5998; }
 .invite-share-links a:hover { opacity: .72; }
+:root[data-theme="dark"] .invite-link-card.panel {
+  border-color: #2b5366;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(59 130 246 / 14%), transparent 54%),
+    linear-gradient(145deg, #1a2e3b 0%, #192832 100%);
+}
+:root[data-theme="dark"] .invite-link-accordion { border-color: #355362; background: rgb(17 28 36 / 40%); }
+:root[data-theme="dark"] .invite-link-toggle[aria-expanded="true"] { background: #213c4b; color: #e6f0f2; }
+:root[data-theme="dark"] .invite-link-content { background: rgb(17 28 36 / 35%); }
+:root[data-theme="dark"] .invite-link-content > input { background: #203d44; color: var(--text); }
+.invite-link-card .invite-link-menu-trigger { background: rgb(59 130 246 / 9%); }
+.invite-link-card .invite-link-menu-trigger:hover { background: rgb(59 130 246 / 16%); }
 .invite-earn-page { max-width: 760px; }
 .invite-earn-page > .invite-link-card { margin: 0; }
 .dashboard-service-invite-grid { display: grid; grid-template-columns: minmax(220px, .95fr) minmax(0, 2fr); gap: 18px; align-items: start; margin-top: 24px; }
