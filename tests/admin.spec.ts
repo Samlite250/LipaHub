@@ -79,11 +79,16 @@ test('admin overview connects country settings, review filters and audit on desk
   await expect(metricCards).toHaveCount(4)
   const lightMetricBackgrounds = await metricCards.evaluateAll(cards => cards.map(card => getComputedStyle(card).backgroundImage))
   expect(lightMetricBackgrounds.every(background => background.includes('linear-gradient'))).toBeTruthy()
-  expect(new Set(lightMetricBackgrounds).size).toBe(4)
+  expect(lightMetricBackgrounds).toEqual([
+    'linear-gradient(135deg, rgb(74, 222, 128), rgb(21, 128, 61))',
+    'linear-gradient(135deg, rgb(248, 113, 113), rgb(185, 28, 28))',
+    'linear-gradient(135deg, rgb(96, 165, 250), rgb(29, 78, 216))',
+    'linear-gradient(135deg, rgb(253, 224, 71), rgb(217, 119, 6))',
+  ])
   await page.getByRole('button', { name: 'Switch to dark mode' }).click()
   const darkMetricBackgrounds = await metricCards.evaluateAll(cards => cards.map(card => getComputedStyle(card).backgroundImage))
   expect(darkMetricBackgrounds.every(background => background.includes('linear-gradient'))).toBeTruthy()
-  expect(darkMetricBackgrounds).not.toEqual(lightMetricBackgrounds)
+  expect(darkMetricBackgrounds).toEqual(lightMetricBackgrounds)
   await page.getByRole('button', { name: 'Switch to light mode' }).click()
   await adminLink(page, 'Payments')
   await page.getByLabel('Payment country').selectOption('Burundi')
